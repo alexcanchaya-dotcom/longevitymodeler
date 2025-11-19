@@ -6,89 +6,491 @@
     <title>Longevity Modeler - Calculate Your Lifespan</title>
     <meta name="description" content="Calculate your life expectancy and healthspan with our advanced longevity calculator. Get personalized insights based on lifestyle, genetics, and health factors.">
     <style>
+        :root {
+            --bg: #0e1116;
+            --card: #121722;
+            --muted: #9ba3b4;
+            --accent: #3ecf8e;
+            --border: #1d2433;
+            --heading: #e5e7eb;
+            --danger: #f87171;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #d1d5db;
+            background: var(--bg);
+            min-height: 100vh;
         }
+
+        a { color: var(--accent); text-decoration: none; }
+
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px;
         }
+
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 1rem;
+            padding: 40px 0 16px;
         }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(62, 207, 142, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-size: clamp(32px, 4vw, 42px);
+            color: var(--heading);
+            margin: 18px 0 10px;
         }
+
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 700px;
         }
+
         main {
-            padding: 2rem 0;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 20px;
+            margin-top: 28px;
         }
-        .info-section {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 2rem;
-            margin: 2rem 0;
+
+        .card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%), var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
         }
-        .info-section h2 {
-            color: #667eea;
-            margin-bottom: 1rem;
+
+        .card h2 {
+            color: var(--heading);
+            margin-bottom: 12px;
+            font-size: 1.35rem;
         }
+
+        form {
+            display: grid;
+            gap: 14px;
+        }
+
+        label {
+            display: block;
+            color: #cfd4de;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #0c1018;
+            color: #f3f4f6;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(62, 207, 142, 0.18);
+        }
+
+        .button {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: #0a0f17;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+        }
+
+        .button:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(16,185,129,0.35); }
+        .button:active { transform: translateY(0); }
+
+        .results {
+            display: none;
+            gap: 12px;
+        }
+
+        .result-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .metric {
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+        }
+
+        .metric h3 { color: var(--heading); margin-bottom: 6px; font-size: 1.05rem; }
+        .metric p { color: var(--muted); font-size: 0.95rem; }
+
+        ul { padding-left: 18px; color: var(--muted); }
+        li + li { margin-top: 6px; }
+
+        .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .pill { background: rgba(255,255,255,0.06); padding: 8px 10px; border-radius: 999px; color: #e5e7eb; border: 1px solid var(--border); font-size: 0.9rem; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: grid;
+            place-items: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 50;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            padding: 24px;
+            width: min(520px, 100%);
+            position: relative;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+        }
+
+        .modal h3 { color: var(--heading); font-size: 1.35rem; margin-bottom: 8px; }
+        .modal p { color: var(--muted); margin-bottom: 14px; }
+
+        .close-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            transition: color 0.2s ease;
+        }
+        .close-btn:hover { color: #fff; }
+
+        .checkbox-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .checkbox-row input { width: auto; margin-top: 4px; }
+        .privacy { color: var(--muted); font-size: 0.9rem; margin-top: 6px; }
+
+        .skip-link {
+            display: inline-block;
+            margin-top: 14px;
+            font-size: 0.95rem;
+            color: #9ca3af;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .error { color: var(--danger); font-size: 0.9rem; margin-top: 6px; min-height: 20px; }
+
         footer {
             text-align: center;
-            padding: 2rem;
-            background: #333;
-            color: white;
-            margin-top: 3rem;
+            padding: 20px;
+            margin: 32px 0 12px;
+            color: #6b7280;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            main { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Longevity Modeler</h1>
-        <p class="subtitle">Discover Your Life Expectancy & Healthspan</p>
-    </header>
-    
-    <main class="container">
-        <div class="info-section">
-            <h2>Welcome to Longevity Modeler</h2>
-            <p>This website is under development. Soon you'll be able to:</p>
-            <ul style="margin-left: 2rem; margin-top: 1rem;">
-                <li>Calculate your estimated lifespan based on scientific data</li>
-                <li>Assess your healthspan and quality of life years</li>
-                <li>Get personalized recommendations to improve longevity</li>
-                <li>Track health metrics and lifestyle factors</li>
-            </ul>
+    <div class="container">
+        <header>
+            <div class="badge">Precision Longevity Calculator</div>
+            <h1>Longevity Modeler</h1>
+            <p class="subtitle">Project your lifespan, healthspan, and actionable recommendations using lifestyle, recovery, and biomarker indicators.</p>
+        </header>
+
+        <main>
+            <section class="card" aria-labelledby="calculator-heading">
+                <h2 id="calculator-heading">Input your profile</h2>
+                <form id="calculator-form">
+                    <div>
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" placeholder="32" min="0" max="110" required>
+                    </div>
+                    <div>
+                        <label for="sex">Biological Sex</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select</option>
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                            <option value="non-binary">Non-binary / prefer not to say</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="exercise">Weekly exercise (hours)</label>
+                        <input type="number" id="exercise" name="exercise" placeholder="4" min="0" max="50" step="0.5" required>
+                    </div>
+                    <div>
+                        <label for="sleep">Average sleep (hours/night)</label>
+                        <input type="number" id="sleep" name="sleep" placeholder="7.5" min="0" max="14" step="0.1" required>
+                    </div>
+                    <div>
+                        <label for="stress">Stress level</label>
+                        <select id="stress" name="stress" required>
+                            <option value="">Select</option>
+                            <option value="low">Low</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="button">Calculate</button>
+                </form>
+            </section>
+
+            <section class="card results" id="results" aria-live="polite">
+                <h2>Your longevity insights</h2>
+                <div class="result-grid">
+                    <div class="metric">
+                        <h3>Estimated lifespan</h3>
+                        <p id="lifespan">--</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Healthspan</h3>
+                        <p id="healthspan">--</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Vitality score</h3>
+                        <p id="vitality">--</p>
+                    </div>
+                </div>
+                <div style="margin-top: 14px;">
+                    <h3 style="color: var(--heading); margin-bottom: 6px;">Personalized recommendations</h3>
+                    <ul id="recommendations"></ul>
+                    <div class="pill-row" id="highlights"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="email-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal">
+            <button class="close-btn" id="close-modal" aria-label="Close">&times;</button>
+            <h3 id="modal-title">Get Your Complete Longevity Report</h3>
+            <p>Enter your email to see your detailed results, personalized recommendations, and downloadable PDF report</p>
+            <form id="email-capture-form">
+                <label for="email-input">Email address</label>
+                <input type="email" id="email-input" name="email" placeholder="you@example.com" required>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="tips-opt-in" name="tips" aria-label="Receive tips">
+                    <label for="tips-opt-in" style="margin: 0;">I agree to receive health and longevity tips (you can unsubscribe anytime)</label>
+                </div>
+                <p class="privacy">We respect your privacy. Your email will never be shared.</p>
+                <div class="error" id="email-error"></div>
+                <button type="submit" class="button" style="width: 100%;">Show My Results</button>
+                <a href="#" class="skip-link" id="skip-email">Continue without email</a>
+            </form>
         </div>
-        
-        <div class="info-section">
-            <h2>Coming Soon</h2>
-            <p>Our advanced calculator will consider factors including:</p>
-            <ul style="margin-left: 2rem; margin-top: 1rem;">
-                <li>Age, gender, and genetics</li>
-                <li>Lifestyle habits (exercise, diet, sleep)</li>
-                <li>Medical history and current health conditions</li>
-                <li>Environmental and socioeconomic factors</li>
-            </ul>
-        </div>
-    </main>
-    
+    </div>
+
     <footer>
         <p>&copy; 2025 LongevityModeler.com - All rights reserved</p>
     </footer>
+
+    <script>
+        const form = document.getElementById('calculator-form');
+        const results = document.getElementById('results');
+        const lifespanEl = document.getElementById('lifespan');
+        const healthspanEl = document.getElementById('healthspan');
+        const vitalityEl = document.getElementById('vitality');
+        const recommendationsEl = document.getElementById('recommendations');
+        const highlightsEl = document.getElementById('highlights');
+        const modal = document.getElementById('email-modal');
+        const emailForm = document.getElementById('email-capture-form');
+        const emailInput = document.getElementById('email-input');
+        const emailError = document.getElementById('email-error');
+        const skipLink = document.getElementById('skip-email');
+        const closeModalBtn = document.getElementById('close-modal');
+        const storageKey = 'longevityEmails';
+        let pendingResult = null;
+
+        function calculateInsights(data) {
+            const baseLife = 82;
+            const exerciseBoost = Math.min(data.exercise * 0.4, 6);
+            const sleepBoost = Math.max(0, Math.min((data.sleep - 7) * 1.5, 5));
+            const stressPenalty = data.stress === 'high' ? -6 : data.stress === 'moderate' ? -2.5 : 0;
+            const vitalityScore = Math.min(100, Math.max(45, 70 + exerciseBoost * 3 + sleepBoost * 2 + stressPenalty * 1.5));
+            const lifespan = Math.max(65, Math.min(105, baseLife + exerciseBoost + sleepBoost + stressPenalty - (data.age - 35) * 0.1));
+            const healthspan = Math.max(55, Math.min(lifespan - 8, lifespan * 0.82));
+
+            const recs = [
+                data.exercise < 3 ? 'Add two 30-minute strength sessions to lift vitality and bone density.' : 'Maintain 150+ minutes of weekly movement; prioritize progressive overload.',
+                data.sleep < 7 ? 'Tighten your sleep routine: consistent bedtimes, cool room, and morning light.' : 'Protect your 7-9 hours by setting digital sunsets and caffeine curfews.',
+                data.stress === 'high' ? 'Schedule daily decompression: breath work, walks, or a 10-minute meditation.' : 'Keep stress in the sweet spot with breaks, breathing, and micro-recoveries.'
+            ];
+
+            const highlights = [
+                `${lifespan.toFixed(1)} years projected lifespan`,
+                `${healthspan.toFixed(1)} healthy years`,
+                `${vitalityScore.toFixed(0)} vitality score`
+            ];
+
+            return { lifespan, healthspan, vitalityScore, recs, highlights };
+        }
+
+        function renderResults(data) {
+            lifespanEl.textContent = `${data.lifespan.toFixed(1)} years`;
+            healthspanEl.textContent = `${data.healthspan.toFixed(1)} years`; 
+            vitalityEl.textContent = `${data.vitalityScore.toFixed(0)}/100`;
+
+            recommendationsEl.innerHTML = '';
+            data.recs.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                recommendationsEl.appendChild(li);
+            });
+
+            highlightsEl.innerHTML = '';
+            data.highlights.forEach(highlight => {
+                const span = document.createElement('span');
+                span.className = 'pill';
+                span.textContent = highlight;
+                highlightsEl.appendChild(span);
+            });
+
+            results.style.display = 'block';
+            results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function getStoredEmails() {
+            const raw = localStorage.getItem(storageKey);
+            try {
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                console.warn('Unable to parse stored emails', e);
+                return [];
+            }
+        }
+
+        function hasSubmittedEmail() {
+            const emails = getStoredEmails();
+            return Array.isArray(emails) && emails.length > 0;
+        }
+
+        function storeEmail(email) {
+            const emails = getStoredEmails();
+            emails.push({ email, timestamp: new Date().toISOString() });
+            localStorage.setItem(storageKey, JSON.stringify(emails));
+        }
+
+        function openModal() {
+            modal.classList.add('active');
+            emailError.textContent = '';
+            setTimeout(() => emailInput.focus(), 120);
+        }
+
+        function closeModal(showResults = false) {
+            modal.classList.remove('active');
+            if (showResults && pendingResult) {
+                renderResults(pendingResult);
+                pendingResult = null;
+            }
+        }
+
+        function isValidEmail(email) {
+            const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            return pattern.test(email);
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = {
+                age: Number(form.age.value),
+                sex: form.sex.value,
+                exercise: Number(form.exercise.value),
+                sleep: Number(form.sleep.value),
+                stress: form.stress.value
+            };
+            pendingResult = calculateInsights(data);
+
+            if (hasSubmittedEmail()) {
+                renderResults(pendingResult);
+                pendingResult = null;
+            } else {
+                openModal();
+            }
+        });
+
+        emailForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            if (!isValidEmail(email)) {
+                emailError.textContent = 'Please enter a valid email address to unlock your results.';
+                return;
+            }
+            storeEmail(email.toLowerCase());
+            emailError.textContent = '';
+            closeModal(true);
+        });
+
+        skipLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(true);
+        });
+
+        closeModalBtn.addEventListener('click', () => closeModal(false));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal(false);
+            }
+        });
+
+        // If the user already shared an email previously, keep modal hidden
+        if (hasSubmittedEmail()) {
+            modal.style.display = 'none';
+        }
+    </script>
 </body>
 </html>
