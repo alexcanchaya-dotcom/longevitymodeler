@@ -6,89 +6,528 @@
     <title>Longevity Modeler - Calculate Your Lifespan</title>
     <meta name="description" content="Calculate your life expectancy and healthspan with our advanced longevity calculator. Get personalized insights based on lifestyle, genetics, and health factors.">
     <style>
+        :root {
+            --bg: #0e1116;
+            --card: #131821;
+            --muted: #9aa5b1;
+            --text: #e2e8f0;
+            --accent: #3ecf8e;
+            --accent-2: #22a06b;
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: var(--text);
+            background: radial-gradient(circle at 20% 20%, rgba(62,207,142,0.08), transparent 25%),
+                        radial-gradient(circle at 80% 10%, rgba(62,207,142,0.06), transparent 20%),
+                        var(--bg);
+            min-height: 100vh;
+        }
+        a { color: inherit; }
+        header {
+            background: linear-gradient(135deg, rgba(62,207,142,0.18) 0%, rgba(14,17,22,0.75) 60%);
+            padding: 48px 20px 36px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px 64px;
         }
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: 3rem 1rem;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+        .hero-title {
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            color: var(--muted);
+            max-width: 640px;
+            margin-top: 12px;
         }
-        main {
-            padding: 2rem 0;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
-        .info-section {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 2rem;
-            margin: 2rem 0;
+        .card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
         }
-        .info-section h2 {
-            color: #667eea;
-            margin-bottom: 1rem;
+        .card h2, .card h3 { margin-bottom: 10px; }
+        label { display: block; color: var(--muted); margin-bottom: 6px; font-size: 14px; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: #0b0f15;
+            color: var(--text);
+            margin-bottom: 14px;
         }
-        footer {
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            font-size: 15px;
+        }
+        .primary-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #0b0f15;
+            box-shadow: 0 12px 30px rgba(62,207,142,0.35);
+        }
+        .primary-btn:hover { transform: translateY(-1px); }
+        .secondary-btn {
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .stat {
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .stat-label { color: var(--muted); font-size: 13px; }
+        .stat-value { font-size: 26px; font-weight: 800; margin-top: 6px; }
+        .progress {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #a0f0c9);
+            width: 50%;
+        }
+        ul { margin-left: 16px; }
+        .stack { display: flex; flex-direction: column; gap: 10px; }
+        .muted { color: var(--muted); }
+        .tag {
+            display: inline-block;
+            padding: 6px 10px;
+            background: rgba(62,207,142,0.12);
+            color: var(--accent);
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .cta-card {
+            background: linear-gradient(135deg, rgba(62,207,142,0.16), rgba(62,207,142,0.08));
+            border: 1px solid rgba(62,207,142,0.45);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 40%, rgba(255,255,255,0.08), transparent 35%);
+            pointer-events: none;
+        }
+        .cta-card h3 { font-size: 20px; }
+        .footer {
             text-align: center;
-            padding: 2rem;
-            background: #333;
-            color: white;
-            margin-top: 3rem;
+            color: var(--muted);
+            padding: 32px 20px 48px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            margin-top: 40px;
+        }
+        .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 22px 0; }
+        .hidden { display: none; }
+        .inline-flex { display: inline-flex; align-items: center; gap: 8px; }
+        .small { font-size: 12px; }
+        @media (max-width: 640px) {
+            header { padding: 32px 16px; }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Longevity Modeler</h1>
-        <p class="subtitle">Discover Your Life Expectancy & Healthspan</p>
+        <div class="container">
+            <span class="tag">Longevity Intelligence</span>
+            <h1 class="hero-title">Longevity Modeler</h1>
+            <p class="subtitle">Calculate your estimated lifespan, healthspan, and the gap between them with science-backed recommendations to help you thrive longer.</p>
+        </div>
     </header>
-    
+
     <main class="container">
-        <div class="info-section">
-            <h2>Welcome to Longevity Modeler</h2>
-            <p>This website is under development. Soon you'll be able to:</p>
-            <ul style="margin-left: 2rem; margin-top: 1rem;">
-                <li>Calculate your estimated lifespan based on scientific data</li>
-                <li>Assess your healthspan and quality of life years</li>
-                <li>Get personalized recommendations to improve longevity</li>
-                <li>Track health metrics and lifestyle factors</li>
-            </ul>
-        </div>
-        
-        <div class="info-section">
-            <h2>Coming Soon</h2>
-            <p>Our advanced calculator will consider factors including:</p>
-            <ul style="margin-left: 2rem; margin-top: 1rem;">
-                <li>Age, gender, and genetics</li>
-                <li>Lifestyle habits (exercise, diet, sleep)</li>
-                <li>Medical history and current health conditions</li>
-                <li>Environmental and socioeconomic factors</li>
-            </ul>
-        </div>
+        <section class="grid">
+            <div class="card">
+                <h2>Longevity Calculator</h2>
+                <p class="muted" style="margin-bottom:12px;">Provide a few details to generate your personalized longevity snapshot.</p>
+                <form id="calculator-form">
+                    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+                        <div>
+                            <label for="age">Current age</label>
+                            <input type="number" id="age" name="age" min="18" max="100" value="35" required>
+                        </div>
+                        <div>
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender">
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="nonbinary">Non-binary</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="activity">Weekly exercise</label>
+                            <select id="activity" name="activity">
+                                <option value="low">Less than 2 hours</option>
+                                <option value="moderate" selected>2-5 hours</option>
+                                <option value="high">5+ hours</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="nutrition">Nutrition quality</label>
+                            <select id="nutrition" name="nutrition">
+                                <option value="basic">Needs improvement</option>
+                                <option value="balanced" selected>Balanced most days</option>
+                                <option value="optimal">High-quality whole foods</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="sleep">Average sleep</label>
+                            <select id="sleep" name="sleep">
+                                <option value="short">Under 6 hours</option>
+                                <option value="regular" selected>6-8 hours</option>
+                                <option value="optimal">8+ hours</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="stress">Stress level</label>
+                            <select id="stress" name="stress">
+                                <option value="high">High</option>
+                                <option value="moderate" selected>Moderate</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:8px;">
+                        <button type="submit" class="primary-btn">Calculate longevity</button>
+                        <button type="button" class="secondary-btn" id="reset-btn">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" id="results-card">
+                <div class="inline-flex" style="justify-content: space-between; width: 100%;">
+                    <h2>Your Personal Longevity Report</h2>
+                    <span class="small muted" id="generation-date"></span>
+                </div>
+                <div id="results-placeholder" class="muted">Run the calculator to unlock your results and PDF report.</div>
+                <div id="results" class="hidden">
+                    <div class="results-grid">
+                        <div class="stat">
+                            <div class="stat-label">Projected Lifespan</div>
+                            <div class="stat-value" id="lifespan-value">--</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Projected Healthspan</div>
+                            <div class="stat-value" id="healthspan-value">--</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Projection Gap</div>
+                            <div class="stat-value" id="gap-value">--</div>
+                        </div>
+                    </div>
+                    <div class="muted" style="margin-top:6px;">Healthspan vs. Lifespan</div>
+                    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+                    <div class="divider"></div>
+                    <h3>Top 5 recommendations</h3>
+                    <ul id="recommendations" class="stack"></ul>
+                    <div style="margin-top:16px; display:flex; gap:10px; align-items:center;">
+                        <button id="download-btn" class="primary-btn" type="button">Download PDF Report</button>
+                        <span class="muted small">Includes your personalized insights & InsideTracker offer</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid" style="margin-top:24px;">
+            <div class="card">
+                <h3>What affects your longevity</h3>
+                <p class="muted" style="margin-bottom:10px;">Small, consistent improvements across lifestyle domains compound to extend both years of life and years of vitality.</p>
+                <ul class="stack" style="margin-left:18px;">
+                    <li><strong>Movement consistency:</strong> Aerobic + strength training keeps metabolic and cognitive health resilient.</li>
+                    <li><strong>Nutrition quality:</strong> Whole foods, adequate protein, and micronutrient sufficiency reduce disease risk.</li>
+                    <li><strong>Sleep and recovery:</strong> Deep, regular sleep unlocks hormonal balance and cellular repair.</li>
+                    <li><strong>Stress load:</strong> Chronic stress accelerates aging; recovery practices slow it down.</li>
+                    <li><strong>Biomarker vigilance:</strong> Tracking bloodwork highlights silent risks before they become problems.</li>
+                </ul>
+            </div>
+            <div class="card cta-card">
+                <h3>Take Your Longevity Analysis Further</h3>
+                <p class="muted" style="margin:10px 0 12px;">Get a comprehensive blood biomarker analysis with InsideTracker to discover your true biological age and receive science-backed recommendations.</p>
+                <a id="insidetracker-link" href="#" class="primary-btn" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none;">Get 25% Off InsideTracker</a>
+                <p class="small muted" style="margin-top:10px;">Affiliate link placeholder – update with your tracking URL.</p>
+            </div>
+        </section>
     </main>
-    
-    <footer>
-        <p>&copy; 2025 LongevityModeler.com - All rights reserved</p>
-    </footer>
+
+    <div class="footer">
+        <div>LongevityModeler.com • Science-backed wellness intelligence</div>
+        <div class="small" style="margin-top:6px;">This experience provides educational insights and is not medical advice. Consult your clinician before making significant lifestyle changes.</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script>
+        const form = document.getElementById('calculator-form');
+        const resetBtn = document.getElementById('reset-btn');
+        const results = document.getElementById('results');
+        const resultsPlaceholder = document.getElementById('results-placeholder');
+        const lifespanValue = document.getElementById('lifespan-value');
+        const healthspanValue = document.getElementById('healthspan-value');
+        const gapValue = document.getElementById('gap-value');
+        const progressBar = document.getElementById('progress-bar');
+        const recommendationsEl = document.getElementById('recommendations');
+        const downloadBtn = document.getElementById('download-btn');
+        const generationDate = document.getElementById('generation-date');
+
+        function trackEvent(eventName, payload = {}) {
+            const eventData = { event: eventName, timestamp: new Date().toISOString(), ...payload };
+            if (window.dataLayer) {
+                window.dataLayer.push(eventData);
+            }
+            console.log('Analytics event:', eventData);
+        }
+
+        function formatYears(value) {
+            return `${value.toFixed(1)} years`;
+        }
+
+        function deriveRecommendations({ activity, nutrition, sleep, stress }) {
+            const recs = [];
+            if (activity === 'low') recs.push('Increase weekly movement to at least 150 minutes of moderate activity plus 2 strength sessions.');
+            if (activity === 'moderate') recs.push('Add one extra strength session and mobility work to stabilize joints and metabolic health.');
+            if (activity === 'high') recs.push('Maintain high activity while prioritizing recovery, hydration, and periodized training.');
+
+            if (nutrition === 'basic') recs.push('Upgrade nutrition with more whole foods, colorful plants, and 1.2-1.6g/kg protein.');
+            if (nutrition === 'balanced') recs.push('Dial in protein timing and fiber to keep glucose stable and support lean mass.');
+            if (nutrition === 'optimal') recs.push('Stay consistent with micronutrient-dense meals and periodic lab checks to confirm sufficiency.');
+
+            if (sleep === 'short') recs.push('Build a wind-down routine to secure 7-9 hours of sleep with consistent bed/wake times.');
+            if (sleep === 'regular') recs.push('Protect your 7-8 hour sleep window with light hygiene and stress management.');
+            if (sleep === 'optimal') recs.push('Maintain strong sleep hygiene and align timing with circadian rhythms for repair.');
+
+            if (stress === 'high') recs.push('Adopt daily stress-reduction rituals (breathwork, walking breaks, micro-recovery).');
+            if (stress === 'moderate') recs.push('Schedule decompression blocks and monitor workload to avoid creeping stress.');
+            if (stress === 'low') recs.push('Continue routines that keep stress low and add occasional HRV monitoring.');
+
+            return recs.slice(0, 5);
+        }
+
+        function calculateProjections(data) {
+            let lifespan = 82;
+            let healthspan = 70;
+
+            if (data.gender === 'female') lifespan += 2;
+            if (data.gender === 'nonbinary') lifespan += 0.5;
+
+            if (data.activity === 'high') { lifespan += 2; healthspan += 3; }
+            if (data.activity === 'moderate') { lifespan += 1; healthspan += 1.5; }
+            if (data.activity === 'low') { lifespan -= 1.5; healthspan -= 2; }
+
+            if (data.nutrition === 'optimal') { lifespan += 1.2; healthspan += 2.2; }
+            if (data.nutrition === 'balanced') { lifespan += 0.5; healthspan += 1.2; }
+            if (data.nutrition === 'basic') { lifespan -= 1; healthspan -= 1.8; }
+
+            if (data.sleep === 'optimal') { lifespan += 1; healthspan += 2; }
+            if (data.sleep === 'regular') { lifespan += 0.4; healthspan += 0.8; }
+            if (data.sleep === 'short') { lifespan -= 1.2; healthspan -= 2.4; }
+
+            if (data.stress === 'low') { lifespan += 0.8; healthspan += 1.6; }
+            if (data.stress === 'moderate') { lifespan += 0.2; healthspan += 0.5; }
+            if (data.stress === 'high') { lifespan -= 1; healthspan -= 1.6; }
+
+            const ageAdjustment = Math.max(0, (50 - data.age) * 0.05);
+            lifespan += ageAdjustment;
+            healthspan += ageAdjustment * 0.8;
+
+            const projectionGap = Math.max(0, lifespan - healthspan);
+            return {
+                lifespan: Math.max(data.age + 5, lifespan),
+                healthspan: Math.max(data.age + 3, healthspan),
+                gap: projectionGap,
+            };
+        }
+
+        function updateUI(resultsData, recs) {
+            lifespanValue.textContent = formatYears(resultsData.lifespan);
+            healthspanValue.textContent = formatYears(resultsData.healthspan);
+            gapValue.textContent = formatYears(resultsData.gap);
+            const ratio = Math.min(1, resultsData.healthspan / resultsData.lifespan);
+            progressBar.style.width = `${Math.round(ratio * 100)}%`;
+
+            recommendationsEl.innerHTML = '';
+            recs.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recommendationsEl.appendChild(li);
+            });
+
+            resultsPlaceholder.classList.add('hidden');
+            results.classList.remove('hidden');
+            generationDate.textContent = `Generated ${new Date().toLocaleDateString()}`;
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.age = Number(data.age || 0);
+            const resultsData = calculateProjections(data);
+            const recs = deriveRecommendations(data);
+            updateUI(resultsData, recs);
+            form.dataset.latestResults = JSON.stringify({ resultsData, recs });
+        });
+
+        resetBtn.addEventListener('click', () => {
+            form.reset();
+            results.classList.add('hidden');
+            resultsPlaceholder.classList.remove('hidden');
+            recommendationsEl.innerHTML = '';
+            progressBar.style.width = '0%';
+            generationDate.textContent = '';
+        });
+
+        function addPageNumbers(doc) {
+            const pageCount = doc.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.setTextColor(154, 165, 177);
+                doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 20, { align: 'center' });
+            }
+        }
+
+        function generatePDF() {
+            const stored = form.dataset.latestResults ? JSON.parse(form.dataset.latestResults) : null;
+            if (!stored) return alert('Please calculate your results first.');
+            const { resultsData, recs } = stored;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+            const width = doc.internal.pageSize.getWidth();
+
+            const accent = [62, 207, 142];
+            const bg = [14, 17, 22];
+            const text = [226, 232, 240];
+            const muted = [154, 165, 177];
+
+            doc.setFillColor(...bg);
+            doc.rect(0, 0, width, 842, 'F');
+            doc.setTextColor(...text);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(26);
+            doc.text('Your Personal Longevity Report', 40, 80);
+            doc.setDrawColor(...accent);
+            doc.setLineWidth(2);
+            doc.line(40, 92, 240, 92);
+
+            doc.setFontSize(12);
+            doc.setTextColor(...muted);
+            doc.text(`Generated on ${new Date().toLocaleDateString()}`, 40, 110);
+            doc.text('LongevityModeler.com', 40, 130);
+
+            doc.setTextColor(...text);
+            doc.setFontSize(18);
+            doc.text('Key Results Summary', 40, 170);
+            doc.setFontSize(14);
+            doc.text(`Projected Lifespan: ${formatYears(resultsData.lifespan)}`, 40, 200);
+            doc.text(`Projected Healthspan: ${formatYears(resultsData.healthspan)}`, 40, 224);
+            doc.text(`Projection Gap: ${formatYears(resultsData.gap)}`, 40, 248);
+
+            doc.setFontSize(12);
+            doc.setTextColor(...muted);
+            doc.text('Healthspan vs Lifespan', 40, 280);
+            doc.setDrawColor(255, 255, 255);
+            doc.setLineWidth(0.8);
+            doc.roundedRect(40, 290, width - 80, 16, 8, 8, 'S');
+            doc.setFillColor(...accent);
+            const ratio = Math.min(1, resultsData.healthspan / resultsData.lifespan);
+            doc.roundedRect(40, 290, (width - 80) * ratio, 16, 8, 8, 'F');
+
+            doc.setTextColor(...text);
+            doc.setFontSize(16);
+            doc.text('Top Recommendations', 40, 340);
+            doc.setFontSize(12);
+            doc.setTextColor(...muted);
+            recs.forEach((rec, idx) => {
+                doc.circle(45, 360 + idx * 26, 3, 'F');
+                doc.text(rec, 60, 366 + idx * 26, { maxWidth: width - 100 });
+            });
+
+            doc.addPage();
+            doc.setFillColor(...bg);
+            doc.rect(0, 0, width, 842, 'F');
+            doc.setTextColor(...text);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text('What affects your longevity', 40, 80);
+            doc.setFontSize(12);
+            doc.setTextColor(...muted);
+            const factors = [
+                'Movement consistency keeps metabolic, cardiovascular, and cognitive health resilient.',
+                'High-quality nutrition (whole foods, protein, fiber) reduces chronic disease risk.',
+                'Restorative sleep enables hormonal balance and cellular repair.',
+                'Stress modulation protects against accelerated biological aging.',
+                'Biomarker vigilance detects silent risks early and guides precision interventions.'
+            ];
+            factors.forEach((factor, idx) => {
+                doc.circle(45, 100 + idx * 24, 3, 'F');
+                doc.text(factor, 60, 106 + idx * 24, { maxWidth: width - 100 });
+            });
+
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...text);
+            doc.setFontSize(18);
+            doc.text('Take Your Longevity Analysis Further', 40, 240);
+            doc.setFontSize(12);
+            doc.setTextColor(...muted);
+            doc.text('Get a comprehensive blood biomarker analysis with InsideTracker to discover your true biological age and receive science-backed recommendations.', 40, 260, { maxWidth: width - 80 });
+
+            doc.setFillColor(...accent);
+            doc.roundedRect(40, 300, 220, 34, 10, 10, 'F');
+            doc.setTextColor(11, 15, 21);
+            doc.setFontSize(13);
+            doc.text('Get 25% Off InsideTracker', 150, 322, { align: 'center' });
+            doc.setTextColor(...muted);
+            doc.text('Affiliate link placeholder – add your tracking URL.', 40, 350);
+
+            doc.setTextColor(...muted);
+            doc.setFontSize(11);
+            doc.text('LongevityModeler.com • Educational purposes only. Consult your clinician before changing your health routines.', 40, 400, { maxWidth: width - 80 });
+
+            addPageNumbers(doc);
+
+            const filename = `Longevity-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(filename);
+
+            localStorage.setItem('pdf_downloaded', JSON.stringify({ downloaded: true, timestamp: new Date().toISOString() }));
+            trackEvent('pdf_download', { filename });
+        }
+
+        downloadBtn.addEventListener('click', generatePDF);
+    </script>
 </body>
 </html>
