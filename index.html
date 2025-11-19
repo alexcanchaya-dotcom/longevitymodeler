@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Longevity Modeler - Calculate Your Lifespan</title>
     <meta name="description" content="Calculate your life expectancy and healthspan with our advanced longevity calculator. Get personalized insights based on lifestyle, genetics, and health factors.">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <style>
         * {
             margin: 0;
@@ -61,8 +69,16 @@
     <header>
         <h1>Longevity Modeler</h1>
         <p class="subtitle">Discover Your Life Expectancy & Healthspan</p>
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button data-track="calculator_start" style="padding: 0.75rem 1.5rem; border: none; border-radius: 6px; background: #fff; color: #764ba2; font-weight: 600; cursor: pointer;">
+                Start Calculator
+            </button>
+            <button data-track="email_skip" style="padding: 0.75rem 1.5rem; border: 1px solid rgba(255,255,255,0.6); border-radius: 6px; background: transparent; color: #fff; font-weight: 600; cursor: pointer;">
+                Skip Email
+            </button>
+        </div>
     </header>
-    
+
     <main class="container">
         <div class="info-section">
             <h2>Welcome to Longevity Modeler</h2>
@@ -74,7 +90,7 @@
                 <li>Track health metrics and lifestyle factors</li>
             </ul>
         </div>
-        
+
         <div class="info-section">
             <h2>Coming Soon</h2>
             <p>Our advanced calculator will consider factors including:</p>
@@ -86,9 +102,163 @@
             </ul>
         </div>
     </main>
-    
+
     <footer>
         <p>&copy; 2025 LongevityModeler.com - All rights reserved</p>
     </footer>
+
+    <script>
+        (function () {
+            const MEASUREMENT_ID = 'G-XXXXXXXXXX';
+            const STORAGE_KEYS = {
+                sessionId: 'lm_session_id',
+                firstVisit: 'lm_first_visit'
+            };
+
+            const generateId = () => {
+                if (crypto.randomUUID) return crypto.randomUUID();
+                return 'xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            };
+
+            const ensureSessionId = () => {
+                let id = localStorage.getItem(STORAGE_KEYS.sessionId);
+                if (!id) {
+                    id = generateId();
+                    localStorage.setItem(STORAGE_KEYS.sessionId, id);
+                }
+                return id;
+            };
+
+            const ensureFirstVisit = () => {
+                let firstVisit = localStorage.getItem(STORAGE_KEYS.firstVisit);
+                if (!firstVisit) {
+                    firstVisit = new Date().toISOString();
+                    localStorage.setItem(STORAGE_KEYS.firstVisit, firstVisit);
+                }
+                return firstVisit;
+            };
+
+            const sessionId = ensureSessionId();
+            const firstVisit = ensureFirstVisit();
+            let calculatorStarted = false;
+
+            const getUserProperties = () => {
+                const ageInput = document.querySelector('[data-user-prop="age_group"]');
+                const genderInput = document.querySelector('[data-user-prop="gender"]');
+
+                return {
+                    age_group: ageInput?.value || ageInput?.dataset.value,
+                    gender: genderInput?.value || genderInput?.dataset.value
+                };
+            };
+
+            const setUserProperties = () => {
+                const properties = getUserProperties();
+                const cleaned = Object.fromEntries(
+                    Object.entries(properties).filter(([, value]) => Boolean(value))
+                );
+
+                if (Object.keys(cleaned).length > 0) {
+                    gtag('set', 'user_properties', cleaned);
+                }
+
+                return cleaned;
+            };
+
+            const getCalculatorMetrics = (triggerElement) => {
+                const lookup = (selector) => {
+                    const el = document.querySelector(selector);
+                    if (el) {
+                        const text = 'value' in el ? el.value : el.textContent;
+                        const numeric = parseFloat(text);
+                        return Number.isFinite(numeric) ? numeric : undefined;
+                    }
+                    return undefined;
+                };
+
+                const datasetValue = (key) => {
+                    const value = triggerElement?.dataset?.[key];
+                    const numeric = value ? parseFloat(value) : undefined;
+                    return Number.isFinite(numeric) ? numeric : undefined;
+                };
+
+                return {
+                    lifespan: datasetValue('lifespan') ?? lookup('[data-metric="lifespan"]'),
+                    healthspan: datasetValue('healthspan') ?? lookup('[data-metric="healthspan"]'),
+                    gap: datasetValue('gap') ?? lookup('[data-metric="gap"]')
+                };
+            };
+
+            const trackEvent = (eventName, params = {}) => {
+                const userProperties = setUserProperties();
+                const payload = {
+                    session_id: sessionId,
+                    first_visit: firstVisit,
+                    ...params
+                };
+
+                if (userProperties.age_group) payload.age_group = userProperties.age_group;
+                if (userProperties.gender) payload.gender = userProperties.gender;
+
+                gtag('event', eventName, payload);
+            };
+
+            document.addEventListener('input', (event) => {
+                if (calculatorStarted) return;
+                const withinCalculator = event.target.closest('[data-calculator-form]') || event.target.hasAttribute('data-calculator-input');
+                if (withinCalculator) {
+                    calculatorStarted = true;
+                    trackEvent('calculator_start');
+                }
+            });
+
+            document.addEventListener('submit', (event) => {
+                const form = event.target.closest('[data-email-capture]');
+                if (form) {
+                    trackEvent('email_capture');
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                const trackable = event.target.closest('[data-track]');
+                if (!trackable) return;
+
+                const eventName = trackable.dataset.track;
+                const payload = {};
+
+                if (eventName === 'calculator_complete') {
+                    Object.assign(payload, getCalculatorMetrics(trackable));
+                }
+
+                if (eventName === 'pdf_download') {
+                    payload.label = trackable.dataset.label || 'download_pdf';
+                }
+
+                if (eventName === 'insidetracker_click') {
+                    payload.destination = trackable.getAttribute('href') || trackable.dataset.destination;
+                }
+
+                trackEvent(eventName, payload);
+            });
+
+            // Preemptive binding for planned events
+            const pdfLink = document.querySelector('[data-pdf-download]');
+            if (pdfLink) {
+                pdfLink.setAttribute('data-track', 'pdf_download');
+            }
+
+            const insideTrackerLink = document.querySelector('[data-insidetracker]');
+            if (insideTrackerLink) {
+                insideTrackerLink.setAttribute('data-track', 'insidetracker_click');
+            }
+
+            // Initial page view is handled by GA configuration, but we ensure user properties are set
+            setUserProperties();
+        })();
+    </script>
 </body>
 </html>
