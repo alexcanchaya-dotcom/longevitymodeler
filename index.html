@@ -557,12 +557,17 @@
             }
         });
 
+        function revealPendingResults() {
+            const pending = pendingResults || (form.dataset.latestResults ? JSON.parse(form.dataset.latestResults) : null);
+            if (pending) {
+                updateUI(pending.resultsData, pending.recs);
+            }
+        }
+
         skipEmailBtn.addEventListener('click', () => {
             trackEvent('email_skipped');
             closeEmailModal();
-            if (pendingResults) {
-                updateUI(pendingResults.resultsData, pendingResults.recs);
-            }
+            revealPendingResults();
         });
 
         function addPageNumbers(doc) {
