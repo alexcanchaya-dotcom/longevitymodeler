@@ -372,6 +372,7 @@
 
         const emailStorageKey = 'lm_email_capture';
         let pendingResults = null;
+        let justCalculated = false;
 
         function trackEvent(eventName, payload = {}) {
             const eventData = { event: eventName, timestamp: new Date().toISOString(), ...payload };
@@ -426,12 +427,14 @@
         function closeEmailModal() {
             emailModal.classList.add('hidden');
             emailModal.setAttribute('aria-hidden', 'true');
+            justCalculated = false;
         }
 
         function resetEmailModalState() {
             closeEmailModal();
             emailError.textContent = '';
             pendingResults = null;
+            justCalculated = false;
         }
 
         function deriveRecommendations({ activity, nutrition, sleep, stress }) {
@@ -517,17 +520,21 @@
             if (savedEmail?.email) {
                 trackEvent('calculator_submit', { emailCaptured: true });
                 updateUI(payload.resultsData, payload.recs);
+                justCalculated = false;
                 return;
             }
             results.classList.add('hidden');
             resultsPlaceholder.classList.remove('hidden');
             resultsPlaceholder.textContent = 'Share your email to unlock and save your personalized results.';
             trackEvent('calculator_submit', { emailCaptured: false });
-            openEmailModal();
+            if (justCalculated) {
+                openEmailModal();
+            }
         }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            justCalculated = true;
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             data.age = Number(data.age || 0);
