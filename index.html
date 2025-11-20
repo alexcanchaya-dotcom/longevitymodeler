@@ -522,17 +522,17 @@
             form.dataset.latestResults = JSON.stringify(pendingResults);
 
             const savedEmail = getStoredEmail();
-            if (savedEmail?.email) {
-                trackEvent('calculator_submit', { emailCaptured: true });
-                updateUI(resultsData, recs);
+            if (!savedEmail?.email) {
+                openEmailModal();
+                results.classList.add('hidden');
+                resultsPlaceholder.classList.remove('hidden');
+                resultsPlaceholder.textContent = 'Share your email to unlock and save your personalized results.';
+                trackEvent('calculator_submit', { emailCaptured: false });
                 return;
             }
 
-            results.classList.add('hidden');
-            resultsPlaceholder.classList.remove('hidden');
-            resultsPlaceholder.textContent = 'Share your email to unlock and save your personalized results.';
-            trackEvent('calculator_submit', { emailCaptured: false });
-            openEmailModal();
+            trackEvent('calculator_submit', { emailCaptured: true });
+            updateUI(resultsData, recs);
         });
 
         resetBtn.addEventListener('click', () => {
