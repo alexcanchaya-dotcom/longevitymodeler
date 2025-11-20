@@ -327,7 +327,14 @@
         </section>
     </main>
 
-    <div id="email-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="email-modal-title" hidden>
+    <div
+        id="email-modal"
+        class="modal-overlay hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="email-modal-title"
+        hidden
+    >
         <div class="modal-card">
             <p class="tag">Stay in the loop</p>
             <h3 id="email-modal-title" style="margin:8px 0 6px;">Get your personalized results</h3>
@@ -413,9 +420,7 @@
 
         function openEmailModal() {
             const existing = getStoredEmail();
-            if (existing?.email) {
-                emailInput.value = existing.email;
-            }
+            if (existing?.email) return;
             emailModal.classList.remove('hidden');
             emailModal.setAttribute('aria-hidden', 'false');
             emailInput.focus();
