@@ -428,6 +428,12 @@
             emailModal.setAttribute('aria-hidden', 'true');
         }
 
+        function resetEmailModalState() {
+            closeEmailModal();
+            emailError.textContent = '';
+            pendingResults = null;
+        }
+
         function deriveRecommendations({ activity, nutrition, sleep, stress }) {
             const recs = [];
             if (activity === 'low') recs.push('Increase weekly movement to at least 150 minutes of moderate activity plus 2 strength sessions.');
@@ -687,6 +693,8 @@
         }
 
         downloadBtn.addEventListener('click', generatePDF);
+        window.addEventListener('pageshow', resetEmailModalState);
+        resetEmailModalState();
         initDataTrackListeners();
     </script>
 </body>
