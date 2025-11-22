@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Longevity Calculator</title>
+  <meta name="description" content="Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.">
+  <title>Longevity & Vitality Insights</title>
+  <link rel="alternate" hreflang="x-default" href="?lang=en">
+  <link rel="alternate" hreflang="en" href="?lang=en">
+  <link rel="alternate" hreflang="es" href="?lang=es">
+  <link rel="alternate" hreflang="pl" href="?lang=pl">
+  <link rel="alternate" hreflang="de" href="?lang=de">
+  <link rel="alternate" hreflang="fr" href="?lang=fr">
+  <link rel="alternate" hreflang="zh" href="?lang=zh">
   <style>
     :root {
       --bg-start: #3d1c5b;
@@ -41,6 +49,7 @@
       padding: clamp(18px, 3vw, 32px);
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
+      position: relative;
     }
 
     header {
@@ -74,6 +83,30 @@
 
     .top-note a:hover {
       text-decoration: underline;
+    }
+
+    .language-select {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 8px 10px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .language-select select {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-weight: 600;
     }
 
     .section-grid {
@@ -194,8 +227,6 @@
     }
 
     .action-button:active { transform: translateY(0); }
-
-    #calculate { display: inline-block; }
 
     #reset {
       background: linear-gradient(135deg, #8a9ccf, #6d7fb8);
@@ -377,362 +408,229 @@
       .section-grid { grid-template-columns: 1fr; }
       .inputs-grid { grid-template-columns: 1fr; }
       .radio-group { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+      .language-select { position: static; justify-content: flex-end; margin-bottom: 10px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="language-select">
+      <span id="languageLabel">Language</span>
+      <select id="languagePicker" aria-label="Language selector">
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+        <option value="pl">PL</option>
+        <option value="de">DE</option>
+        <option value="fr">FR</option>
+        <option value="zh">ZH</option>
+      </select>
+    </div>
     <header>
-      <h1>Longevity & Vitality Insights</h1>
-      <p class="lead">Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.</p>
-      <p class="top-note">For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.</p>
+      <h1 id="pageTitle">Longevity &amp; Vitality Insights</h1>
+      <p class="lead" id="pageSubtitle">Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.</p>
+      <p class="top-note" id="topNote">For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.</p>
     </header>
 
     <div class="section-grid">
       <section class="section">
-        <h2>🧑 Basic Demographics</h2>
+        <h2 id="sectionDemographics">🧑 Basic Demographics</h2>
         <div class="inputs-grid">
           <div>
-            <label for="age">Age (18-100)</label>
+            <label for="age" id="labelAge">Age (18-100)</label>
             <input type="number" id="age" min="18" max="100" value="35">
           </div>
           <div>
-            <label>Gender</label>
+            <label id="labelGender">Gender</label>
             <div class="radio-group">
-              <label><input type="radio" name="gender" value="male" checked> Male</label>
-              <label><input type="radio" name="gender" value="female"> Female</label>
+              <label><input type="radio" name="gender" value="male" checked> <span id="genderMale">Male</span></label>
+              <label><input type="radio" name="gender" value="female"> <span id="genderFemale">Female</span></label>
             </div>
           </div>
           <div>
-            <label for="height">Height (cm)</label>
+            <label for="height" id="labelHeight">Height (cm)</label>
             <input type="number" id="height" min="120" max="230" value="175">
           </div>
           <div>
-            <label for="weight">Weight (kg)</label>
+            <label for="weight" id="labelWeight">Weight (kg)</label>
             <input type="number" id="weight" min="35" max="200" value="72">
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🏃 Physical Activity</h2>
+        <h2 id="sectionActivity">🏃 Physical Activity</h2>
         <div class="inputs-grid">
           <div>
-            <label for="cardio">Cardio exercise frequency</label>
-            <select id="cardio">
-              <option>Never</option>
-              <option>1-2x/week</option>
-              <option selected>3-4x/week</option>
-              <option>5+x/week</option>
-            </select>
+            <label for="cardio" id="labelCardio">Cardio exercise frequency</label>
+            <select id="cardio"></select>
           </div>
           <div>
-            <label for="strength">Strength training frequency</label>
-            <select id="strength">
-              <option>Never</option>
-              <option>1-2x/week</option>
-              <option selected>3-4x/week</option>
-              <option>5+x/week</option>
-            </select>
+            <label for="strength" id="labelStrength">Strength training frequency</label>
+            <select id="strength"></select>
           </div>
           <div>
-            <label for="steps">Daily steps average</label>
-            <select id="steps">
-              <option>&lt;5000</option>
-              <option>5000-8000</option>
-              <option selected>8000-10000</option>
-              <option>10000+</option>
-            </select>
+            <label for="steps" id="labelSteps">Daily steps average</label>
+            <select id="steps"></select>
           </div>
           <div>
-            <label for="sauna">Sauna usage</label>
-            <select id="sauna">
-              <option>Never</option>
-              <option>1x/week</option>
-              <option selected>2-3x/week</option>
-              <option>4+x/week</option>
-            </select>
+            <label for="sauna" id="labelSauna">Sauna usage</label>
+            <select id="sauna"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🥗 Nutrition & Diet</h2>
+        <h2 id="sectionNutrition">🥗 Nutrition &amp; Diet</h2>
         <div class="inputs-grid">
           <div>
-            <label for="diet">Diet type</label>
-            <select id="diet">
-              <option>Standard</option>
-              <option>Balanced/Whole foods</option>
-              <option>Mediterranean</option>
-              <option>Vegetarian/Vegan</option>
-              <option>Keto/Low-carb</option>
-            </select>
+            <label for="diet" id="labelDiet">Diet type</label>
+            <select id="diet"></select>
           </div>
           <div>
-            <label for="vegetables">Daily vegetable servings</label>
-            <select id="vegetables">
-              <option>&lt;2</option>
-              <option>2-3</option>
-              <option selected>4-5</option>
-              <option>6+</option>
-            </select>
+            <label for="vegetables" id="labelVegetables">Daily vegetable servings</label>
+            <select id="vegetables"></select>
           </div>
           <div>
-            <label for="processed">Ultra-processed foods consumption</label>
-            <select id="processed">
-              <option>Daily</option>
-              <option>Several times/week</option>
-              <option selected>Rarely</option>
-              <option>Never</option>
-            </select>
+            <label for="processed" id="labelProcessed">Ultra-processed foods consumption</label>
+            <select id="processed"></select>
           </div>
           <div>
-            <label for="water">Water intake</label>
-            <select id="water">
-              <option>&lt;4 cups</option>
-              <option>4-6 cups</option>
-              <option>6-8 cups</option>
-              <option selected>8+ cups</option>
-            </select>
+            <label for="water" id="labelWater">Water intake</label>
+            <select id="water"></select>
           </div>
           <div>
-            <label for="fish">Fish consumption</label>
-            <select id="fish">
-              <option>Never</option>
-              <option selected>1x/week</option>
-              <option>2-3x/week</option>
-              <option>4+x/week</option>
-            </select>
+            <label for="fish" id="labelFish">Fish consumption</label>
+            <select id="fish"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>😴 Sleep & Recovery</h2>
+        <h2 id="sectionSleep">😴 Sleep &amp; Recovery</h2>
         <div class="inputs-grid">
           <div>
-            <label for="sleepHours">Sleep hours (4-12)</label>
+            <label for="sleepHours" id="labelSleepHours">Sleep hours (4-12)</label>
             <input type="number" id="sleepHours" min="4" max="12" value="7.5" step="0.5">
           </div>
           <div>
-            <label for="sleepQuality">Sleep quality</label>
-            <select id="sleepQuality">
-              <option>Poor</option>
-              <option>Fair</option>
-              <option selected>Good</option>
-              <option>Excellent</option>
-            </select>
+            <label for="sleepQuality" id="labelSleepQuality">Sleep quality</label>
+            <select id="sleepQuality"></select>
           </div>
           <div>
-            <label for="sleepConsistency">Sleep schedule consistency</label>
-            <select id="sleepConsistency">
-              <option>Very irregular</option>
-              <option>Somewhat irregular</option>
-              <option selected>Mostly consistent</option>
-              <option>Very consistent</option>
-            </select>
+            <label for="sleepConsistency" id="labelSleepConsistency">Sleep schedule consistency</label>
+            <select id="sleepConsistency"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🌿 Lifestyle & Habits</h2>
+        <h2 id="sectionLifestyle">🌿 Lifestyle &amp; Habits</h2>
         <div class="inputs-grid">
           <div>
-            <label for="smoking">Smoking status</label>
-            <select id="smoking">
-              <option selected>Never</option>
-              <option>Former (5+ years)</option>
-              <option>Former (&lt;5 years)</option>
-              <option>Current</option>
-            </select>
+            <label for="smoking" id="labelSmoking">Smoking status</label>
+            <select id="smoking"></select>
           </div>
           <div>
-            <label for="alcohol">Alcohol consumption</label>
-            <select id="alcohol">
-              <option>None</option>
-              <option selected>Light (1-7/week)</option>
-              <option>Moderate (8-14/week)</option>
-              <option>Heavy (15+/week)</option>
-            </select>
+            <label for="alcohol" id="labelAlcohol">Alcohol consumption</label>
+            <select id="alcohol"></select>
           </div>
           <div>
-            <label for="stress">Stress level</label>
-            <select id="stress">
-              <option>Very high</option>
-              <option>High</option>
-              <option selected>Moderate</option>
-              <option>Low</option>
-              <option>Very low</option>
-            </select>
+            <label for="stress" id="labelStress">Stress level</label>
+            <select id="stress"></select>
           </div>
           <div>
-            <label for="social">Social connections</label>
-            <select id="social">
-              <option>Isolated</option>
-              <option>Few friends</option>
-              <option selected>Moderate social life</option>
-              <option>Very social</option>
-            </select>
+            <label for="social" id="labelSocial">Social connections</label>
+            <select id="social"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🧘 Wellness Practices</h2>
+        <h2 id="sectionWellness">🧘 Wellness Practices</h2>
         <div class="inputs-grid">
           <div>
-            <label for="meditation">Meditation / mindfulness</label>
-            <select id="meditation">
-              <option>Never</option>
-              <option>Occasionally</option>
-              <option>Weekly</option>
-              <option selected>Daily</option>
-            </select>
+            <label for="meditation" id="labelMeditation">Meditation / mindfulness</label>
+            <select id="meditation"></select>
           </div>
           <div>
-            <label for="nature">Time in nature</label>
-            <select id="nature">
-              <option>Rarely</option>
-              <option>Monthly</option>
-              <option selected>Weekly</option>
-              <option>Daily</option>
-            </select>
+            <label for="nature" id="labelNature">Time in nature</label>
+            <select id="nature"></select>
           </div>
           <div>
-            <label for="sun">Sun exposure</label>
-            <select id="sun">
-              <option>Minimal</option>
-              <option>Moderate with sunscreen</option>
-              <option>Moderate without sunscreen</option>
-              <option>Excessive</option>
-            </select>
+            <label for="sun" id="labelSun">Sun exposure</label>
+            <select id="sun"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🏥 Health Management</h2>
+        <h2 id="sectionManagement">🏥 Health Management</h2>
         <div class="inputs-grid">
           <div>
-            <label for="checkups">Medical checkups</label>
-            <select id="checkups">
-              <option>Never</option>
-              <option>Every 2+ years</option>
-              <option selected>Annually</option>
-              <option>Every 6 months</option>
-            </select>
+            <label for="checkups" id="labelCheckups">Medical checkups</label>
+            <select id="checkups"></select>
           </div>
           <div>
-            <label for="conditions">Chronic conditions</label>
-            <select id="conditions">
-              <option>None</option>
-              <option>1 condition</option>
-              <option>2-3 conditions</option>
-              <option>4+ conditions</option>
-            </select>
+            <label for="conditions" id="labelConditions">Chronic conditions</label>
+            <select id="conditions"></select>
           </div>
           <div>
-            <label for="family">Family longevity history</label>
-            <select id="family">
-              <option>Poor (&lt;70 avg)</option>
-              <option>Fair (70-80 avg)</option>
-              <option>Good (80-85 avg)</option>
-              <option selected>Excellent (85+ avg)</option>
-            </select>
+            <label for="family" id="labelFamily">Family longevity history</label>
+            <select id="family"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🌐 Socioeconomic Factors</h2>
+        <h2 id="sectionSocioeconomic">🌐 Socioeconomic Factors</h2>
         <div class="inputs-grid">
           <div>
-            <label for="education">Education level</label>
-            <select id="education">
-              <option>Less than high school</option>
-              <option>High school</option>
-              <option>Some college</option>
-              <option>Bachelor's degree</option>
-              <option selected>Graduate degree</option>
-            </select>
+            <label for="education" id="labelEducation">Education level</label>
+            <select id="education"></select>
           </div>
           <div>
-            <label for="marital">Marital status</label>
-            <select id="marital">
-              <option>Single/Never married</option>
-              <option selected>Married/Partnered</option>
-              <option>Divorced/Separated</option>
-              <option>Widowed</option>
-            </select>
+            <label for="marital" id="labelMarital">Marital status</label>
+            <select id="marital"></select>
           </div>
           <div>
-            <label for="income">Income level</label>
-            <select id="income">
-              <option>Below poverty line</option>
-              <option>Lower middle class</option>
-              <option selected>Middle class</option>
-              <option>Upper middle class</option>
-              <option>High income</option>
-            </select>
+            <label for="income" id="labelIncome">Income level</label>
+            <select id="income"></select>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2>🩺 Medical Preconditions</h2>
+        <h2 id="sectionMedical">🩺 Medical Preconditions</h2>
         <div class="inputs-grid">
           <div>
-            <label>History of heart disease</label>
+            <label id="labelHeart">History of heart disease</label>
             <div class="radio-group">
-              <label><input type="radio" name="heart" value="no" checked> No</label>
-              <label><input type="radio" name="heart" value="yes"> Yes</label>
+              <label><input type="radio" name="heart" value="no" checked> <span id="heartNo">No</span></label>
+              <label><input type="radio" name="heart" value="yes"> <span id="heartYes">Yes</span></label>
             </div>
           </div>
           <div>
-            <label>History of cancer</label>
+            <label id="labelCancer">History of cancer</label>
             <div class="radio-group">
-              <label><input type="radio" name="cancer" value="no" checked> No</label>
-              <label><input type="radio" name="cancer" value="yes"> Yes</label>
+              <label><input type="radio" name="cancer" value="no" checked> <span id="cancerNo">No</span></label>
+              <label><input type="radio" name="cancer" value="yes"> <span id="cancerYes">Yes</span></label>
             </div>
           </div>
           <div>
-            <label for="diabetes">Diabetes</label>
-            <select id="diabetes">
-              <option>None</option>
-              <option>Pre-diabetic</option>
-              <option>Type 1</option>
-              <option>Type 2 controlled</option>
-              <option>Type 2 uncontrolled</option>
-            </select>
+            <label for="diabetes" id="labelDiabetes">Diabetes</label>
+            <select id="diabetes"></select>
           </div>
           <div>
-            <label for="bp">High blood pressure</label>
-            <select id="bp">
-              <option>Normal</option>
-              <option>Elevated</option>
-              <option>Stage 1</option>
-              <option>Stage 2</option>
-            </select>
+            <label for="bp" id="labelBp">High blood pressure</label>
+            <select id="bp"></select>
           </div>
           <div>
-            <label for="cholesterol">Cholesterol levels</label>
-            <select id="cholesterol">
-              <option>Optimal (<200 mg/dL)</option>
-              <option>Borderline high (200-239 mg/dL)</option>
-              <option>High (240+ mg/dL)</option>
-              <option>On medication</option>
-            </select>
+            <label for="cholesterol" id="labelCholesterol">Cholesterol levels</label>
+            <select id="cholesterol"></select>
           </div>
           <div>
-            <label for="mentalHealth">Mental health conditions</label>
-            <select id="mentalHealth">
-              <option>None</option>
-              <option>Mild anxiety/depression</option>
-              <option>Moderate</option>
-              <option>Severe</option>
-            </select>
+            <label for="mentalHealth" id="labelMentalHealth">Mental health conditions</label>
+            <select id="mentalHealth"></select>
           </div>
         </div>
       </section>
@@ -747,7 +645,7 @@
       <div class="result-card">
         <div class="lifespan-row">
           <div>
-            <div class="result-subtitle">Estimated lifespan</div>
+            <div class="result-subtitle" id="resultEstimateLabel">Estimated lifespan</div>
             <div class="lifespan-value" id="lifespanValue">-- years</div>
           </div>
           <div class="remaining-years" id="remainingYears"></div>
@@ -757,43 +655,43 @@
         <div class="impact-grid" id="impactGrid"></div>
 
         <div class="recommendations">
-          <h3>Top opportunities to improve</h3>
+          <h3 id="recommendationsTitle">Top opportunities to improve</h3>
           <div id="recommendationChips"></div>
         </div>
 
         <div class="disclaimer">
           <span>⚠️</span>
-          <span>This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
+          <span id="inlineDisclaimer">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
         </div>
       </div>
     </div>
 
     <div class="disclaimer-section" id="disclaimer">
-      <h2>⚠️ Important Disclaimers</h2>
+      <h2 id="disclaimerHeader">⚠️ Important Disclaimers</h2>
       <div class="disclaimer-grid">
         <div class="disclaimer-block">
-          <h3>Medical Disclaimer</h3>
+          <h3 id="medicalDisclaimerTitle">Medical Disclaimer</h3>
           <ul>
-            <li>This calculator provides estimates for informational and educational purposes only.</li>
-            <li>Results are not medical advice, diagnosis, or treatment recommendations.</li>
-            <li>Do not use this calculator as a substitute for professional medical advice.</li>
-            <li>Always consult with qualified healthcare providers for medical decisions.</li>
-            <li>Individual results may vary significantly based on many factors.</li>
+            <li id="medicalDisclaimer1">This calculator provides estimates for informational and educational purposes only.</li>
+            <li id="medicalDisclaimer2">Results are not medical advice, diagnosis, or treatment recommendations.</li>
+            <li id="medicalDisclaimer3">Do not use this calculator as a substitute for professional medical advice.</li>
+            <li id="medicalDisclaimer4">Always consult with qualified healthcare providers for medical decisions.</li>
+            <li id="medicalDisclaimer5">Individual results may vary significantly based on many factors.</li>
           </ul>
         </div>
         <div class="disclaimer-block">
-          <h3>Accuracy Disclaimer</h3>
+          <h3 id="accuracyDisclaimerTitle">Accuracy Disclaimer</h3>
           <ul>
-            <li>Estimates are based on statistical models and research data.</li>
-            <li>No guarantee of accuracy or specific outcomes.</li>
-            <li>Many factors affecting longevity cannot be fully captured.</li>
+            <li id="accuracyDisclaimer1">Estimates are based on statistical models and research data.</li>
+            <li id="accuracyDisclaimer2">No guarantee of accuracy or specific outcomes.</li>
+            <li id="accuracyDisclaimer3">Many factors affecting longevity cannot be fully captured.</li>
           </ul>
         </div>
         <div class="disclaimer-block">
-          <h3>Liability Disclaimer</h3>
+          <h3 id="liabilityDisclaimerTitle">Liability Disclaimer</h3>
           <ul>
-            <li>Website owners assume no liability for decisions made based on calculator results.</li>
-            <li>Users assume all risks associated with using this information.</li>
+            <li id="liabilityDisclaimer1">Website owners assume no liability for decisions made based on calculator results.</li>
+            <li id="liabilityDisclaimer2">Users assume all risks associated with using this information.</li>
           </ul>
         </div>
       </div>
@@ -801,40 +699,213 @@
   </div>
 
   <script>
+    const supportedLanguages = ['en', 'es', 'pl', 'de', 'fr', 'zh'];
+
+    const selectOptions = {
+      cardio: [
+        { value: 'never', key: 'never' },
+        { value: '1-2', key: '1-2' },
+        { value: '3-4', key: '3-4' },
+        { value: '5plus', key: '5plus' }
+      ],
+      strength: [
+        { value: 'never', key: 'never' },
+        { value: '1-2', key: '1-2' },
+        { value: '3-4', key: '3-4' },
+        { value: '5plus', key: '5plus' }
+      ],
+      steps: [
+        { value: 'lt5k', key: 'lt5k' },
+        { value: '5-8k', key: '5-8k' },
+        { value: '8-10k', key: '8-10k' },
+        { value: '10kplus', key: '10kplus' }
+      ],
+      sauna: [
+        { value: 'never', key: 'never' },
+        { value: '1x', key: '1x' },
+        { value: '2-3', key: '2-3' },
+        { value: '4plus', key: '4plus' }
+      ],
+      diet: [
+        { value: 'standard', key: 'standard' },
+        { value: 'balanced', key: 'balanced' },
+        { value: 'mediterranean', key: 'mediterranean' },
+        { value: 'plant', key: 'plant' },
+        { value: 'keto', key: 'keto' }
+      ],
+      vegetables: [
+        { value: 'lt2', key: 'lt2' },
+        { value: '2-3', key: '2-3' },
+        { value: '4-5', key: '4-5' },
+        { value: '6plus', key: '6plus' }
+      ],
+      processed: [
+        { value: 'daily', key: 'daily' },
+        { value: 'several', key: 'several' },
+        { value: 'rarely', key: 'rarely' },
+        { value: 'never', key: 'never' }
+      ],
+      water: [
+        { value: 'lt4', key: 'lt4' },
+        { value: '4-6', key: '4-6' },
+        { value: '6-8', key: '6-8' },
+        { value: '8plus', key: '8plus' }
+      ],
+      fish: [
+        { value: 'never', key: 'never' },
+        { value: '1x', key: '1x' },
+        { value: '2-3', key: '2-3' },
+        { value: '4plus', key: '4plus' }
+      ],
+      sleepQuality: [
+        { value: 'poor', key: 'poor' },
+        { value: 'fair', key: 'fair' },
+        { value: 'good', key: 'good' },
+        { value: 'excellent', key: 'excellent' }
+      ],
+      sleepConsistency: [
+        { value: 'veryIrregular', key: 'veryIrregular' },
+        { value: 'somewhatIrregular', key: 'somewhatIrregular' },
+        { value: 'mostly', key: 'mostly' },
+        { value: 'veryConsistent', key: 'veryConsistent' }
+      ],
+      smoking: [
+        { value: 'never', key: 'never' },
+        { value: 'former5', key: 'former5' },
+        { value: 'formerRecent', key: 'formerRecent' },
+        { value: 'current', key: 'current' }
+      ],
+      alcohol: [
+        { value: 'none', key: 'none' },
+        { value: 'light', key: 'light' },
+        { value: 'moderate', key: 'moderate' },
+        { value: 'heavy', key: 'heavy' }
+      ],
+      stress: [
+        { value: 'veryHigh', key: 'veryHigh' },
+        { value: 'high', key: 'high' },
+        { value: 'moderate', key: 'moderate' },
+        { value: 'low', key: 'low' },
+        { value: 'veryLow', key: 'veryLow' }
+      ],
+      social: [
+        { value: 'isolated', key: 'isolated' },
+        { value: 'few', key: 'few' },
+        { value: 'moderate', key: 'moderate' },
+        { value: 'very', key: 'very' }
+      ],
+      meditation: [
+        { value: 'never', key: 'never' },
+        { value: 'occasionally', key: 'occasionally' },
+        { value: 'weekly', key: 'weekly' },
+        { value: 'daily', key: 'daily' }
+      ],
+      nature: [
+        { value: 'rarely', key: 'rarely' },
+        { value: 'monthly', key: 'monthly' },
+        { value: 'weekly', key: 'weekly' },
+        { value: 'daily', key: 'daily' }
+      ],
+      sun: [
+        { value: 'minimal', key: 'minimal' },
+        { value: 'moderateScreen', key: 'moderateScreen' },
+        { value: 'moderateNoScreen', key: 'moderateNoScreen' },
+        { value: 'excessive', key: 'excessive' }
+      ],
+      checkups: [
+        { value: 'never', key: 'never' },
+        { value: 'twoYears', key: 'twoYears' },
+        { value: 'annual', key: 'annual' },
+        { value: 'sixMonths', key: 'sixMonths' }
+      ],
+      conditions: [
+        { value: 'none', key: 'none' },
+        { value: 'one', key: 'one' },
+        { value: 'twoThree', key: 'twoThree' },
+        { value: 'fourPlus', key: 'fourPlus' }
+      ],
+      family: [
+        { value: 'poor', key: 'poor' },
+        { value: 'fair', key: 'fair' },
+        { value: 'good', key: 'good' },
+        { value: 'excellent', key: 'excellent' }
+      ],
+      education: [
+        { value: 'lessHS', key: 'lessHS' },
+        { value: 'highSchool', key: 'highSchool' },
+        { value: 'someCollege', key: 'someCollege' },
+        { value: 'bachelor', key: 'bachelor' },
+        { value: 'graduate', key: 'graduate' }
+      ],
+      marital: [
+        { value: 'single', key: 'single' },
+        { value: 'married', key: 'married' },
+        { value: 'divorced', key: 'divorced' },
+        { value: 'widowed', key: 'widowed' }
+      ],
+      income: [
+        { value: 'poverty', key: 'poverty' },
+        { value: 'lowerMiddle', key: 'lowerMiddle' },
+        { value: 'middle', key: 'middle' },
+        { value: 'upperMiddle', key: 'upperMiddle' },
+        { value: 'high', key: 'high' }
+      ],
+      diabetes: [
+        { value: 'none', key: 'none' },
+        { value: 'prediabetic', key: 'prediabetic' },
+        { value: 'type1', key: 'type1' },
+        { value: 'type2controlled', key: 'type2controlled' },
+        { value: 'type2uncontrolled', key: 'type2uncontrolled' }
+      ],
+      bp: [
+        { value: 'normal', key: 'normal' },
+        { value: 'elevated', key: 'elevated' },
+        { value: 'stage1', key: 'stage1' },
+        { value: 'stage2', key: 'stage2' }
+      ],
+      cholesterol: [
+        { value: 'optimal', key: 'optimal' },
+        { value: 'borderline', key: 'borderline' },
+        { value: 'high', key: 'high' },
+        { value: 'medication', key: 'medication' }
+      ],
+      mentalHealth: [
+        { value: 'none', key: 'none' },
+        { value: 'mild', key: 'mild' },
+        { value: 'moderate', key: 'moderate' },
+        { value: 'severe', key: 'severe' }
+      ]
+    };
+
     const optionValues = {
-      cardio: { 'Never': 0, '1-2x/week': 1, '3-4x/week': 2, '5+x/week': 3 },
-      strength: { 'Never': 0, '1-2x/week': 1, '3-4x/week': 2, '5+x/week': 3 },
-      steps: { '<5000': 0, '5000-8000': 1, '8000-10000': 2, '10000+': 3 },
-      sauna: { 'Never': 0, '1x/week': 1, '2-3x/week': 2, '4+x/week': 3 },
-      diet: { 'Standard': 0, 'Balanced/Whole foods': 1, 'Mediterranean': 1.2, 'Vegetarian/Vegan': 1, 'Keto/Low-carb': 0.5 },
-      vegetables: { '<2': 0, '2-3': 0.3, '4-5': 0.6, '6+': 0.8 },
-      processed: { 'Daily': -1, 'Several times/week': -0.5, 'Rarely': 0.35, 'Never': 0.5 },
-      water: { '<4 cups': -0.4, '4-6 cups': 0, '6-8 cups': 0.2, '8+ cups': 0.35 },
-      fish: { 'Never': 0, '1x/week': 0.25, '2-3x/week': 0.4, '4+x/week': 0.5 },
-      sleepQuality: { 'Poor': 0, 'Fair': 0.4, 'Good': 0.8, 'Excellent': 0.8 },
-      sleepConsistency: { 'Very irregular': 0, 'Somewhat irregular': 0.4, 'Mostly consistent': 0.8, 'Very consistent': 0.8 },
-      smoking: { 'Current': -8, 'Former (5+ years)': -2.5, 'Former (<5 years)': -4.5, 'Never': 0 },
-      alcohol: { 'None': 0.8, 'Light (1-7/week)': 0.8, 'Moderate (8-14/week)': -0.4, 'Heavy (15+/week)': -1.8 },
-      stress: { 'Very high': -3, 'High': -2, 'Moderate': 0, 'Low': 0.8, 'Very low': 1.5 },
-      social: { 'Isolated': -1, 'Few friends': 0, 'Moderate social life': 1, 'Very social': 2 },
-      meditation: { 'Never': 0, 'Occasionally': 0.2, 'Weekly': 0.35, 'Daily': 0.6 },
-      nature: { 'Rarely': 0, 'Monthly': 0.2, 'Weekly': 0.35, 'Daily': 0.35 },
-      sun: { 'Minimal': 0, 'Moderate with sunscreen': 0.35, 'Moderate without sunscreen': 0.35, 'Excessive': -0.5 },
-      checkups: { 'Never': 0, 'Every 2+ years': 0.2, 'Annually': 0.5, 'Every 6 months': 0.7 },
-      conditions: { 'None': 0, '1 condition': -1, '2-3 conditions': -1.5, '4+ conditions': -2 },
-      family: { 'Poor (<70 avg)': -5, 'Fair (70-80 avg)': -1, 'Good (80-85 avg)': 1, 'Excellent (85+ avg)': 4 },
-      education: { 'Less than high school': -2, 'High school': 0, 'Some college': 0.8, 'Bachelor\'s degree': 1.5, 'Graduate degree': 2.2 },
-      marital: { 'Single/Never married': -0.8, 'Married/Partnered': 1.5, 'Divorced/Separated': -0.4, 'Widowed': 0 },
-      income: { 'Below poverty line': -3, 'Lower middle class': -1, 'Middle class': 0, 'Upper middle class': 0.8, 'High income': 1.5 },
-      diabetes: { 'None': 0, 'Pre-diabetic': -1, 'Type 1': -2, 'Type 2 controlled': -1.5, 'Type 2 uncontrolled': -4 },
-      bp: { 'Normal': 0, 'Elevated': -0.5, 'Stage 1': -1.5, 'Stage 2': -3 },
-      cholesterol: {
-        'Optimal (<200 mg/dL)': 0,
-        'Borderline high (200-239 mg/dL)': -1,
-        'High (240+ mg/dL)': -3,
-        'On medication': -1.5
-      },
-      mentalHealth: { 'None': 0, 'Mild anxiety/depression': -0.5, 'Moderate': -1.5, 'Severe': -3 }
+      cardio: { never: 0, '1-2': 1, '3-4': 2, '5plus': 3 },
+      strength: { never: 0, '1-2': 1, '3-4': 2, '5plus': 3 },
+      steps: { lt5k: 0, '5-8k': 1, '8-10k': 2, '10kplus': 3 },
+      sauna: { never: 0, '1x': 1, '2-3': 2, '4plus': 3 },
+      diet: { standard: 0, balanced: 1, mediterranean: 1.2, plant: 1, keto: 0.5 },
+      vegetables: { lt2: 0, '2-3': 0.3, '4-5': 0.6, '6plus': 0.8 },
+      processed: { daily: -1, several: -0.5, rarely: 0.35, never: 0.5 },
+      water: { lt4: -0.4, '4-6': 0, '6-8': 0.2, '8plus': 0.35 },
+      fish: { never: 0, '1x': 0.25, '2-3': 0.4, '4plus': 0.5 },
+      sleepQuality: { poor: 0, fair: 0.4, good: 0.8, excellent: 0.8 },
+      sleepConsistency: { veryIrregular: 0, somewhatIrregular: 0.4, mostly: 0.8, veryConsistent: 0.8 },
+      smoking: { current: -8, former5: -2.5, formerRecent: -4.5, never: 0 },
+      alcohol: { none: 0.8, light: 0.8, moderate: -0.4, heavy: -1.8 },
+      stress: { veryHigh: -3, high: -2, moderate: 0, low: 0.8, veryLow: 1.5 },
+      social: { isolated: -1, few: 0, moderate: 1, very: 2 },
+      meditation: { never: 0, occasionally: 0.2, weekly: 0.35, daily: 0.6 },
+      nature: { rarely: 0, monthly: 0.2, weekly: 0.35, daily: 0.35 },
+      sun: { minimal: 0, moderateScreen: 0.35, moderateNoScreen: 0.35, excessive: -0.5 },
+      checkups: { never: 0, twoYears: 0.2, annual: 0.5, sixMonths: 0.7 },
+      conditions: { none: 0, one: -1, twoThree: -1.5, fourPlus: -2 },
+      family: { poor: -5, fair: -1, good: 1, excellent: 4 },
+      education: { lessHS: -2, highSchool: 0, someCollege: 0.8, bachelor: 1.5, graduate: 2.2 },
+      marital: { single: -0.8, married: 1.5, divorced: -0.4, widowed: 0 },
+      income: { poverty: -3, lowerMiddle: -1, middle: 0, upperMiddle: 0.8, high: 1.5 },
+      diabetes: { none: 0, prediabetic: -1, type1: -2, type2controlled: -1.5, type2uncontrolled: -4 },
+      bp: { normal: 0, elevated: -0.5, stage1: -1.5, stage2: -3 },
+      cholesterol: { optimal: 0, borderline: -1, high: -3, medication: -1.5 },
+      mentalHealth: { none: 0, mild: -0.5, moderate: -1.5, severe: -3 }
     };
 
     const DEFAULT_INPUTS = {
@@ -844,83 +915,1316 @@
       weight: 72,
       sleepHours: 7.5,
       heart: 'no',
-      cancer: 'no'
+      cancer: 'no',
+      selects: {
+        cardio: '3-4',
+        strength: '3-4',
+        steps: '8-10k',
+        sauna: '2-3',
+        diet: 'balanced',
+        vegetables: '4-5',
+        processed: 'rarely',
+        water: '8plus',
+        fish: '1x',
+        sleepQuality: 'good',
+        sleepConsistency: 'mostly',
+        smoking: 'never',
+        alcohol: 'light',
+        stress: 'moderate',
+        social: 'moderate',
+        meditation: 'daily',
+        nature: 'weekly',
+        sun: 'moderateScreen',
+        checkups: 'annual',
+        conditions: 'none',
+        family: 'excellent',
+        education: 'graduate',
+        marital: 'married',
+        income: 'middle',
+        diabetes: 'none',
+        bp: 'normal',
+        cholesterol: 'optimal',
+        mentalHealth: 'none'
+      }
     };
-
-    const DEFAULT_ENCOURAGEMENT = 'Your lifestyle choices can meaningfully shift this estimate.';
 
     const BONUS_SCALING = 0.45;
 
     const categoryWeights = {
-      activity: { max: 2.7, keys: ['cardio', 'strength', 'steps', 'sauna'], labels: 'Physical activity' },
-      nutrition: { max: 2.25, keys: ['diet', 'vegetables', 'processed', 'water', 'fish'], labels: 'Nutrition' },
-      sleep: { max: 1.35, keys: ['sleepHours', 'sleepQuality', 'sleepConsistency'], labels: 'Sleep & Recovery' },
-      lifestyle: { max: 2.7, keys: ['smoking', 'alcohol', 'stress', 'social'], labels: 'Lifestyle & Habits' },
-      wellness: { max: 0.9, keys: ['meditation', 'nature', 'sun'], labels: 'Wellness Practices' },
-      management: { max: 1.35, keys: ['checkups', 'conditions', 'family'], labels: 'Health Management' },
-      socioeconomic: { max: 2.25, keys: ['education', 'marital', 'income'], labels: 'Socioeconomic' },
-      medical: { max: 10, keys: ['heart', 'cancer', 'diabetes', 'bp', 'cholesterol', 'mentalHealth'], labels: 'Medical Preconditions' }
+      activity: { max: 2.7, keys: ['cardio', 'strength', 'steps', 'sauna'] },
+      nutrition: { max: 2.25, keys: ['diet', 'vegetables', 'processed', 'water', 'fish'] },
+      sleep: { max: 1.35, keys: ['sleepHours', 'sleepQuality', 'sleepConsistency'] },
+      lifestyle: { max: 2.7, keys: ['smoking', 'alcohol', 'stress', 'social'] },
+      wellness: { max: 0.9, keys: ['meditation', 'nature', 'sun'] },
+      management: { max: 1.35, keys: ['checkups', 'conditions', 'family'] },
+      socioeconomic: { max: 2.25, keys: ['education', 'marital', 'income'] },
+      medical: { max: 10, keys: ['heart', 'cancer', 'diabetes', 'bp', 'cholesterol', 'mentalHealth'] }
     };
 
-    const impactDescriptors = {
-      activity: 'Move regularly with cardio, resistance training, and daily steps while adding heat exposure like sauna.',
-      nutrition: 'Favor whole foods, fiber, hydration, and omega-3 rich fish while minimizing processed items.',
-      sleep: 'Aim for consistent, quality sleep in a quiet, dark environment.',
-      lifestyle: 'Eliminate smoking, moderate alcohol, manage stress, and nurture social ties.',
-      wellness: 'Layer in mindfulness, nature time, and sensible sun habits.',
-      management: 'Stay proactive with checkups and condition management, leveraging family history awareness.',
-      socioeconomic: 'Education, stable relationships, and financial security often support healthier choices and access.',
-      medical: 'Work closely with clinicians to manage or mitigate existing conditions.'
+    const translations = {
+      en: {
+        metaDescription: 'Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.',
+        languageLabel: 'Language',
+        pageTitle: 'Longevity & Vitality Insights',
+        pageSubtitle: 'Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.',
+        topNote: 'For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.',
+        sections: {
+          demographics: '🧑 Basic Demographics',
+          activity: '🏃 Physical Activity',
+          nutrition: '🥗 Nutrition & Diet',
+          sleep: '😴 Sleep & Recovery',
+          lifestyle: '🌿 Lifestyle & Habits',
+          wellness: '🧘 Wellness Practices',
+          management: '🏥 Health Management',
+          socioeconomic: '🌐 Socioeconomic Factors',
+          medical: '🩺 Medical Preconditions',
+          disclaimers: '⚠️ Important Disclaimers'
+        },
+        labels: {
+          age: 'Age (18-100)',
+          gender: 'Gender',
+          male: 'Male',
+          female: 'Female',
+          height: 'Height (cm)',
+          weight: 'Weight (kg)',
+          cardio: 'Cardio exercise frequency',
+          strength: 'Strength training frequency',
+          steps: 'Daily steps average',
+          sauna: 'Sauna usage',
+          diet: 'Diet type',
+          vegetables: 'Daily vegetable servings',
+          processed: 'Ultra-processed foods consumption',
+          water: 'Water intake',
+          fish: 'Fish consumption',
+          sleepHours: 'Sleep hours (4-12)',
+          sleepQuality: 'Sleep quality',
+          sleepConsistency: 'Sleep schedule consistency',
+          smoking: 'Smoking status',
+          alcohol: 'Alcohol consumption',
+          stress: 'Stress level',
+          social: 'Social connections',
+          meditation: 'Meditation / mindfulness',
+          nature: 'Time in nature',
+          sun: 'Sun exposure',
+          checkups: 'Medical checkups',
+          conditions: 'Chronic conditions',
+          family: 'Family longevity history',
+          education: 'Education level',
+          marital: 'Marital status',
+          income: 'Income level',
+          heart: 'History of heart disease',
+          cancer: 'History of cancer',
+          diabetes: 'Diabetes',
+          bp: 'High blood pressure',
+          cholesterol: 'Cholesterol levels',
+          mentalHealth: 'Mental health conditions'
+        },
+        options: {
+          gender: { male: 'Male', female: 'Female' },
+          cardio: { never: 'Never', '1-2': '1-2x/week', '3-4': '3-4x/week', '5plus': '5+x/week' },
+          strength: { never: 'Never', '1-2': '1-2x/week', '3-4': '3-4x/week', '5plus': '5+x/week' },
+          steps: { lt5k: '<5000', '5-8k': '5000-8000', '8-10k': '8000-10000', '10kplus': '10000+' },
+          sauna: { never: 'Never', '1x': '1x/week', '2-3': '2-3x/week', '4plus': '4+x/week' },
+          diet: { standard: 'Standard', balanced: 'Balanced/Whole foods', mediterranean: 'Mediterranean', plant: 'Vegetarian/Vegan', keto: 'Keto/Low-carb' },
+          vegetables: { lt2: '<2', '2-3': '2-3', '4-5': '4-5', '6plus': '6+' },
+          processed: { daily: 'Daily', several: 'Several times/week', rarely: 'Rarely', never: 'Never' },
+          water: { lt4: '<4 cups', '4-6': '4-6 cups', '6-8': '6-8 cups', '8plus': '8+ cups' },
+          fish: { never: 'Never', '1x': '1x/week', '2-3': '2-3x/week', '4plus': '4+x/week' },
+          sleepQuality: { poor: 'Poor', fair: 'Fair', good: 'Good', excellent: 'Excellent' },
+          sleepConsistency: { veryIrregular: 'Very irregular', somewhatIrregular: 'Somewhat irregular', mostly: 'Mostly consistent', veryConsistent: 'Very consistent' },
+          smoking: { never: 'Never', former5: 'Former (5+ years)', formerRecent: 'Former (<5 years)', current: 'Current' },
+          alcohol: { none: 'None', light: 'Light (1-7/week)', moderate: 'Moderate (8-14/week)', heavy: 'Heavy (15+/week)' },
+          stress: { veryHigh: 'Very high', high: 'High', moderate: 'Moderate', low: 'Low', veryLow: 'Very low' },
+          social: { isolated: 'Isolated', few: 'Few friends', moderate: 'Moderate social life', very: 'Very social' },
+          meditation: { never: 'Never', occasionally: 'Occasionally', weekly: 'Weekly', daily: 'Daily' },
+          nature: { rarely: 'Rarely', monthly: 'Monthly', weekly: 'Weekly', daily: 'Daily' },
+          sun: { minimal: 'Minimal', moderateScreen: 'Moderate with sunscreen', moderateNoScreen: 'Moderate without sunscreen', excessive: 'Excessive' },
+          checkups: { never: 'Never', twoYears: 'Every 2+ years', annual: 'Annually', sixMonths: 'Every 6 months' },
+          conditions: { none: 'None', one: '1 condition', twoThree: '2-3 conditions', fourPlus: '4+ conditions' },
+          family: { poor: 'Poor (<70 avg)', fair: 'Fair (70-80 avg)', good: 'Good (80-85 avg)', excellent: 'Excellent (85+ avg)' },
+          education: { lessHS: 'Less than high school', highSchool: 'High school', someCollege: 'Some college', bachelor: "Bachelor's degree", graduate: 'Graduate degree' },
+          marital: { single: 'Single/Never married', married: 'Married/Partnered', divorced: 'Divorced/Separated', widowed: 'Widowed' },
+          income: { poverty: 'Below poverty line', lowerMiddle: 'Lower middle class', middle: 'Middle class', upperMiddle: 'Upper middle class', high: 'High income' },
+          diabetes: { none: 'None', prediabetic: 'Pre-diabetic', type1: 'Type 1', type2controlled: 'Type 2 controlled', type2uncontrolled: 'Type 2 uncontrolled' },
+          bp: { normal: 'Normal', elevated: 'Elevated', stage1: 'Stage 1', stage2: 'Stage 2' },
+          cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Borderline high (200-239 mg/dL)', high: 'High (240+ mg/dL)', medication: 'On medication' },
+          mentalHealth: { none: 'None', mild: 'Mild anxiety/depression', moderate: 'Moderate', severe: 'Severe' }
+        },
+        buttons: { calculate: 'Calculate Longevity Insights', reset: 'Reset Form' },
+        results: {
+          estimated: 'Estimated lifespan',
+          yearsLabel: 'years',
+          remainingPositive: 'years remaining',
+          remainingNegative: 'years beyond current age',
+          encouragementPositive: 'Great job! Your current habits are adding years—keep them strong and refine the gaps.',
+          encouragementNegative: 'Your choices can add years—focus on the biggest opportunities to improve your estimate.',
+          defaultEncouragement: 'Your lifestyle choices can meaningfully shift this estimate.',
+          topOpportunities: 'Top opportunities to improve',
+          strongPerformance: 'You are performing strongly across key areas—maintain your habits!'
+        },
+        inlineDisclaimer: 'This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.',
+        disclaimers: {
+          medicalTitle: 'Medical Disclaimer',
+          medical: [
+            'This calculator provides estimates for informational and educational purposes only.',
+            'Results are not medical advice, diagnosis, or treatment recommendations.',
+            'Do not use this calculator as a substitute for professional medical advice.',
+            'Always consult with qualified healthcare providers for medical decisions.',
+            'Individual results may vary significantly based on many factors.'
+          ],
+                  accuracyTitle: 'Accuracy Disclaimer',
+          accuracy: [
+            'Estimates are based on statistical models and research data.',
+            'No guarantee of accuracy or specific outcomes.',
+            'Many factors affecting longevity cannot be fully captured.'
+          ],
+          liabilityTitle: 'Liability Disclaimer',
+          liability: [
+            'Website owners assume no liability for decisions made based on calculator results.',
+            'Users assume all risks associated with using this information.'
+          ]
+        },
+        categories: {
+          activity: 'Physical activity',
+          nutrition: 'Nutrition',
+          sleep: 'Sleep & Recovery',
+          lifestyle: 'Lifestyle & Habits',
+          wellness: 'Wellness Practices',
+          management: 'Health Management',
+          socioeconomic: 'Socioeconomic',
+          medical: 'Medical Preconditions'
+        },
+        impactDescriptors: {
+          activity: 'Move regularly with cardio, resistance training, and daily steps while adding heat exposure like sauna.',
+          nutrition: 'Favor whole foods, fiber, hydration, and omega-3 rich fish while minimizing processed items.',
+          sleep: 'Aim for consistent, quality sleep in a quiet, dark environment.',
+          lifestyle: 'Eliminate smoking, moderate alcohol, manage stress, and nurture social ties.',
+          wellness: 'Layer in mindfulness, nature time, and sensible sun habits.',
+          management: 'Stay proactive with checkups and condition management, leveraging family history awareness.',
+          socioeconomic: 'Education, stable relationships, and financial security often support healthier choices and access.',
+          medical: 'Work closely with clinicians to manage or mitigate existing conditions.'
+        },
+        recommendations: {
+          cardio: 'Increase cardio frequency',
+          strength: 'Add more strength sessions',
+          steps: 'Increase daily steps',
+          sauna: 'Include sauna sessions',
+          diet: 'Shift toward Mediterranean/whole foods',
+          vegetables: 'Boost vegetable servings',
+          processed: 'Reduce processed foods',
+          water: 'Improve hydration',
+          fish: 'Add omega-3 rich fish',
+          sleepHours: 'Optimize sleep duration',
+          sleepQuality: 'Improve sleep quality',
+          sleepConsistency: 'Keep sleep schedule regular',
+          smoking: 'Eliminate smoking',
+          alcohol: 'Moderate alcohol',
+          stress: 'Lower stress levels',
+          social: 'Strengthen social connections',
+          meditation: 'Practice mindfulness',
+          nature: 'Spend time in nature',
+          sun: 'Favor moderate sun with protection',
+          checkups: 'Increase medical checkups',
+          conditions: 'Better manage chronic conditions',
+          family: 'Factor family history into choices',
+          education: 'Pursue additional education/skills',
+          marital: 'Cultivate supportive partnerships',
+          income: 'Improve financial stability/access',
+          heart: 'Address heart disease risk',
+          cancer: 'Address cancer risk factors',
+          diabetes: 'Improve diabetes control',
+          bp: 'Control blood pressure',
+          cholesterol: 'Improve cholesterol profile',
+          mentalHealth: 'Support mental health'
+        }
+      },
+      es: {
+        metaDescription: 'Estimador integral basado en ciencia que destaca factores modificables que influyen en la esperanza de vida.',
+        languageLabel: 'Idioma',
+        pageTitle: 'Calculadora de Longevidad y Vitalidad',
+        pageSubtitle: 'Estimador integral basado en ciencia que destaca factores modificables que influyen en la esperanza de vida.',
+        topNote: 'Solo para fines educativos — <a href="#disclaimer">revise los avisos importantes</a>.',
+        sections: {
+          demographics: '🧑 Datos Demográficos Básicos',
+          activity: '🏃 Actividad Física',
+          nutrition: '🥗 Nutrición y Dieta',
+          sleep: '😴 Sueño y Recuperación',
+          lifestyle: '🌿 Estilo de Vida y Hábitos',
+          wellness: '🧘 Prácticas de Bienestar',
+          management: '🏥 Manejo de la Salud',
+          socioeconomic: '🌐 Factores Socioeconómicos',
+          medical: '🩺 Condiciones Médicas Previas',
+          disclaimers: '⚠️ Avisos Importantes'
+        },
+        labels: {
+          age: 'Edad (18-100)',
+          gender: 'Género',
+          male: 'Hombre',
+          female: 'Mujer',
+          height: 'Altura (cm)',
+          weight: 'Peso (kg)',
+          cardio: 'Frecuencia de ejercicio cardiovascular',
+          strength: 'Frecuencia de entrenamiento de fuerza',
+          steps: 'Promedio de pasos diarios',
+          sauna: 'Uso de sauna',
+          diet: 'Tipo de dieta',
+          vegetables: 'Porciones diarias de vegetales',
+          processed: 'Consumo de ultraprocesados',
+          water: 'Ingesta de agua',
+          fish: 'Consumo de pescado',
+          sleepHours: 'Horas de sueño (4-12)',
+          sleepQuality: 'Calidad del sueño',
+          sleepConsistency: 'Regularidad del horario de sueño',
+          smoking: 'Estado de tabaquismo',
+          alcohol: 'Consumo de alcohol',
+          stress: 'Nivel de estrés',
+          social: 'Conexiones sociales',
+          meditation: 'Meditación / atención plena',
+          nature: 'Tiempo en la naturaleza',
+          sun: 'Exposición solar',
+          checkups: 'Controles médicos',
+          conditions: 'Condiciones crónicas',
+          family: 'Historial de longevidad familiar',
+          education: 'Nivel educativo',
+          marital: 'Estado civil',
+          income: 'Nivel de ingresos',
+          heart: 'Antecedentes de enfermedad cardíaca',
+          cancer: 'Antecedentes de cáncer',
+          diabetes: 'Diabetes',
+          bp: 'Presión arterial alta',
+          cholesterol: 'Niveles de colesterol',
+          mentalHealth: 'Condiciones de salud mental'
+        },
+        options: {
+          gender: { male: 'Hombre', female: 'Mujer' },
+          cardio: { never: 'Nunca', '1-2': '1-2x/semana', '3-4': '3-4x/semana', '5plus': '5+x/semana' },
+          strength: { never: 'Nunca', '1-2': '1-2x/semana', '3-4': '3-4x/semana', '5plus': '5+x/semana' },
+          steps: { lt5k: '<5000', '5-8k': '5000-8000', '8-10k': '8000-10000', '10kplus': '10000+' },
+          sauna: { never: 'Nunca', '1x': '1x/semana', '2-3': '2-3x/semana', '4plus': '4+x/semana' },
+          diet: { standard: 'Estándar', balanced: 'Equilibrada/Comida real', mediterranean: 'Mediterránea', plant: 'Vegetariana/Vegana', keto: 'Keto/Baja en carbohidratos' },
+          vegetables: { lt2: '<2', '2-3': '2-3', '4-5': '4-5', '6plus': '6+' },
+          processed: { daily: 'Diariamente', several: 'Varias veces/semana', rarely: 'Rara vez', never: 'Nunca' },
+          water: { lt4: '<4 tazas', '4-6': '4-6 tazas', '6-8': '6-8 tazas', '8plus': '8+ tazas' },
+          fish: { never: 'Nunca', '1x': '1x/semana', '2-3': '2-3x/semana', '4plus': '4+x/semana' },
+          sleepQuality: { poor: 'Mala', fair: 'Regular', good: 'Buena', excellent: 'Excelente' },
+          sleepConsistency: { veryIrregular: 'Muy irregular', somewhatIrregular: 'Algo irregular', mostly: 'Mayormente consistente', veryConsistent: 'Muy consistente' },
+          smoking: { never: 'Nunca', former5: 'Exfumador (5+ años)', formerRecent: 'Exfumador (<5 años)', current: 'Actual' },
+          alcohol: { none: 'Ninguno', light: 'Ligero (1-7/semana)', moderate: 'Moderado (8-14/semana)', heavy: 'Excesivo (15+/semana)' },
+          stress: { veryHigh: 'Muy alto', high: 'Alto', moderate: 'Moderado', low: 'Bajo', veryLow: 'Muy bajo' },
+          social: { isolated: 'Aislado', few: 'Pocos amigos', moderate: 'Vida social moderada', very: 'Muy sociable' },
+          meditation: { never: 'Nunca', occasionally: 'Ocasional', weekly: 'Semanal', daily: 'Diario' },
+          nature: { rarely: 'Rara vez', monthly: 'Mensual', weekly: 'Semanal', daily: 'Diario' },
+          sun: { minimal: 'Mínima', moderateScreen: 'Moderada con protector', moderateNoScreen: 'Moderada sin protector', excessive: 'Excesiva' },
+          checkups: { never: 'Nunca', twoYears: 'Cada 2+ años', annual: 'Anualmente', sixMonths: 'Cada 6 meses' },
+          conditions: { none: 'Ninguna', one: '1 condición', twoThree: '2-3 condiciones', fourPlus: '4+ condiciones' },
+          family: { poor: 'Pobre (<70 prom.)', fair: 'Regular (70-80 prom.)', good: 'Buena (80-85 prom.)', excellent: 'Excelente (85+ prom.)' },
+          education: { lessHS: 'Menos que secundaria', highSchool: 'Secundaria', someCollege: 'Algo de universidad', bachelor: 'Licenciatura', graduate: 'Posgrado' },
+          marital: { single: 'Soltero/Nunca casado', married: 'Casado/Pareja', divorced: 'Divorciado/Separado', widowed: 'Viudo' },
+          income: { poverty: 'Bajo la línea de pobreza', lowerMiddle: 'Clase media baja', middle: 'Clase media', upperMiddle: 'Clase media alta', high: 'Altos ingresos' },
+          diabetes: { none: 'Ninguna', prediabetic: 'Prediabetes', type1: 'Tipo 1', type2controlled: 'Tipo 2 controlada', type2uncontrolled: 'Tipo 2 no controlada' },
+          bp: { normal: 'Normal', elevated: 'Elevada', stage1: 'Etapa 1', stage2: 'Etapa 2' },
+          cholesterol: { optimal: 'Óptimo (<200 mg/dL)', borderline: 'Límite alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'En medicación' },
+          mentalHealth: { none: 'Ninguna', mild: 'Ansiedad/Depresión leve', moderate: 'Moderada', severe: 'Severa' }
+        },
+        buttons: { calculate: 'Calcular Perspectivas de Longevidad', reset: 'Restablecer' },
+        results: {
+          estimated: 'Esperanza de vida estimada',
+          yearsLabel: 'años',
+          remainingPositive: 'años restantes',
+          remainingNegative: 'años por encima de la edad actual',
+          encouragementPositive: '¡Buen trabajo! Tus hábitos actuales están sumando años; mantenlos fuertes y mejora los detalles.',
+          encouragementNegative: 'Tus elecciones pueden sumar años: enfócate en las mejores oportunidades para mejorar tu estimación.',
+          defaultEncouragement: 'Tus elecciones de estilo de vida pueden cambiar significativamente esta estimación.',
+          topOpportunities: 'Principales oportunidades de mejora',
+          strongPerformance: 'Estás rindiendo bien en las áreas clave: ¡mantén tus hábitos!'
+        },
+        inlineDisclaimer: 'Esta calculadora es solo informativa y educativa y no brinda consejos médicos. Consulta a profesionales de salud para recomendaciones personales. Revisa los avisos completos abajo.',
+        disclaimers: {
+          medicalTitle: 'Aviso Médico',
+          medical: [
+            'Esta calculadora brinda estimaciones solo con fines informativos y educativos.',
+            'Los resultados no son consejos médicos, diagnósticos ni tratamientos.',
+            'No uses esta calculadora como sustituto del consejo médico profesional.',
+            'Consulta siempre con profesionales de salud calificados para decisiones médicas.',
+            'Los resultados individuales pueden variar significativamente según muchos factores.'
+          ],
+          accuracyTitle: 'Aviso de Exactitud',
+          accuracy: [
+            'Las estimaciones se basan en modelos estadísticos y datos de investigación.',
+            'No hay garantía de exactitud ni de resultados específicos.',
+            'Muchos factores que afectan la longevidad no pueden capturarse por completo.'
+          ],
+          liabilityTitle: 'Aviso de Responsabilidad',
+          liability: [
+            'Los propietarios del sitio no asumen responsabilidad por decisiones basadas en los resultados.',
+            'Los usuarios asumen todos los riesgos asociados con usar esta información.'
+          ]
+        },
+        categories: {
+          activity: 'Actividad física',
+          nutrition: 'Nutrición',
+          sleep: 'Sueño y Recuperación',
+          lifestyle: 'Estilo de Vida y Hábitos',
+          wellness: 'Prácticas de Bienestar',
+          management: 'Manejo de la Salud',
+          socioeconomic: 'Socioeconómico',
+          medical: 'Condiciones Médicas Previas'
+        },
+        impactDescriptors: {
+          activity: 'Muévete con regularidad con cardio, fuerza y pasos diarios, sumando calor como el sauna.',
+          nutrition: 'Prefiere alimentos integrales, fibra, hidratación y pescado rico en omega-3 mientras reduces procesados.',
+          sleep: 'Apunta a un sueño consistente y de calidad en un ambiente tranquilo y oscuro.',
+          lifestyle: 'Elimina el tabaco, modera el alcohol, controla el estrés y cultiva lazos sociales.',
+          wellness: 'Incorpora atención plena, tiempo en la naturaleza y hábitos sensatos de sol.',
+          management: 'Sé proactivo con chequeos y control de condiciones, considerando los antecedentes familiares.',
+          socioeconomic: 'La educación, relaciones estables y seguridad financiera apoyan elecciones y acceso más saludables.',
+          medical: 'Trabaja con clínicos para gestionar o mitigar condiciones existentes.'
+        },
+        recommendations: {
+          cardio: 'Aumenta la frecuencia de cardio',
+          strength: 'Suma más sesiones de fuerza',
+          steps: 'Incrementa los pasos diarios',
+          sauna: 'Incluye sesiones de sauna',
+          diet: 'Oriéntate a dieta mediterránea/comida real',
+          vegetables: 'Aumenta las porciones de vegetales',
+          processed: 'Reduce los ultraprocesados',
+          water: 'Mejora la hidratación',
+          fish: 'Añade pescado rico en omega-3',
+          sleepHours: 'Optimiza la duración del sueño',
+          sleepQuality: 'Mejora la calidad del sueño',
+          sleepConsistency: 'Mantén un horario de sueño regular',
+          smoking: 'Elimina el tabaco',
+          alcohol: 'Modera el alcohol',
+          stress: 'Reduce los niveles de estrés',
+          social: 'Fortalece las conexiones sociales',
+          meditation: 'Practica mindfulness',
+          nature: 'Pasa tiempo en la naturaleza',
+          sun: 'Prefiere sol moderado con protección',
+          checkups: 'Aumenta los chequeos médicos',
+          conditions: 'Mejor gestiona las condiciones crónicas',
+          family: 'Incorpora el historial familiar en tus decisiones',
+          education: 'Busca más educación/habilidades',
+          marital: 'Cultiva relaciones de apoyo',
+          income: 'Mejora la estabilidad/acceso financiero',
+          heart: 'Aborda el riesgo cardíaco',
+          cancer: 'Aborda factores de riesgo de cáncer',
+          diabetes: 'Mejora el control de la diabetes',
+          bp: 'Controla la presión arterial',
+          cholesterol: 'Mejora el perfil de colesterol',
+          mentalHealth: 'Apoya la salud mental'
+        }
+      },
+      pl: {
+        metaDescription: 'Kompleksowy, oparty na nauce estymator podkreślający modyfikowalne czynniki wpływające na długość życia.',
+        languageLabel: 'Język',
+        pageTitle: 'Kalkulator Długowieczności i Witalności',
+        pageSubtitle: 'Kompleksowy, oparty na nauce estymator podkreślający modyfikowalne czynniki wpływające na długość życia.',
+        topNote: 'Tylko do celów edukacyjnych — <a href="#disclaimer">zapoznaj się z ważnymi zastrzeżeniami</a>.',
+        sections: {
+          demographics: '🧑 Podstawowe Dane Demograficzne',
+          activity: '🏃 Aktywność Fizyczna',
+          nutrition: '🥗 Odżywianie i Dieta',
+          sleep: '😴 Sen i Regeneracja',
+          lifestyle: '🌿 Styl Życia i Nawyki',
+          wellness: '🧘 Praktyki Wellness',
+          management: '🏥 Zarządzanie Zdrowiem',
+          socioeconomic: '🌐 Czynniki Społeczno-Ekonomiczne',
+          medical: '🩺 Schorzenia Wcześniejsze',
+          disclaimers: '⚠️ Ważne Zastrzeżenia'
+        },
+        labels: {
+          age: 'Wiek (18-100)',
+          gender: 'Płeć',
+          male: 'Mężczyzna',
+          female: 'Kobieta',
+          height: 'Wzrost (cm)',
+          weight: 'Waga (kg)',
+          cardio: 'Częstotliwość ćwiczeń cardio',
+          strength: 'Częstotliwość treningu siłowego',
+          steps: 'Średnia liczba kroków dziennie',
+          sauna: 'Korzystanie z sauny',
+          diet: 'Rodzaj diety',
+          vegetables: 'Dzienne porcje warzyw',
+          processed: 'Spożycie żywności wysoko przetworzonej',
+          water: 'Spożycie wody',
+          fish: 'Spożycie ryb',
+          sleepHours: 'Godziny snu (4-12)',
+          sleepQuality: 'Jakość snu',
+          sleepConsistency: 'Regularność godzin snu',
+          smoking: 'Status palenia',
+          alcohol: 'Spożycie alkoholu',
+          stress: 'Poziom stresu',
+          social: 'Relacje społeczne',
+          meditation: 'Medytacja / uważność',
+          nature: 'Czas w naturze',
+          sun: 'Ekspozycja na słońce',
+          checkups: 'Badania kontrolne',
+          conditions: 'Choroby przewlekłe',
+          family: 'Historia długowieczności w rodzinie',
+          education: 'Poziom wykształcenia',
+          marital: 'Stan cywilny',
+          income: 'Poziom dochodów',
+          heart: 'Historia chorób serca',
+          cancer: 'Historia chorób nowotworowych',
+          diabetes: 'Cukrzyca',
+          bp: 'Nadciśnienie',
+          cholesterol: 'Poziom cholesterolu',
+          mentalHealth: 'Problemy ze zdrowiem psychicznym'
+        },
+        options: {
+          gender: { male: 'Mężczyzna', female: 'Kobieta' },
+          cardio: { never: 'Nigdy', '1-2': '1-2x/tydz.', '3-4': '3-4x/tydz.', '5plus': '5+x/tydz.' },
+          strength: { never: 'Nigdy', '1-2': '1-2x/tydz.', '3-4': '3-4x/tydz.', '5plus': '5+x/tydz.' },
+          steps: { lt5k: '<5000', '5-8k': '5000-8000', '8-10k': '8000-10000', '10kplus': '10000+' },
+          sauna: { never: 'Nigdy', '1x': '1x/tydz.', '2-3': '2-3x/tydz.', '4plus': '4+x/tydz.' },
+          diet: { standard: 'Standardowa', balanced: 'Zbilansowana/Produkty pełne', mediterranean: 'Śródziemnomorska', plant: 'Wegetariańska/Wegańska', keto: 'Keto/Niskowęglowodanowa' },
+          vegetables: { lt2: '<2', '2-3': '2-3', '4-5': '4-5', '6plus': '6+' },
+          processed: { daily: 'Codziennie', several: 'Kilka razy/tydz.', rarely: 'Rzadko', never: 'Nigdy' },
+          water: { lt4: '<4 szklanki', '4-6': '4-6 szklanek', '6-8': '6-8 szklanek', '8plus': '8+ szklanek' },
+          fish: { never: 'Nigdy', '1x': '1x/tydz.', '2-3': '2-3x/tydz.', '4plus': '4+x/tydz.' },
+          sleepQuality: { poor: 'Słaba', fair: 'Średnia', good: 'Dobra', excellent: 'Świetna' },
+          sleepConsistency: { veryIrregular: 'Bardzo nieregularny', somewhatIrregular: 'Dość nieregularny', mostly: 'Dość regularny', veryConsistent: 'Bardzo regularny' },
+          smoking: { never: 'Nigdy', former5: 'Były palacz (5+ lat)', formerRecent: 'Były palacz (<5 lat)', current: 'Pali obecnie' },
+          alcohol: { none: 'Brak', light: 'Niewielkie (1-7/tydz.)', moderate: 'Umiarkowane (8-14/tydz.)', heavy: 'Wysokie (15+/tydz.)' },
+          stress: { veryHigh: 'Bardzo wysoki', high: 'Wysoki', moderate: 'Umiarkowany', low: 'Niski', veryLow: 'Bardzo niski' },
+          social: { isolated: 'Izolacja', few: 'Kilku znajomych', moderate: 'Średnie życie towarzyskie', very: 'Bardzo towarzyski' },
+          meditation: { never: 'Nigdy', occasionally: 'Czasami', weekly: 'Co tydzień', daily: 'Codziennie' },
+          nature: { rarely: 'Rzadko', monthly: 'Raz w miesiącu', weekly: 'Co tydzień', daily: 'Codziennie' },
+          sun: { minimal: 'Minimalna', moderateScreen: 'Umiarkowana z filtrem', moderateNoScreen: 'Umiarkowana bez filtra', excessive: 'Nadmierna' },
+          checkups: { never: 'Nigdy', twoYears: 'Co 2+ lata', annual: 'Corocznie', sixMonths: 'Co 6 miesięcy' },
+          conditions: { none: 'Brak', one: '1 schorzenie', twoThree: '2-3 schorzenia', fourPlus: '4+ schorzenia' },
+          family: { poor: 'Słaba (<70 śr.)', fair: 'Przeciętna (70-80 śr.)', good: 'Dobra (80-85 śr.)', excellent: 'Świetna (85+ śr.)' },
+          education: { lessHS: 'Pon. średniego', highSchool: 'Średnie', someCollege: 'Część studiów', bachelor: 'Licencjat', graduate: 'Studia magisterskie+' },
+          marital: { single: 'Singiel/Nieżonaty', married: 'Małżeństwo/Związek', divorced: 'Rozwiedziony/Separacja', widowed: 'Wdowiec/Wdowa' },
+          income: { poverty: 'Poniżej progu ubóstwa', lowerMiddle: 'Niższa klasa średnia', middle: 'Klasa średnia', upperMiddle: 'Wyższa klasa średnia', high: 'Wysokie dochody' },
+          diabetes: { none: 'Brak', prediabetic: 'Stan przedcukrzycowy', type1: 'Typ 1', type2controlled: 'Typ 2 kontrolowana', type2uncontrolled: 'Typ 2 niekontrolowana' },
+          bp: { normal: 'Prawidłowe', elevated: 'Podwyższone', stage1: 'Stadium 1', stage2: 'Stadium 2' },
+          cholesterol: { optimal: 'Optymalny (<200 mg/dL)', borderline: 'Na granicy (200-239 mg/dL)', high: 'Wysoki (240+ mg/dL)', medication: 'Na lekach' },
+          mentalHealth: { none: 'Brak', mild: 'Łagodny niepokój/depresja', moderate: 'Umiarkowany', severe: 'Poważny' }
+        },
+        buttons: { calculate: 'Oblicz Prognozy Długowieczności', reset: 'Resetuj Formularz' },
+        results: {
+          estimated: 'Szacowana długość życia',
+          yearsLabel: 'lat',
+          remainingPositive: 'lat pozostało',
+          remainingNegative: 'lat powyżej obecnego wieku',
+          encouragementPositive: 'Świetnie! Obecne nawyki dodają lat — utrzymuj je i doskonal szczegóły.',
+          encouragementNegative: 'Twoje wybory mogą dodać lat — skup się na największych możliwościach poprawy wyniku.',
+          defaultEncouragement: 'Twoje wybory stylu życia mogą znacząco zmienić tę estymację.',
+          topOpportunities: 'Najważniejsze obszary do poprawy',
+          strongPerformance: 'Wypadasz dobrze w kluczowych obszarach — utrzymuj te nawyki!'
+        },
+        inlineDisclaimer: 'Ten kalkulator ma charakter wyłącznie informacyjny i edukacyjny i nie stanowi porady medycznej. Skonsultuj się z personelem medycznym po indywidualne zalecenia. Zobacz pełne zastrzeżenia poniżej.',
+        disclaimers: {
+          medicalTitle: 'Zastrzeżenie Medyczne',
+          medical: [
+            'Kalkulator zapewnia szacunki wyłącznie w celach informacyjnych i edukacyjnych.',
+            'Wyniki nie są poradą medyczną, diagnozą ani zaleceniem leczenia.',
+            'Nie używaj tego kalkulatora jako substytutu profesjonalnej porady medycznej.',
+            'Zawsze konsultuj decyzje medyczne z wykwalifikowanymi specjalistami.',
+            'Wyniki indywidualne mogą znacznie się różnić w zależności od wielu czynników.'
+          ],
+          accuracyTitle: 'Zastrzeżenie Dot. Dokładności',
+          accuracy: [
+            'Szacunki bazują na modelach statystycznych i danych badawczych.',
+            'Brak gwarancji dokładności ani konkretnych wyników.',
+            'Wiele czynników wpływających na długość życia nie może być w pełni ujętych.'
+          ],
+          liabilityTitle: 'Zastrzeżenie Odpowiedzialności',
+          liability: [
+            'Właściciele witryny nie ponoszą odpowiedzialności za decyzje podjęte na podstawie wyników kalkulatora.',
+            'Użytkownicy ponoszą wszelkie ryzyko związane z korzystaniem z tych informacji.'
+          ]
+        },
+        categories: {
+          activity: 'Aktywność fizyczna',
+          nutrition: 'Odżywianie',
+          sleep: 'Sen i Regeneracja',
+          lifestyle: 'Styl Życia i Nawyki',
+          wellness: 'Praktyki Wellness',
+          management: 'Zarządzanie Zdrowiem',
+          socioeconomic: 'Społeczno-ekonomiczne',
+          medical: 'Schorzenia wcześniejsze'
+        },
+        impactDescriptors: {
+          activity: 'Ruszaj się regularnie: cardio, siła i codzienne kroki oraz ciepło z sauny.',
+          nutrition: 'Stawiaj na pełnowartościowe produkty, błonnik, nawodnienie i ryby bogate w omega-3, ograniczaj przetworzone.',
+          sleep: 'Dbaj o regularny, jakościowy sen w cichym i ciemnym otoczeniu.',
+          lifestyle: 'Wyeliminuj palenie, umiarkuj alkohol, zarządzaj stresem i pielęgnuj relacje.',
+          wellness: 'Dodaj uważność, czas w naturze i rozsądne korzystanie ze słońca.',
+          management: 'Bądź proaktywny w badaniach i kontroli chorób, uwzględniając historię rodziny.',
+          socioeconomic: 'Edukacja, stabilne relacje i bezpieczeństwo finansowe wspierają zdrowsze wybory i dostęp.',
+          medical: 'Współpracuj z lekarzami, aby lepiej zarządzać istniejącymi schorzeniami.'
+        },
+        recommendations: {
+          cardio: 'Zwiększ częstotliwość cardio',
+          strength: 'Dodaj więcej treningów siłowych',
+          steps: 'Zwiększ liczbę kroków',
+          sauna: 'Uwzględnij sesje sauny',
+          diet: 'Przejdź na dietę śródziemnomorską/pełnowartościową',
+          vegetables: 'Zwiększ porcje warzyw',
+          processed: 'Ogranicz żywność przetworzoną',
+          water: 'Popraw nawodnienie',
+          fish: 'Dodaj ryby bogate w omega-3',
+          sleepHours: 'Optymalizuj długość snu',
+          sleepQuality: 'Popraw jakość snu',
+          sleepConsistency: 'Utrzymuj regularne godziny snu',
+          smoking: 'Rzuć palenie',
+          alcohol: 'Umiarkuj alkohol',
+          stress: 'Obniż poziom stresu',
+          social: 'Wzmacniaj relacje społeczne',
+          meditation: 'Praktykuj uważność',
+          nature: 'Spędzaj czas w naturze',
+          sun: 'Korzystaj z umiarkowanego słońca z ochroną',
+          checkups: 'Zwiększ częstotliwość badań',
+          conditions: 'Lepiej zarządzaj chorobami przewlekłymi',
+          family: 'Uwzględnij historię rodziny',
+          education: 'Rozwijaj edukację/umiejętności',
+          marital: 'Buduj wspierające relacje',
+          income: 'Popraw stabilność finansową/dostęp',
+          heart: 'Zadbaj o ryzyko sercowe',
+          cancer: 'Zadbaj o czynniki ryzyka raka',
+          diabetes: 'Popraw kontrolę cukrzycy',
+          bp: 'Kontroluj ciśnienie',
+          cholesterol: 'Popraw profil cholesterolu',
+          mentalHealth: 'Wspieraj zdrowie psychiczne'
+        }
+      },
+      de: {
+        metaDescription: 'Umfassender, wissenschaftlich fundierter Schätzer, der modifizierbare Faktoren hervorhebt, die die Lebensspanne beeinflussen.',
+        languageLabel: 'Sprache',
+        pageTitle: 'Langlebigkeits- und Vitalitätsrechner',
+        pageSubtitle: 'Umfassender, wissenschaftlich fundierter Schätzer, der modifizierbare Faktoren hervorhebt, die die Lebensspanne beeinflussen.',
+        topNote: 'Nur zu Bildungszwecken — <a href="#disclaimer">wichtige Hinweise ansehen</a>.',
+        sections: {
+          demographics: '🧑 Grundlegende Demografische Daten',
+          activity: '🏃 Körperliche Aktivität',
+          nutrition: '🥗 Ernährung & Diät',
+          sleep: '😴 Schlaf & Erholung',
+          lifestyle: '🌿 Lebensstil & Gewohnheiten',
+          wellness: '🧘 Wohlbefinden',
+          management: '🏥 Gesundheitsmanagement',
+          socioeconomic: '🌐 Sozioökonomische Faktoren',
+          medical: '🩺 Medizinische Vorerkrankungen',
+          disclaimers: '⚠️ Wichtige Hinweise'
+        },
+        labels: {
+          age: 'Alter (18-100)',
+          gender: 'Geschlecht',
+          male: 'Männlich',
+          female: 'Weiblich',
+          height: 'Größe (cm)',
+          weight: 'Gewicht (kg)',
+          cardio: 'Häufigkeit Ausdauertraining',
+          strength: 'Häufigkeit Krafttraining',
+          steps: 'Durchschnittliche Schritte pro Tag',
+          sauna: 'Saunanutzung',
+          diet: 'Ernährungsform',
+          vegetables: 'Tägliche Portionen Gemüse',
+          processed: 'Verzehr ultraverarbeiteter Lebensmittel',
+          water: 'Wasserzufuhr',
+          fish: 'Fischkonsum',
+          sleepHours: 'Schlafstunden (4-12)',
+          sleepQuality: 'Schlafqualität',
+          sleepConsistency: 'Regelmäßigkeit des Schlafplans',
+          smoking: 'Raucherstatus',
+          alcohol: 'Alkoholkonsum',
+          stress: 'Stresslevel',
+          social: 'Soziale Kontakte',
+          meditation: 'Meditation / Achtsamkeit',
+          nature: 'Zeit in der Natur',
+          sun: 'Sonneneinstrahlung',
+          checkups: 'Medizinische Vorsorge',
+          conditions: 'Chronische Erkrankungen',
+          family: 'Familiäre Langlebigkeitsgeschichte',
+          education: 'Bildungsniveau',
+          marital: 'Familienstand',
+          income: 'Einkommensniveau',
+          heart: 'Herzkrankheiten in der Vorgeschichte',
+          cancer: 'Krebserkrankungen in der Vorgeschichte',
+          diabetes: 'Diabetes',
+          bp: 'Bluthochdruck',
+          cholesterol: 'Cholesterinspiegel',
+          mentalHealth: 'Psychische Erkrankungen'
+        },
+        options: {
+          gender: { male: 'Männlich', female: 'Weiblich' },
+          cardio: { never: 'Nie', '1-2': '1-2x/Woche', '3-4': '3-4x/Woche', '5plus': '5+x/Woche' },
+          strength: { never: 'Nie', '1-2': '1-2x/Woche', '3-4': '3-4x/Woche', '5plus': '5+x/Woche' },
+          steps: { lt5k: '<5000', '5-8k': '5000-8000', '8-10k': '8000-10000', '10kplus': '10000+' },
+          sauna: { never: 'Nie', '1x': '1x/Woche', '2-3': '2-3x/Woche', '4plus': '4+x/Woche' },
+          diet: { standard: 'Standard', balanced: 'Ausgewogen/Vollwertig', mediterranean: 'Mittelmeer', plant: 'Vegetarisch/Vegan', keto: 'Keto/Low-Carb' },
+          vegetables: { lt2: '<2', '2-3': '2-3', '4-5': '4-5', '6plus': '6+' },
+          processed: { daily: 'Täglich', several: 'Mehrmals/Woche', rarely: 'Selten', never: 'Nie' },
+          water: { lt4: '<4 Tassen', '4-6': '4-6 Tassen', '6-8': '6-8 Tassen', '8plus': '8+ Tassen' },
+          fish: { never: 'Nie', '1x': '1x/Woche', '2-3': '2-3x/Woche', '4plus': '4+x/Woche' },
+          sleepQuality: { poor: 'Schlecht', fair: 'Mittel', good: 'Gut', excellent: 'Ausgezeichnet' },
+          sleepConsistency: { veryIrregular: 'Sehr unregelmäßig', somewhatIrregular: 'Etwas unregelmäßig', mostly: 'Weitgehend regelmäßig', veryConsistent: 'Sehr regelmäßig' },
+          smoking: { never: 'Nie', former5: 'Ex-Raucher (5+ Jahre)', formerRecent: 'Ex-Raucher (<5 Jahre)', current: 'Aktuell' },
+          alcohol: { none: 'Keiner', light: 'Gering (1-7/Woche)', moderate: 'Mäßig (8-14/Woche)', heavy: 'Hoch (15+/Woche)' },
+          stress: { veryHigh: 'Sehr hoch', high: 'Hoch', moderate: 'Mittel', low: 'Niedrig', veryLow: 'Sehr niedrig' },
+          social: { isolated: 'Isoliert', few: 'Wenige Freunde', moderate: 'Mittleres Sozialleben', very: 'Sehr sozial' },
+          meditation: { never: 'Nie', occasionally: 'Gelegentlich', weekly: 'Wöchentlich', daily: 'Täglich' },
+          nature: { rarely: 'Selten', monthly: 'Monatlich', weekly: 'Wöchentlich', daily: 'Täglich' },
+          sun: { minimal: 'Minimal', moderateScreen: 'Mäßig mit Sonnenschutz', moderateNoScreen: 'Mäßig ohne Sonnenschutz', excessive: 'Übermäßig' },
+          checkups: { never: 'Nie', twoYears: 'Alle 2+ Jahre', annual: 'Jährlich', sixMonths: 'Alle 6 Monate' },
+          conditions: { none: 'Keine', one: '1 Erkrankung', twoThree: '2-3 Erkrankungen', fourPlus: '4+ Erkrankungen' },
+          family: { poor: 'Schwach (<70 Ø)', fair: 'Mittel (70-80 Ø)', good: 'Gut (80-85 Ø)', excellent: 'Ausgezeichnet (85+ Ø)' },
+          education: { lessHS: 'Unter Hauptschule', highSchool: 'Abitur/Schule', someCollege: 'Teil des Studiums', bachelor: 'Bachelor', graduate: 'Master/Promotion' },
+          marital: { single: 'Ledig', married: 'Verheiratet/Partnerschaft', divorced: 'Geschieden/Getrennt', widowed: 'Verwitwet' },
+          income: { poverty: 'Unter Armutsgrenze', lowerMiddle: 'Untere Mittelschicht', middle: 'Mittelschicht', upperMiddle: 'Obere Mittelschicht', high: 'Hohes Einkommen' },
+          diabetes: { none: 'Keine', prediabetic: 'Prädiabetes', type1: 'Typ 1', type2controlled: 'Typ 2 kontrolliert', type2uncontrolled: 'Typ 2 unkontrolliert' },
+          bp: { normal: 'Normal', elevated: 'Erhöht', stage1: 'Stufe 1', stage2: 'Stufe 2' },
+          cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Grenzwertig hoch (200-239 mg/dL)', high: 'Hoch (240+ mg/dL)', medication: 'Unter Medikation' },
+          mentalHealth: { none: 'Keine', mild: 'Leichte Angst/Depression', moderate: 'Mittel', severe: 'Schwer' }
+        },
+        buttons: { calculate: 'Langlebigkeitseinblicke Berechnen', reset: 'Formular Zurücksetzen' },
+        results: {
+          estimated: 'Geschätzte Lebensspanne',
+          yearsLabel: 'Jahre',
+          remainingPositive: 'verbleibende Jahre',
+          remainingNegative: 'Jahre über dem aktuellen Alter',
+          encouragementPositive: 'Gut gemacht! Deine Gewohnheiten fügen Jahre hinzu – halte sie stark und optimiere Details.',
+          encouragementNegative: 'Deine Entscheidungen können Jahre hinzufügen – konzentriere dich auf die größten Chancen zur Verbesserung.',
+          defaultEncouragement: 'Deine Lebensstilentscheidungen können diese Schätzung deutlich verändern.',
+          topOpportunities: 'Top-Möglichkeiten zur Verbesserung',
+          strongPerformance: 'Du lieferst starke Leistungen in den wichtigsten Bereichen – weiter so!'
+        },
+        inlineDisclaimer: 'Dieser Rechner dient nur Informations- und Bildungszwecken und bietet keine medizinische Beratung. Konsultiere Fachpersonal für individuelle Empfehlungen. Sieh dir unten die vollständigen Hinweise an.',
+        disclaimers: {
+          medicalTitle: 'Medizinischer Hinweis',
+          medical: [
+            'Dieser Rechner liefert Schätzungen nur zu Informations- und Bildungszwecken.',
+            'Die Ergebnisse sind keine medizinische Beratung, Diagnose oder Behandlungsempfehlung.',
+            'Nutze diesen Rechner nicht als Ersatz für professionelle medizinische Beratung.',
+            'Ziehe für medizinische Entscheidungen immer qualifizierte Fachkräfte hinzu.',
+            'Individuelle Ergebnisse können sich aufgrund vieler Faktoren deutlich unterscheiden.'
+          ],
+          accuracyTitle: 'Hinweis zur Genauigkeit',
+          accuracy: [
+            'Schätzungen basieren auf statistischen Modellen und Forschungsdaten.',
+            'Es gibt keine Garantie für Genauigkeit oder spezifische Ergebnisse.',
+            'Viele Faktoren, die die Langlebigkeit beeinflussen, können nicht vollständig erfasst werden.'
+          ],
+          liabilityTitle: 'Haftungshinweis',
+          liability: [
+            'Die Website-Betreiber übernehmen keine Haftung für Entscheidungen, die auf den Ergebnissen des Rechners basieren.',
+            'Nutzer tragen alle Risiken, die mit der Verwendung dieser Informationen verbunden sind.'
+          ]
+        },
+        categories: {
+          activity: 'Körperliche Aktivität',
+          nutrition: 'Ernährung',
+          sleep: 'Schlaf & Erholung',
+          lifestyle: 'Lebensstil & Gewohnheiten',
+          wellness: 'Wohlbefinden',
+          management: 'Gesundheitsmanagement',
+          socioeconomic: 'Sozioökonomisch',
+          medical: 'Medizinische Vorerkrankungen'
+        },
+        impactDescriptors: {
+          activity: 'Bewege dich regelmäßig mit Ausdauer, Krafttraining und täglichen Schritten sowie Wärme wie Sauna.',
+          nutrition: 'Setze auf vollwertige Lebensmittel, Ballaststoffe, Hydration und omega-3-reichen Fisch und reduziere Verarbeitetes.',
+          sleep: 'Strebe konsistenten, hochwertigen Schlaf in ruhiger, dunkler Umgebung an.',
+          lifestyle: 'Eliminiere Rauchen, moderiere Alkohol, manage Stress und pflege soziale Beziehungen.',
+          wellness: 'Baue Achtsamkeit, Naturzeit und sinnvolle Sonnengewohnheiten ein.',
+          management: 'Sei proaktiv mit Vorsorge und Krankheitsmanagement und berücksichtige die Familiengeschichte.',
+          socioeconomic: 'Bildung, stabile Beziehungen und finanzielle Sicherheit fördern gesündere Entscheidungen und Zugang.',
+          medical: 'Arbeite eng mit Ärztinnen und Ärzten zusammen, um bestehende Bedingungen zu managen.'
+        },
+        recommendations: {
+          cardio: 'Cardio-Häufigkeit erhöhen',
+          strength: 'Mehr Krafteinheiten einbauen',
+          steps: 'Tägliche Schritte steigern',
+          sauna: 'Saunaeinheiten hinzufügen',
+          diet: 'Richtung mediterran/vollwertig umstellen',
+          vegetables: 'Gemüseportionen erhöhen',
+          processed: 'Verarbeitete Lebensmittel reduzieren',
+          water: 'Hydration verbessern',
+          fish: 'Omega-3-reichen Fisch ergänzen',
+          sleepHours: 'Schlafdauer optimieren',
+          sleepQuality: 'Schlafqualität verbessern',
+          sleepConsistency: 'Schlafrhythmus regelmäßig halten',
+          smoking: 'Rauchen eliminieren',
+          alcohol: 'Alkohol mäßigen',
+          stress: 'Stresslevel senken',
+          social: 'Soziale Kontakte stärken',
+          meditation: 'Achtsamkeit üben',
+          nature: 'Zeit in der Natur verbringen',
+          sun: 'Mäßige Sonne mit Schutz bevorzugen',
+          checkups: 'Vorsorgeuntersuchungen erhöhen',
+          conditions: 'Chronische Erkrankungen besser steuern',
+          family: 'Familiengeschichte berücksichtigen',
+          education: 'Weiterbildung/Skills ausbauen',
+          marital: 'Unterstützende Partnerschaften pflegen',
+          income: 'Finanzielle Stabilität/ Zugang verbessern',
+          heart: 'Herzrisiko adressieren',
+          cancer: 'Krebsrisikofaktoren adressieren',
+          diabetes: 'Diabeteskontrolle verbessern',
+          bp: 'Blutdruck kontrollieren',
+          cholesterol: 'Cholesterinprofil verbessern',
+          mentalHealth: 'Psychische Gesundheit unterstützen'
+        }
+      },
+      fr: {
+        metaDescription: 'Estimateur complet et scientifique mettant en évidence les facteurs modifiables qui influencent la durée de vie.',
+        languageLabel: 'Langue',
+        pageTitle: 'Calculateur de Longévité et Vitalité',
+        pageSubtitle: 'Estimateur complet et scientifique mettant en évidence les facteurs modifiables qui influencent la durée de vie.',
+        topNote: 'À des fins éducatives seulement — <a href="#disclaimer">consultez les avertissements importants</a>.',
+        sections: {
+          demographics: '🧑 Données Démographiques de Base',
+          activity: '🏃 Activité Physique',
+          nutrition: '🥗 Nutrition et Régime',
+          sleep: '😴 Sommeil et Récupération',
+          lifestyle: '🌿 Mode de Vie et Habitudes',
+          wellness: '🧘 Pratiques de Bien-être',
+          management: '🏥 Gestion de la Santé',
+          socioeconomic: '🌐 Facteurs Socioéconomiques',
+          medical: '🩺 Conditions Médicales Préexistantes',
+          disclaimers: '⚠️ Avertissements Importants'
+        },
+        labels: {
+          age: 'Âge (18-100)',
+          gender: 'Sexe',
+          male: 'Homme',
+          female: 'Femme',
+          height: 'Taille (cm)',
+          weight: 'Poids (kg)',
+          cardio: 'Fréquence du cardio',
+          strength: 'Fréquence de musculation',
+          steps: 'Moyenne de pas quotidiens',
+          sauna: 'Usage du sauna',
+          diet: 'Type de régime',
+          vegetables: 'Portions quotidiennes de légumes',
+          processed: 'Consommation d’ultra-transformés',
+          water: 'Hydratation',
+          fish: 'Consommation de poisson',
+          sleepHours: 'Heures de sommeil (4-12)',
+          sleepQuality: 'Qualité du sommeil',
+          sleepConsistency: 'Regularité du sommeil',
+          smoking: 'Statut tabagique',
+          alcohol: 'Consommation d’alcool',
+          stress: 'Niveau de stress',
+          social: 'Liens sociaux',
+          meditation: 'Méditation / pleine conscience',
+          nature: 'Temps dans la nature',
+          sun: 'Exposition au soleil',
+          checkups: 'Bilans médicaux',
+          conditions: 'Maladies chroniques',
+          family: 'Historique familial de longévité',
+          education: 'Niveau d’éducation',
+          marital: 'Statut marital',
+          income: 'Niveau de revenu',
+          heart: 'Antécédents de maladie cardiaque',
+          cancer: 'Antécédents de cancer',
+          diabetes: 'Diabète',
+          bp: 'Hypertension',
+          cholesterol: 'Cholestérol',
+          mentalHealth: 'Troubles de santé mentale'
+        },
+        options: {
+          gender: { male: 'Homme', female: 'Femme' },
+          cardio: { never: 'Jamais', '1-2': '1-2x/semaine', '3-4': '3-4x/semaine', '5plus': '5+x/semaine' },
+          strength: { never: 'Jamais', '1-2': '1-2x/semaine', '3-4': '3-4x/semaine', '5plus': '5+x/semaine' },
+          steps: { lt5k: '<5000', '5-8k': '5000-8000', '8-10k': '8000-10000', '10kplus': '10000+' },
+          sauna: { never: 'Jamais', '1x': '1x/semaine', '2-3': '2-3x/semaine', '4plus': '4+x/semaine' },
+          diet: { standard: 'Standard', balanced: 'Équilibré/Aliments complets', mediterranean: 'Méditerranéen', plant: 'Végétarien/Vegan', keto: 'Keto/Pauvre en glucides' },
+          vegetables: { lt2: '<2', '2-3': '2-3', '4-5': '4-5', '6plus': '6+' },
+          processed: { daily: 'Quotidien', several: 'Plusieurs fois/semaine', rarely: 'Rarement', never: 'Jamais' },
+          water: { lt4: '<4 tasses', '4-6': '4-6 tasses', '6-8': '6-8 tasses', '8plus': '8+ tasses' },
+          fish: { never: 'Jamais', '1x': '1x/semaine', '2-3': '2-3x/semaine', '4plus': '4+x/semaine' },
+          sleepQuality: { poor: 'Mauvaise', fair: 'Moyenne', good: 'Bonne', excellent: 'Excellente' },
+          sleepConsistency: { veryIrregular: 'Très irrégulier', somewhatIrregular: 'Plutôt irrégulier', mostly: 'Plutôt régulier', veryConsistent: 'Très régulier' },
+          smoking: { never: 'Jamais', former5: 'Ancien fumeur (5+ ans)', formerRecent: 'Ancien fumeur (<5 ans)', current: 'Actuel' },
+          alcohol: { none: 'Aucun', light: 'Faible (1-7/sem.)', moderate: 'Modéré (8-14/sem.)', heavy: 'Élevé (15+/sem.)' },
+          stress: { veryHigh: 'Très élevé', high: 'Élevé', moderate: 'Modéré', low: 'Faible', veryLow: 'Très faible' },
+          social: { isolated: 'Isolé', few: 'Peu d’amis', moderate: 'Vie sociale modérée', very: 'Très sociable' },
+          meditation: { never: 'Jamais', occasionally: 'Occasionnel', weekly: 'Hebdomadaire', daily: 'Quotidien' },
+          nature: { rarely: 'Rarement', monthly: 'Mensuel', weekly: 'Hebdomadaire', daily: 'Quotidien' },
+          sun: { minimal: 'Minimale', moderateScreen: 'Modérée avec écran', moderateNoScreen: 'Modérée sans écran', excessive: 'Excessive' },
+          checkups: { never: 'Jamais', twoYears: 'Tous les 2+ ans', annual: 'Annuel', sixMonths: 'Tous les 6 mois' },
+          conditions: { none: 'Aucune', one: '1 condition', twoThree: '2-3 conditions', fourPlus: '4+ conditions' },
+          family: { poor: 'Faible (<70 moy.)', fair: 'Moyen (70-80 moy.)', good: 'Bon (80-85 moy.)', excellent: 'Excellent (85+ moy.)' },
+          education: { lessHS: 'Moins que lycée', highSchool: 'Lycée', someCollege: 'Quelques études supérieures', bachelor: 'Licence', graduate: 'Master/Doctorat' },
+          marital: { single: 'Célibataire/Jamais marié', married: 'Marié/En couple', divorced: 'Divorcé/Séparé', widowed: 'Veuf/Veuve' },
+          income: { poverty: 'Sous le seuil de pauvreté', lowerMiddle: 'Classe moyenne inférieure', middle: 'Classe moyenne', upperMiddle: 'Classe moyenne supérieure', high: 'Haut revenu' },
+          diabetes: { none: 'Aucun', prediabetic: 'Pré-diabète', type1: 'Type 1', type2controlled: 'Type 2 contrôlé', type2uncontrolled: 'Type 2 non contrôlé' },
+          bp: { normal: 'Normal', elevated: 'Élevée', stage1: 'Stade 1', stage2: 'Stade 2' },
+          cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Limite haute (200-239 mg/dL)', high: 'Élevé (240+ mg/dL)', medication: 'Sous traitement' },
+          mentalHealth: { none: 'Aucun', mild: 'Anxiété/Dépression légère', moderate: 'Modérée', severe: 'Sévère' }
+        },
+        buttons: { calculate: 'Calculer les Perspectives de Longévité', reset: 'Réinitialiser le Formulaire' },
+        results: {
+          estimated: 'Durée de vie estimée',
+          yearsLabel: 'ans',
+          remainingPositive: 'années restantes',
+          remainingNegative: 'années au-delà de l’âge actuel',
+          encouragementPositive: 'Bravo ! Vos habitudes actuelles ajoutent des années — maintenez-les et optimisez les détails.',
+          encouragementNegative: 'Vos choix peuvent ajouter des années — concentrez-vous sur les meilleures opportunités pour améliorer votre estimation.',
+          defaultEncouragement: 'Vos choix de vie peuvent modifier sensiblement cette estimation.',
+          topOpportunities: 'Principales opportunités d’amélioration',
+          strongPerformance: 'Vous performez bien sur les axes clés — continuez ainsi !'
+        },
+        inlineDisclaimer: 'Ce calculateur est uniquement informatif et éducatif et ne fournit pas de conseils médicaux. Consultez des professionnels de santé pour des recommandations personnalisées. Voir les avertissements complets ci-dessous.',
+        disclaimers: {
+          medicalTitle: 'Avertissement Médical',
+          medical: [
+            'Ce calculateur fournit des estimations à des fins informatives et éducatives seulement.',
+            'Les résultats ne sont pas des conseils médicaux, un diagnostic ou un traitement.',
+            'Ne remplacez pas les conseils médicaux professionnels par ce calculateur.',
+            'Consultez toujours des professionnels de santé qualifiés pour les décisions médicales.',
+            'Les résultats individuels peuvent varier considérablement selon de nombreux facteurs.'
+          ],
+          accuracyTitle: 'Avertissement sur la Précision',
+          accuracy: [
+            'Les estimations reposent sur des modèles statistiques et des données de recherche.',
+            'Aucune garantie d’exactitude ou de résultat spécifique.',
+            'De nombreux facteurs de longévité ne peuvent être entièrement capturés.'
+          ],
+          liabilityTitle: 'Avertissement de Responsabilité',
+          liability: [
+            'Les propriétaires du site n’assument aucune responsabilité pour les décisions basées sur les résultats.',
+            'Les utilisateurs assument tous les risques liés à l’utilisation de ces informations.'
+          ]
+        },
+        categories: {
+          activity: 'Activité physique',
+          nutrition: 'Nutrition',
+          sleep: 'Sommeil et récupération',
+          lifestyle: 'Mode de vie et habitudes',
+          wellness: 'Pratiques de bien-être',
+          management: 'Gestion de la santé',
+          socioeconomic: 'Socioéconomique',
+          medical: 'Conditions médicales'
+        },
+        impactDescriptors: {
+          activity: 'Bougez régulièrement avec cardio, musculation et pas quotidiens en ajoutant de la chaleur comme le sauna.',
+          nutrition: 'Privilégiez les aliments complets, les fibres, l’hydratation et le poisson riche en oméga-3 tout en limitant les produits transformés.',
+          sleep: 'Visez un sommeil régulier et de qualité dans un environnement calme et sombre.',
+          lifestyle: 'Éliminez le tabac, modérez l’alcool, gérez le stress et nourrissez vos liens sociaux.',
+          wellness: 'Ajoutez de la pleine conscience, du temps dans la nature et des habitudes solaires raisonnables.',
+          management: 'Soyez proactif avec les bilans et la gestion des maladies en tenant compte de l’historique familial.',
+          socioeconomic: 'Éducation, relations stables et sécurité financière favorisent des choix plus sains et l’accès aux soins.',
+          medical: 'Travaillez avec les cliniciens pour gérer ou atténuer les conditions existantes.'
+        },
+        recommendations: {
+          cardio: 'Augmenter la fréquence du cardio',
+          strength: 'Ajouter des séances de musculation',
+          steps: 'Augmenter les pas quotidiens',
+          sauna: 'Inclure des séances de sauna',
+          diet: 'Passer à un régime méditerranéen/complet',
+          vegetables: 'Augmenter les portions de légumes',
+          processed: 'Réduire les produits transformés',
+          water: 'Améliorer l’hydratation',
+          fish: 'Ajouter du poisson riche en oméga-3',
+          sleepHours: 'Optimiser la durée du sommeil',
+          sleepQuality: 'Améliorer la qualité du sommeil',
+          sleepConsistency: 'Garder un rythme de sommeil régulier',
+          smoking: 'Éliminer le tabac',
+          alcohol: 'Modérer l’alcool',
+          stress: 'Réduire le stress',
+          social: 'Renforcer les liens sociaux',
+          meditation: 'Pratiquer la pleine conscience',
+          nature: 'Passer du temps dans la nature',
+          sun: 'Préférer une exposition modérée avec protection',
+          checkups: 'Augmenter les bilans médicaux',
+          conditions: 'Mieux gérer les maladies chroniques',
+          family: 'Intégrer l’historique familial dans les choix',
+          education: 'Développer l’éducation/les compétences',
+          marital: 'Entretenir des relations de soutien',
+          income: 'Améliorer la stabilité/accès financier',
+          heart: 'Traiter le risque cardiaque',
+          cancer: 'Traiter les facteurs de risque de cancer',
+          diabetes: 'Améliorer la gestion du diabète',
+          bp: 'Contrôler la pression artérielle',
+          cholesterol: 'Améliorer le profil lipidique',
+          mentalHealth: 'Soutenir la santé mentale'
+        }
+      },
+      zh: {
+        metaDescription: '基于科学的综合评估工具，突出影响寿命的可改变因素。',
+        languageLabel: '语言',
+        pageTitle: '长寿与活力计算器',
+        pageSubtitle: '基于科学的综合评估工具，突出影响寿命的可改变因素。',
+        topNote: '仅供教育用途 — <a href="#disclaimer">查看重要免责声明</a>。',
+        sections: {
+          demographics: '🧑 基本人⼝统计',
+          activity: '🏃 身体活动',
+          nutrition: '🥗 营养与饮食',
+          sleep: '😴 睡眠与恢复',
+          lifestyle: '🌿 生活方式与习惯',
+          wellness: '🧘 健康实践',
+          management: '🏥 健康管理',
+          socioeconomic: '🌐 社会经济因素',
+          medical: '🩺 既往医疗状况',
+          disclaimers: '⚠️ 重要免责声明'
+        },
+        labels: {
+          age: '年龄 (18-100)',
+          gender: '性别',
+          male: '男性',
+          female: '女性',
+          height: '身高 (cm)',
+          weight: '体重 (kg)',
+          cardio: '有氧运动频率',
+          strength: '力量训练频率',
+          steps: '日均步数',
+          sauna: '桑拿使用',
+          diet: '饮食类型',
+          vegetables: '每日蔬菜份量',
+          processed: '超加工食品摄入',
+          water: '饮水量',
+          fish: '鱼类摄入',
+          sleepHours: '睡眠时长 (4-12)',
+          sleepQuality: '睡眠质量',
+          sleepConsistency: '作息规律性',
+          smoking: '吸烟状况',
+          alcohol: '饮酒量',
+          stress: '压力水平',
+          social: '社交关系',
+          meditation: '冥想/正念',
+          nature: '亲近自然时间',
+          sun: '日晒',
+          checkups: '体检频率',
+          conditions: '慢性疾病',
+          family: '家族长寿史',
+          education: '受教育程度',
+          marital: '婚姻状况',
+          income: '收入水平',
+          heart: '心脏病史',
+          cancer: '癌症病史',
+          diabetes: '糖尿病',
+          bp: '高血压',
+          cholesterol: '胆固醇水平',
+          mentalHealth: '心理健康状况'
+        },
+        options: {
+          gender: { male: '男性', female: '女性' },
+          cardio: { never: '从不', '1-2': '每周1-2次', '3-4': '每周3-4次', '5plus': '每周5次以上' },
+          strength: { never: '从不', '1-2': '每周1-2次', '3-4': '每周3-4次', '5plus': '每周5次以上' },
+          steps: { lt5k: '<5000', '5-8k': '5000-8000', '8-10k': '8000-10000', '10kplus': '10000+' },
+          sauna: { never: '从不', '1x': '每周1次', '2-3': '每周2-3次', '4plus': '每周4次以上' },
+          diet: { standard: '标准', balanced: '均衡/全食', mediterranean: '地中海', plant: '素食/纯素', keto: '生酮/低碳' },
+          vegetables: { lt2: '<2', '2-3': '2-3', '4-5': '4-5', '6plus': '6+' },
+          processed: { daily: '每天', several: '每周数次', rarely: '很少', never: '从不' },
+          water: { lt4: '<4杯', '4-6': '4-6杯', '6-8': '6-8杯', '8plus': '8+杯' },
+          fish: { never: '从不', '1x': '每周1次', '2-3': '每周2-3次', '4plus': '每周4次以上' },
+          sleepQuality: { poor: '差', fair: '一般', good: '好', excellent: '极佳' },
+          sleepConsistency: { veryIrregular: '非常不规律', somewhatIrregular: '较不规律', mostly: '较规律', veryConsistent: '非常规律' },
+          smoking: { never: '从不', former5: '戒烟5年以上', formerRecent: '戒烟少于5年', current: '当前吸烟' },
+          alcohol: { none: '无', light: '少量 (1-7/周)', moderate: '适量 (8-14/周)', heavy: '大量 (15+/周)' },
+          stress: { veryHigh: '非常高', high: '高', moderate: '中等', low: '低', veryLow: '很低' },
+          social: { isolated: '孤立', few: '少数朋友', moderate: '适度社交', very: '非常社交' },
+          meditation: { never: '从不', occasionally: '偶尔', weekly: '每周', daily: '每天' },
+          nature: { rarely: '很少', monthly: '每月', weekly: '每周', daily: '每天' },
+          sun: { minimal: '极少', moderateScreen: '适度且防晒', moderateNoScreen: '适度无防晒', excessive: '过度' },
+          checkups: { never: '从不', twoYears: '每2年以上', annual: '每年', sixMonths: '每6个月' },
+          conditions: { none: '无', one: '1种疾病', twoThree: '2-3种疾病', fourPlus: '4+种疾病' },
+          family: { poor: '较差 (<70 平均)', fair: '一般 (70-80 平均)', good: '良好 (80-85 平均)', excellent: '优秀 (85+ 平均)' },
+          education: { lessHS: '高中以下', highSchool: '高中', someCollege: '大专/部分大学', bachelor: '本科', graduate: '研究生及以上' },
+          marital: { single: '单身/未婚', married: '已婚/伴侣', divorced: '离异/分居', widowed: '鳏寡' },
+          income: { poverty: '贫困线以下', lowerMiddle: '中下阶层', middle: '中产阶层', upperMiddle: '中上阶层', high: '高收入' },
+          diabetes: { none: '无', prediabetic: '前期糖尿病', type1: '1型', type2controlled: '2型已控制', type2uncontrolled: '2型未控制' },
+          bp: { normal: '正常', elevated: '偏高', stage1: '一期', stage2: '二期' },
+          cholesterol: { optimal: '理想 (<200 mg/dL)', borderline: '临界高 (200-239 mg/dL)', high: '高 (240+ mg/dL)', medication: '药物控制中' },
+          mentalHealth: { none: '无', mild: '轻度焦虑/抑郁', moderate: '中度', severe: '重度' }
+        },
+        buttons: { calculate: '计算长寿洞察', reset: '重置表单' },
+        results: {
+          estimated: '预估寿命',
+          yearsLabel: '年',
+          remainingPositive: '剩余年数',
+          remainingNegative: '超出现有年龄的年数',
+          encouragementPositive: '做得好！当前习惯在增加寿命—继续保持并优化细节。',
+          encouragementNegative: '你的选择可以增加寿命—专注于提升估算的关键机会。',
+          defaultEncouragement: '你的生活方式选择会显著影响此估算。',
+          topOpportunities: '主要改进机会',
+          strongPerformance: '你在关键领域表现良好—请继续保持！'
+        },
+        inlineDisclaimer: '此计算器仅供信息和教育用途，不提供医疗建议。请咨询专业医务人员获取个人建议。完整免责声明见下方。',
+        disclaimers: {
+          medicalTitle: '医疗免责声明',
+          medical: [
+            '此计算器仅提供信息和教育用途的估算。',
+            '结果不是医疗建议、诊断或治疗推荐。',
+            '请勿将此计算器作为专业医疗建议的替代。',
+            '做出医疗决定前请咨询合格的医疗专业人士。',
+            '个人结果可能因多种因素而有较大差异。'
+          ],
+          accuracyTitle: '准确性免责声明',
+          accuracy: [
+            '估算基于统计模型和研究数据。',
+            '不保证准确性或特定结果。',
+            '影响寿命的许多因素无法完全量化。'
+          ],
+          liabilityTitle: '责任免责声明',
+          liability: [
+            '网站所有者不对基于结果的决策承担责任。',
+            '用户自行承担使用本信息的所有风险。'
+          ]
+        },
+        categories: {
+          activity: '身体活动',
+          nutrition: '营养',
+          sleep: '睡眠与恢复',
+          lifestyle: '生活方式与习惯',
+          wellness: '健康实践',
+          management: '健康管理',
+          socioeconomic: '社会经济',
+          medical: '既往医疗状况'
+        },
+        impactDescriptors: {
+          activity: '规律进行有氧、力量和日常步行，并加入桑拿等热暴露。',
+          nutrition: '偏好全食、膳食纤维、补水和富含ω-3的鱼类，同时减少加工食品。',
+          sleep: '在安静、黑暗的环境中保持规律且高质量的睡眠。',
+          lifestyle: '戒烟、适度饮酒、管理压力并维护社交关系。',
+          wellness: '加入正念练习、亲近自然和合理的日晒习惯。',
+          management: '主动进行体检并管理疾病，结合家族史。',
+          socioeconomic: '教育、稳定关系和财务安全有助于更健康的选择和获取资源。',
+          medical: '与临床医生密切合作，管理或减轻现有病情。'
+        },
+        recommendations: {
+          cardio: '提升有氧频率',
+          strength: '增加力量训练',
+          steps: '提高每日步数',
+          sauna: '加入桑拿习惯',
+          diet: '转向地中海/全食饮食',
+          vegetables: '增加蔬菜摄入',
+          processed: '减少加工食品',
+          water: '改善补水',
+          fish: '添加富含ω-3的鱼',
+          sleepHours: '优化睡眠时长',
+          sleepQuality: '提升睡眠质量',
+          sleepConsistency: '保持规律作息',
+          smoking: '戒烟',
+          alcohol: '控制饮酒',
+          stress: '降低压力水平',
+          social: '加强社交联系',
+          meditation: '练习正念',
+          nature: '多亲近自然',
+          sun: '选择适度且防晒的日晒',
+          checkups: '增加体检频率',
+          conditions: '更好管理慢性病',
+          family: '将家族史纳入决策',
+          education: '提升教育/技能',
+          marital: '经营支持性的关系',
+          income: '改善财务稳定/获取',
+          heart: '关注心脏疾病风险',
+          cancer: '关注癌症风险因素',
+          diabetes: '改善糖尿病控制',
+          bp: '控制血压',
+          cholesterol: '改善胆固醇状况',
+          mentalHealth: '支持心理健康'
+        }
+      }
+    };
+    let currentLanguage = 'en';
+
+    function setMetaDescription(text) {
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.setAttribute('content', text);
+    }
+
+    function populateSelectOptions(lang) {
+      const t = translations[lang];
+      Object.entries(selectOptions).forEach(([id, opts]) => {
+        const select = document.getElementById(id);
+        if (!select) return;
+        const previous = select.value;
+        select.innerHTML = '';
+        opts.forEach(option => {
+          const opt = document.createElement('option');
+          opt.value = option.value;
+          opt.textContent = t.options[id][option.value];
+          select.appendChild(opt);
+        });
+        const defaultValue = DEFAULT_INPUTS.selects[id];
+        if (previous && optionValues[id]?.[previous] !== undefined) {
+          select.value = previous;
+        } else if (defaultValue !== undefined) {
+          select.value = defaultValue;
+        }
+      });
+    }
+
+    function setText(id, text) {
+      const node = document.getElementById(id);
+      if (node) node.textContent = text;
+    }
+
+    function updateDisclaimers(lang) {
+      const t = translations[lang];
+      setText('disclaimerHeader', t.sections.disclaimers);
+      setText('medicalDisclaimerTitle', t.disclaimers.medicalTitle);
+      setText('accuracyDisclaimerTitle', t.disclaimers.accuracyTitle);
+      setText('liabilityDisclaimerTitle', t.disclaimers.liabilityTitle);
+      const medicalIds = ['medicalDisclaimer1','medicalDisclaimer2','medicalDisclaimer3','medicalDisclaimer4','medicalDisclaimer5'];
+      medicalIds.forEach((id, idx) => setText(id, t.disclaimers.medical[idx]));
+      const accuracyIds = ['accuracyDisclaimer1','accuracyDisclaimer2','accuracyDisclaimer3'];
+      accuracyIds.forEach((id, idx) => setText(id, t.disclaimers.accuracy[idx]));
+      const liabilityIds = ['liabilityDisclaimer1','liabilityDisclaimer2'];
+      liabilityIds.forEach((id, idx) => setText(id, t.disclaimers.liability[idx]));
+    }
+
+    function updateLabels(lang) {
+      const t = translations[lang];
+      const labelMap = {
+        labelAge: t.labels.age,
+        labelGender: t.labels.gender,
+        genderMale: t.labels.male,
+        genderFemale: t.labels.female,
+        labelHeight: t.labels.height,
+        labelWeight: t.labels.weight,
+        labelCardio: t.labels.cardio,
+        labelStrength: t.labels.strength,
+        labelSteps: t.labels.steps,
+        labelSauna: t.labels.sauna,
+        labelDiet: t.labels.diet,
+        labelVegetables: t.labels.vegetables,
+        labelProcessed: t.labels.processed,
+        labelWater: t.labels.water,
+        labelFish: t.labels.fish,
+        labelSleepHours: t.labels.sleepHours,
+        labelSleepQuality: t.labels.sleepQuality,
+        labelSleepConsistency: t.labels.sleepConsistency,
+        labelSmoking: t.labels.smoking,
+        labelAlcohol: t.labels.alcohol,
+        labelStress: t.labels.stress,
+        labelSocial: t.labels.social,
+        labelMeditation: t.labels.meditation,
+        labelNature: t.labels.nature,
+        labelSun: t.labels.sun,
+        labelCheckups: t.labels.checkups,
+        labelConditions: t.labels.conditions,
+        labelFamily: t.labels.family,
+        labelEducation: t.labels.education,
+        labelMarital: t.labels.marital,
+        labelIncome: t.labels.income,
+        labelHeart: t.labels.heart,
+        labelCancer: t.labels.cancer,
+        labelDiabetes: t.labels.diabetes,
+        labelBp: t.labels.bp,
+        labelCholesterol: t.labels.cholesterol,
+        labelMentalHealth: t.labels.mentalHealth,
+        heartNo: yesNoLabels[lang]?.no ?? 'No',
+        heartYes: yesNoLabels[lang]?.yes ?? 'Yes',
+        cancerNo: yesNoLabels[lang]?.no ?? 'No',
+        cancerYes: yesNoLabels[lang]?.yes ?? 'Yes'
+      };
+
+      Object.entries(labelMap).forEach(([id, text]) => setText(id, text));
+    }
+
+    const yesNoLabels = {
+      en: { yes: 'Yes', no: 'No' },
+      es: { yes: 'Sí', no: 'No' },
+      pl: { yes: 'Tak', no: 'Nie' },
+      de: { yes: 'Ja', no: 'Nein' },
+      fr: { yes: 'Oui', no: 'Non' },
+      zh: { yes: '是', no: '否' }
     };
 
-    const recommendationLabels = {
-      cardio: 'Increase cardio frequency',
-      strength: 'Add more strength sessions',
-      steps: 'Increase daily steps',
-      sauna: 'Include sauna sessions',
-      diet: 'Shift toward Mediterranean/whole foods',
-      vegetables: 'Boost vegetable servings',
-      processed: 'Reduce processed foods',
-      water: 'Improve hydration',
-      fish: 'Add omega-3 rich fish',
-      sleepHours: 'Optimize sleep duration',
-      sleepQuality: 'Improve sleep quality',
-      sleepConsistency: 'Keep sleep schedule regular',
-      smoking: 'Eliminate smoking',
-      alcohol: 'Moderate alcohol',
-      stress: 'Lower stress levels',
-      social: 'Strengthen social connections',
-      meditation: 'Practice mindfulness',
-      nature: 'Spend time in nature',
-      sun: 'Favor moderate sun with protection',
-      checkups: 'Increase medical checkups',
-      conditions: 'Better manage chronic conditions',
-      family: 'Factor family history into choices',
-      education: 'Pursue additional education/skills',
-      marital: 'Cultivate supportive partnerships',
-      income: 'Improve financial stability/access',
-      heart: 'Address heart disease risk',
-      cancer: 'Address cancer risk factors',
-      diabetes: 'Improve diabetes control',
-      bp: 'Control blood pressure',
-      cholesterol: 'Improve cholesterol profile',
-      mentalHealth: 'Support mental health'
-    };
+    function updateStaticText(lang) {
+      const t = translations[lang];
+      document.getElementById('pageTitle').textContent = t.pageTitle;
+      document.title = t.pageTitle;
+      setMetaDescription(t.metaDescription);
+      document.getElementById('pageSubtitle').textContent = t.pageSubtitle;
+      document.getElementById('topNote').innerHTML = t.topNote;
+      document.getElementById('languageLabel').textContent = t.languageLabel;
+      document.documentElement.lang = lang;
+
+      setText('sectionDemographics', t.sections.demographics);
+      setText('sectionActivity', t.sections.activity);
+      setText('sectionNutrition', t.sections.nutrition);
+      setText('sectionSleep', t.sections.sleep);
+      setText('sectionLifestyle', t.sections.lifestyle);
+      setText('sectionWellness', t.sections.wellness);
+      setText('sectionManagement', t.sections.management);
+      setText('sectionSocioeconomic', t.sections.socioeconomic);
+      setText('sectionMedical', t.sections.medical);
+
+      setText('calculate', t.buttons.calculate);
+      setText('reset', t.buttons.reset);
+      setText('resultEstimateLabel', t.results.estimated);
+      setText('recommendationsTitle', t.results.topOpportunities);
+      document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
+      document.getElementById('lifespanValue').textContent = `-- ${t.results.yearsLabel}`;
+      document.getElementById('remainingYears').textContent = '';
+      document.getElementById('inlineDisclaimer').textContent = t.inlineDisclaimer;
+    }
+
+    function updateBinaryLabels(lang) {
+      const labels = yesNoLabels[lang] || yesNoLabels.en;
+      setText('heartNo', labels.no);
+      setText('heartYes', labels.yes);
+      setText('cancerNo', labels.no);
+      setText('cancerYes', labels.yes);
+    }
+
+    function applyLanguage(lang) {
+      currentLanguage = supportedLanguages.includes(lang) ? lang : 'en';
+      const t = translations[currentLanguage];
+      document.getElementById('languagePicker').value = currentLanguage;
+      populateSelectOptions(currentLanguage);
+      updateLabels(currentLanguage);
+      updateBinaryLabels(currentLanguage);
+      updateStaticText(currentLanguage);
+      updateDisclaimers(currentLanguage);
+      rebuildImpactGridIfVisible();
+    }
+
+    function detectLanguage() {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get('lang');
+      if (urlLang && supportedLanguages.includes(urlLang)) return urlLang;
+
+      const stored = localStorage.getItem('preferredLang');
+      if (stored && supportedLanguages.includes(stored)) return stored;
+
+      const browser = navigator.language?.slice(0,2).toLowerCase();
+      if (supportedLanguages.includes(browser)) return browser;
+
+      return 'en';
+    }
+
+    const categoriesForDisplay = Object.keys(categoryWeights);
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function normalize(value, max) {
+      return max ? clamp((value / max) * 100, 0, 100) : 0;
+    }
+
+    function getSelectScore(id) {
+      const select = document.getElementById(id);
+      if (!select) return 0;
+      return optionValues[id]?.[select.value] ?? 0;
+    }
 
     function getNumericValue(id) {
       const el = document.getElementById(id);
       if (!el) return 0;
+      const val = parseFloat(el.value);
+      return isFinite(val) ? val : 0;
+    }
 
-      if (el.type === 'number') {
-        const val = parseFloat(el.value);
-        return isFinite(val) ? val : 0;
-      }
+    function getRadioValue(name) {
+      const selected = document.querySelector(`input[name="${name}"]:checked`);
+      if (!selected) return 0;
+      if (name === 'heart') return selected.value === 'yes' ? -3 : 0;
+      if (name === 'cancer') return selected.value === 'yes' ? -2 : 0;
+      return 0;
+    }
 
-      if (el.tagName === 'SELECT') {
-        const text = el.value;
-        return optionValues[id]?.[text] ?? 0;
-      }
-
+    function calculateHoursScore(hours) {
+      if (!isFinite(hours)) return 0;
+      if (hours >= 7 && hours <= 9) return 1;
+      if (hours >= 6 && hours < 7) return 0.5;
+      if (hours > 9 && hours <= 10) return 0.25;
       return 0;
     }
 
@@ -936,147 +2240,113 @@
       return Object.values(impacts).reduce((a, b) => a + b, 0);
     }
 
-    function getRadioValue(name) {
-      const selected = document.querySelector(`input[name="${name}"]:checked`);
-      if (!selected) return 0;
-      const key = name === 'heart' || name === 'cancer' ? name : selected.value;
-      if (name === 'heart') return selected.value === 'yes' ? -3 : 0;
-      if (name === 'cancer') return selected.value === 'yes' ? -2 : 0;
-      return optionValues[name]?.[selected.value] ?? 0;
+    function collectInputs() {
+      const sleepHours = getNumericValue('sleepHours');
+      return {
+        age: getNumericValue('age'),
+        gender: document.querySelector('input[name="gender"]:checked')?.value === 'female' ? -2 : 0,
+        height: getNumericValue('height'),
+        weight: getNumericValue('weight'),
+        cardio: getSelectScore('cardio'),
+        strength: getSelectScore('strength'),
+        steps: getSelectScore('steps'),
+        sauna: getSelectScore('sauna'),
+        diet: getSelectScore('diet'),
+        vegetables: getSelectScore('vegetables'),
+        processed: getSelectScore('processed'),
+        water: getSelectScore('water'),
+        fish: getSelectScore('fish'),
+        sleepHours,
+        sleepHoursScore: calculateHoursScore(sleepHours),
+        sleepQuality: getSelectScore('sleepQuality'),
+        sleepConsistency: getSelectScore('sleepConsistency'),
+        smoking: getSelectScore('smoking'),
+        alcohol: getSelectScore('alcohol'),
+        stress: getSelectScore('stress'),
+        social: getSelectScore('social'),
+        meditation: getSelectScore('meditation'),
+        nature: getSelectScore('nature'),
+        sun: getSelectScore('sun'),
+        checkups: getSelectScore('checkups'),
+        conditions: getSelectScore('conditions'),
+        family: getSelectScore('family'),
+        education: getSelectScore('education'),
+        marital: getSelectScore('marital'),
+        income: getSelectScore('income'),
+        heart: getRadioValue('heart'),
+        cancer: getRadioValue('cancer'),
+        diabetes: getSelectScore('diabetes'),
+        bp: getSelectScore('bp'),
+        cholesterol: getSelectScore('cholesterol'),
+        mentalHealth: getSelectScore('mentalHealth')
+      };
     }
 
-    function calculateHoursScore(hours) {
-      if (!isFinite(hours)) return 0;
-      if (hours >= 7 && hours <= 9) return 1;
-      if (hours >= 6 && hours < 7) return 0.5;
-      if (hours > 9 && hours <= 10) return 0.25;
-      return 0;
+    function buildDiagnosis(values) {
+      return {
+        activity: values.cardio + values.strength + values.steps + values.sauna,
+        nutrition: values.diet + values.vegetables + values.processed + values.water + values.fish,
+        sleep: values.sleepHoursScore + values.sleepQuality + values.sleepConsistency,
+        lifestyle: values.smoking + values.alcohol + values.stress + values.social,
+        wellness: values.meditation + values.nature + values.sun,
+        management: values.checkups + values.conditions + values.family,
+        socioeconomic: values.education + values.marital + values.income,
+        medical: values.heart + values.cancer + values.diabetes + values.bp + values.cholesterol + values.mentalHealth
+      };
     }
 
-    function clamp(value, min, max) {
-      return Math.min(Math.max(value, min), max);
+    function prepareImpactBreakdown(values) {
+      return buildDiagnosis(values);
     }
 
-    function normalize(value, max) {
-      if (max === 0) return 0;
-      return clamp((value / max) * 100, 0, 100);
+    function clampLifespan(value) {
+      return clamp(value, 40, 110);
     }
 
-    function getBaseLifespan() {
-      const gender = document.querySelector('input[name="gender"]:checked')?.value || 'male';
-      return gender === 'female' ? 80 : 78;
+    function calculateRemainingYears(lifespan, currentAge) {
+      return clamp(lifespan - currentAge, -10, 90);
+    }
+
+    function calculateEncouragement(totalAdjustment) {
+      const t = translations[currentLanguage];
+      return totalAdjustment >= 0 ? t.results.encouragementPositive : t.results.encouragementNegative;
     }
 
     function buildImpactCard(title, value, progress, descriptor) {
-      const div = document.createElement('div');
-      div.className = 'impact-card';
+      const card = document.createElement('div');
+      card.className = 'impact-card';
 
-      const header = document.createElement('h3');
-      header.textContent = title;
+      const heading = document.createElement('h3');
+      const yearsLabel = translations[currentLanguage].results.yearsLabel;
+      heading.innerHTML = `${title} <span class="impact-value">${value.toFixed(1)} ${yearsLabel}</span>`;
+      card.appendChild(heading);
 
-      const valueSpan = document.createElement('div');
-      valueSpan.className = 'impact-value';
-      valueSpan.textContent = `${value >= 0 ? '+' : ''}${value.toFixed(1)} yrs`;
+      const desc = document.createElement('div');
+      desc.className = 'result-subtitle';
+      desc.textContent = descriptor;
+      card.appendChild(desc);
 
-      const progressContainer = document.createElement('div');
-      progressContainer.className = 'progress-container';
-
+      const bar = document.createElement('div');
+      bar.className = 'progress-container';
       const progressBar = document.createElement('div');
       progressBar.className = 'progress-bar';
       progressBar.style.width = `${progress}%`;
+      bar.appendChild(progressBar);
+      card.appendChild(bar);
 
-      const descriptorText = document.createElement('div');
-      descriptorText.className = 'result-subtitle';
-      descriptorText.style.marginTop = '8px';
-      descriptorText.textContent = descriptor;
-
-      progressContainer.appendChild(progressBar);
-      div.appendChild(header);
-      div.appendChild(valueSpan);
-      div.appendChild(progressContainer);
-      div.appendChild(descriptorText);
-      return div;
-    }
-
-    function collectInputs() {
-      const radios = ['heart', 'cancer'];
-      const selectKeys = [
-        'cardio','strength','steps','sauna','diet','vegetables','processed','water','fish',
-        'sleepQuality','sleepConsistency','smoking','alcohol','stress','social','meditation',
-        'nature','sun','checkups','conditions','family','education','marital','income',
-        'diabetes','bp','cholesterol','mentalHealth'
-      ];
-      const numbers = ['sleepHours'];
-
-      const values = {};
-
-      radios.forEach(key => { values[key] = getRadioValue(key); });
-      selectKeys.forEach(key => { values[key] = getNumericValue(key); });
-      numbers.forEach(key => { values[key] = getNumericValue(key); });
-
-      values.sleepHoursScore = calculateHoursScore(values.sleepHours);
-      return values;
-    }
-
-    function buildCategoryImpacts(values) {
-      const impacts = {
-        activity: clamp(
-          (values.cardio * 2/3) +
-          (values.strength * 2/3) +
-          (values.steps * 0.25) +
-          (values.sauna * 0.33),
-          -6, 6),
-        nutrition: clamp(
-          (values.diet) +
-          (values.vegetables) +
-          (values.processed) +
-          (values.water) +
-          (values.fish),
-          -5, 5),
-        sleep: clamp(values.sleepHoursScore + values.sleepQuality + values.sleepConsistency, -3, 3),
-        lifestyle: clamp(values.smoking + values.alcohol + values.stress + values.social, -10, 6),
-        wellness: clamp(values.meditation + values.nature + values.sun, -1, 2),
-        management: clamp(values.checkups + values.conditions + values.family, -5, 3),
-        socioeconomic: clamp(values.education + values.marital + values.income, -5, 5),
-        medical: clamp(values.heart + values.cancer + values.diabetes + values.bp + values.cholesterol + values.mentalHealth, -12, 0)
-      };
-      return impacts;
-    }
-
-    function calculateLifespan(options = {}) {
-      const values = collectInputs();
-      const base = getBaseLifespan();
-      const impacts = applyBonusScaling(buildCategoryImpacts(values));
-
-      const totalAdjustment = sumAdjustment(impacts);
-      const lifespan = clamp(base + totalAdjustment, 40, 110);
-
-      const age = getNumericValue('age');
-      const remaining = isFinite(age) ? clamp(lifespan - age, -10, 90) : null;
-
-      document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} years`;
-      document.getElementById('remainingYears').textContent = isFinite(remaining)
-        ? `${remaining.toFixed(1)} years ${remaining >= 0 ? 'remaining' : 'beyond current age'}`
-        : '';
-
-      document.getElementById('encouragement').textContent =
-        totalAdjustment >= 0
-          ? 'Great job! Your current habits are adding years—keep them strong and refine the gaps.'
-          : 'Your choices can add years—focus on the biggest opportunities to improve your estimate.';
-
-      buildImpactGrid(impacts);
-      buildRecommendations(buildImprovements(values, impacts));
-      renderResults(lifespan, remaining, impacts, options);
+      return card;
     }
 
     function buildImpactGrid(impacts) {
       const grid = document.getElementById('impactGrid');
       grid.innerHTML = '';
+      const t = translations[currentLanguage];
 
-      Object.entries(categoryWeights).forEach(([key, meta]) => {
+      categoriesForDisplay.forEach(key => {
+        const meta = categoryWeights[key];
         const value = impacts[key] ?? 0;
         const progress = normalize(value, meta.max);
-        grid.appendChild(buildImpactCard(meta.labels, value, progress, impactDescriptors[key]));
+        grid.appendChild(buildImpactCard(t.categories[key], value, progress, t.impactDescriptors[key]));
       });
     }
 
@@ -1094,12 +2364,7 @@
         heart: 0, cancer: 0, diabetes: 0, bp: 0, cholesterol: 0, mentalHealth: 0
       };
 
-      const currentScores = {
-        ...values,
-        sleepHours: undefined,
-        heart: values.heart,
-        cancer: values.cancer
-      };
+      const currentScores = { ...values, sleepHours: undefined };
 
       Object.entries(targetRanges).forEach(([factor, target]) => {
         const current = currentScores[factor] ?? 0;
@@ -1124,114 +2389,26 @@
     function buildRecommendations(improvements) {
       const container = document.getElementById('recommendationChips');
       container.innerHTML = '';
+      const t = translations[currentLanguage];
 
       if (!improvements.length) {
-        container.textContent = 'You are performing strongly across key areas—maintain your habits!';
+        container.textContent = t.results.strongPerformance;
         return;
       }
 
       improvements.forEach(item => {
         const chip = document.createElement('div');
         chip.className = 'chip';
-        chip.textContent = `${recommendationLabels[item.factor]} (+${item.potentialGain.toFixed(1)} yrs)`;
+        chip.textContent = `${t.recommendations[item.factor]} (+${item.potentialGain.toFixed(1)} yrs)`;
         container.appendChild(chip);
       });
     }
 
-    function prepareImpactBreakdown(values) {
-      const impacts = buildCategoryImpacts(values);
-      return impacts;
-    }
-
-    function init() {
-      // Placeholder for future initialization logic if needed
-    }
-
-    init();
-
-    function recalcOnChange() {
-      const resultWrapper = document.getElementById('results');
-      if (resultWrapper.classList.contains('visible')) {
-        calculateLifespan({ scrollToResults: false });
-      }
-    }
-
-    document.querySelectorAll('input, select').forEach(el => {
-      el.addEventListener('change', recalcOnChange);
-      el.addEventListener('input', recalcOnChange);
-    });
-
-    function clearResultsDisplay() {
-      const resultWrapper = document.getElementById('results');
-      resultWrapper.classList.remove('visible');
-      document.getElementById('lifespanValue').textContent = '-- years';
-      document.getElementById('remainingYears').textContent = '';
-      document.getElementById('encouragement').textContent = DEFAULT_ENCOURAGEMENT;
-      document.getElementById('impactGrid').innerHTML = '';
-      document.getElementById('recommendationChips').innerHTML = '';
-    }
-
-    function applyDefaults() {
-      const radioDefaults = { heart: DEFAULT_INPUTS.heart, cancer: DEFAULT_INPUTS.cancer };
-      Object.entries(radioDefaults).forEach(([name, value]) => {
-        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-        if (radio) radio.checked = true;
-      });
-    }
-
-    applyDefaults();
-
-    function resetForm() {
-      clearResultsDisplay();
-
-      document.getElementById('age').value = DEFAULT_INPUTS.age;
-      document.getElementById('height').value = DEFAULT_INPUTS.height;
-      document.getElementById('weight').value = DEFAULT_INPUTS.weight;
-      document.getElementById('sleepHours').value = DEFAULT_INPUTS.sleepHours;
-
-      document.querySelectorAll('select').forEach(select => {
-        select.selectedIndex = 0;
-      });
-
-      const radioDefaults = {
-        gender: DEFAULT_INPUTS.gender,
-        heart: DEFAULT_INPUTS.heart,
-        cancer: DEFAULT_INPUTS.cancer
-      };
-
-      Object.entries(radioDefaults).forEach(([name, value]) => {
-        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-        if (radio) radio.checked = true;
-      });
-    }
-
-    function buildDiagnosis(values) {
-      return {
-        activity: values.cardio + values.strength + values.steps + values.sauna,
-        nutrition: values.diet + values.vegetables + values.processed + values.water + values.fish,
-        sleep: values.sleepHoursScore + values.sleepQuality + values.sleepConsistency,
-        lifestyle: values.smoking + values.alcohol + values.stress + values.social,
-        wellness: values.meditation + values.nature + values.sun,
-        management: values.checkups + values.conditions + values.family,
-        socioeconomic: values.education + values.marital + values.income,
-        medical: values.heart + values.cancer + values.diabetes + values.bp + values.cholesterol + values.mentalHealth
-      };
-    }
-
-    function calculateRemainingYears(lifespan, currentAge) {
-      return clamp(lifespan - currentAge, -10, 90);
-    }
-
-    function calculateEncouragement(totalAdjustment) {
-      return totalAdjustment >= 0
-        ? 'Great job! Your current habits are adding years—keep them strong and refine the gaps.'
-        : 'Your choices can add years—focus on the biggest opportunities to improve your estimate.';
-    }
-
     function renderResults(lifespan, remaining, impacts, { scrollToResults = false } = {}) {
-      document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} years`;
+      const t = translations[currentLanguage];
+      document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} ${t.results.yearsLabel}`;
       document.getElementById('remainingYears').textContent = isFinite(remaining)
-        ? `${remaining.toFixed(1)} years ${remaining >= 0 ? 'remaining' : 'beyond current age'}`
+        ? `${remaining.toFixed(1)} ${remaining >= 0 ? t.results.remainingPositive : t.results.remainingNegative}`
         : '';
 
       const totalAdjustment = sumAdjustment(impacts);
@@ -1247,8 +2424,101 @@
       }
     }
 
+    function clearResultsDisplay() {
+      const resultWrapper = document.getElementById('results');
+      resultWrapper.classList.remove('visible');
+      const t = translations[currentLanguage];
+      document.getElementById('lifespanValue').textContent = `-- ${t.results.yearsLabel}`;
+      document.getElementById('remainingYears').textContent = '';
+      document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
+      document.getElementById('impactGrid').innerHTML = '';
+      document.getElementById('recommendationChips').innerHTML = '';
+    }
+
+    function applyDefaults() {
+      document.getElementById('age').value = DEFAULT_INPUTS.age;
+      document.getElementById('height').value = DEFAULT_INPUTS.height;
+      document.getElementById('weight').value = DEFAULT_INPUTS.weight;
+      document.getElementById('sleepHours').value = DEFAULT_INPUTS.sleepHours;
+
+      Object.entries(DEFAULT_INPUTS.selects).forEach(([key, value]) => {
+        const select = document.getElementById(key);
+        if (select) select.value = value;
+      });
+
+      const genderRadio = document.querySelector(`input[name="gender"][value="${DEFAULT_INPUTS.gender}"]`);
+      if (genderRadio) genderRadio.checked = true;
+
+      ['heart','cancer'].forEach(name => {
+        const radio = document.querySelector(`input[name="${name}"][value="${DEFAULT_INPUTS[name]}"]`);
+        if (radio) radio.checked = true;
+      });
+    }
+
+    function resetForm() {
+      clearResultsDisplay();
+      applyDefaults();
+    }
+
+    function buildBaseLifespan(values) {
+      const bmi = values.weight / Math.pow(values.height / 100, 2);
+      const bmiAdjustment = bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
+      const base = 82 + values.gender + bmiAdjustment;
+      return clampLifespan(base);
+    }
+
+    function buildCategoryImpacts(values) {
+      const impacts = buildDiagnosis(values);
+      return applyBonusScaling(impacts);
+    }
+
+    function rebuildImpactGridIfVisible() {
+      const resultWrapper = document.getElementById('results');
+      if (resultWrapper.classList.contains('visible')) {
+        calculateLifespan({ scrollToResults: false });
+      }
+    }
+
+    function calculateLifespan({ scrollToResults = false } = {}) {
+      const values = collectInputs();
+      const impacts = buildCategoryImpacts(values);
+      const totalAdjustment = sumAdjustment(impacts);
+
+      const base = buildBaseLifespan(values);
+      const lifespan = clampLifespan(base + totalAdjustment);
+      const remaining = calculateRemainingYears(lifespan, values.age);
+
+      renderResults(lifespan, remaining, impacts, { scrollToResults });
+    }
+
+    function recalcOnChange() {
+      const resultWrapper = document.getElementById('results');
+      if (resultWrapper.classList.contains('visible')) {
+        calculateLifespan({ scrollToResults: false });
+      }
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', recalcOnChange);
+      el.addEventListener('input', recalcOnChange);
+    });
+
     document.getElementById('calculate').addEventListener('click', () => calculateLifespan({ scrollToResults: true }));
     document.getElementById('reset').addEventListener('click', resetForm);
+
+    document.getElementById('languagePicker').addEventListener('change', (e) => {
+      const lang = e.target.value;
+      applyLanguage(lang);
+      localStorage.setItem('preferredLang', lang);
+      const params = new URLSearchParams(window.location.search);
+      params.set('lang', lang);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+    });
+
+    const initialLang = detectLanguage();
+    applyLanguage(initialLang);
+    applyDefaults();
   </script>
 </body>
 </html>
