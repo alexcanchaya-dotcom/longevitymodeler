@@ -166,10 +166,16 @@
       background: rgba(255,255,255,0.12);
     }
 
-    #calculate {
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .action-button {
       width: min(360px, 100%);
-      display: block;
-      margin: 16px auto 0;
       padding: 14px 16px;
       border: none;
       border-radius: 14px;
@@ -182,12 +188,19 @@
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    #calculate:hover {
+    .action-button:hover {
       transform: translateY(-1px);
       box-shadow: 0 14px 28px rgba(68, 120, 241, 0.45);
     }
 
-    #calculate:active { transform: translateY(0); }
+    .action-button:active { transform: translateY(0); }
+
+    #calculate { display: inline-block; }
+
+    #reset {
+      background: linear-gradient(135deg, #8a9ccf, #6d7fb8);
+      box-shadow: 0 12px 24px rgba(109, 127, 184, 0.35);
+    }
 
     .results-wrapper {
       margin-top: 24px;
@@ -716,7 +729,10 @@
       </section>
     </div>
 
-    <button id="calculate">Calculate Longevity Insights</button>
+    <div class="button-row">
+      <button id="calculate" class="action-button">Calculate Longevity Insights</button>
+      <button id="reset" class="action-button">Reset Form</button>
+    </div>
 
     <div class="results-wrapper" id="results">
       <div class="result-card">
@@ -805,6 +821,18 @@
       bp: { 'Normal': 0, 'Elevated': -0.5, 'Stage 1': -1.5, 'Stage 2': -3 },
       mentalHealth: { 'None': 0, 'Mild anxiety/depression': -0.5, 'Moderate': -1.5, 'Severe': -3 }
     };
+
+    const DEFAULT_INPUTS = {
+      age: 35,
+      gender: 'male',
+      height: 175,
+      weight: 72,
+      sleepHours: 7.5,
+      heart: 'no',
+      cancer: 'no'
+    };
+
+    const DEFAULT_ENCOURAGEMENT = 'Your lifestyle choices can meaningfully shift this estimate.';
 
     const BONUS_SCALING = 0.45;
 
@@ -999,7 +1027,7 @@
       return impacts;
     }
 
-    function calculateLifespan() {
+    function calculateLifespan(options = {}) {
       const values = collectInputs();
       const base = getBaseLifespan();
       const impacts = applyBonusScaling(buildCategoryImpacts(values));
@@ -1022,10 +1050,7 @@
 
       buildImpactGrid(impacts);
       buildRecommendations(buildImprovements(values, impacts));
-
-      const resultWrapper = document.getElementById('results');
-      resultWrapper.classList.add('visible');
-      resultWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      renderResults(lifespan, remaining, impacts, options);
     }
 
     function buildImpactGrid(impacts) {
@@ -1111,7 +1136,7 @@
     function recalcOnChange() {
       const resultWrapper = document.getElementById('results');
       if (resultWrapper.classList.contains('visible')) {
-        calculateLifespan();
+        calculateLifespan({ scrollToResults: false });
       }
     }
 
@@ -1120,8 +1145,18 @@
       el.addEventListener('input', recalcOnChange);
     });
 
+    function clearResultsDisplay() {
+      const resultWrapper = document.getElementById('results');
+      resultWrapper.classList.remove('visible');
+      document.getElementById('lifespanValue').textContent = '-- years';
+      document.getElementById('remainingYears').textContent = '';
+      document.getElementById('encouragement').textContent = DEFAULT_ENCOURAGEMENT;
+      document.getElementById('impactGrid').innerHTML = '';
+      document.getElementById('recommendationChips').innerHTML = '';
+    }
+
     function applyDefaults() {
-      const radioDefaults = { heart: 'no', cancer: 'no' };
+      const radioDefaults = { heart: DEFAULT_INPUTS.heart, cancer: DEFAULT_INPUTS.cancer };
       Object.entries(radioDefaults).forEach(([name, value]) => {
         const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
         if (radio) radio.checked = true;
@@ -1129,6 +1164,30 @@
     }
 
     applyDefaults();
+
+    function resetForm() {
+      clearResultsDisplay();
+
+      document.getElementById('age').value = DEFAULT_INPUTS.age;
+      document.getElementById('height').value = DEFAULT_INPUTS.height;
+      document.getElementById('weight').value = DEFAULT_INPUTS.weight;
+      document.getElementById('sleepHours').value = DEFAULT_INPUTS.sleepHours;
+
+      document.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+      });
+
+      const radioDefaults = {
+        gender: DEFAULT_INPUTS.gender,
+        heart: DEFAULT_INPUTS.heart,
+        cancer: DEFAULT_INPUTS.cancer
+      };
+
+      Object.entries(radioDefaults).forEach(([name, value]) => {
+        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (radio) radio.checked = true;
+      });
+    }
 
     function buildDiagnosis(values) {
       return {
@@ -1153,7 +1212,7 @@
         : 'Your choices can add years—focus on the biggest opportunities to improve your estimate.';
     }
 
-    function renderResults(lifespan, remaining, impacts) {
+    function renderResults(lifespan, remaining, impacts, { scrollToResults = false } = {}) {
       document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} years`;
       document.getElementById('remainingYears').textContent = isFinite(remaining)
         ? `${remaining.toFixed(1)} years ${remaining >= 0 ? 'remaining' : 'beyond current age'}`
@@ -1164,25 +1223,16 @@
 
       buildImpactGrid(impacts);
       buildRecommendations(buildImprovements(collectInputs(), impacts));
-    }
-
-    function calculateAndRender() {
-      const values = collectInputs();
-      const base = getBaseLifespan();
-      const impacts = applyBonusScaling(buildCategoryImpacts(values));
-      const totalAdjustment = sumAdjustment(impacts);
-      const lifespan = clamp(base + totalAdjustment, 40, 110);
-      const age = getNumericValue('age');
-      const remaining = isFinite(age) ? calculateRemainingYears(lifespan, age) : null;
-
-      renderResults(lifespan, remaining, impacts);
 
       const resultWrapper = document.getElementById('results');
       resultWrapper.classList.add('visible');
-      resultWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (scrollToResults) {
+        resultWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
 
-    document.getElementById('calculate').addEventListener('click', calculateLifespan);
+    document.getElementById('calculate').addEventListener('click', () => calculateLifespan({ scrollToResults: true }));
+    document.getElementById('reset').addEventListener('click', resetForm);
   </script>
 </body>
 </html>
