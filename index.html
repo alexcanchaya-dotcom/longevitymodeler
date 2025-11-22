@@ -717,6 +717,15 @@
             </select>
           </div>
           <div>
+            <label for="cholesterol">Cholesterol levels</label>
+            <select id="cholesterol">
+              <option>Optimal (<200 mg/dL)</option>
+              <option>Borderline high (200-239 mg/dL)</option>
+              <option>High (240+ mg/dL)</option>
+              <option>On medication</option>
+            </select>
+          </div>
+          <div>
             <label for="mentalHealth">Mental health conditions</label>
             <select id="mentalHealth">
               <option>None</option>
@@ -819,6 +828,12 @@
       income: { 'Below poverty line': -3, 'Lower middle class': -1, 'Middle class': 0, 'Upper middle class': 0.8, 'High income': 1.5 },
       diabetes: { 'None': 0, 'Pre-diabetic': -1, 'Type 1': -2, 'Type 2 controlled': -1.5, 'Type 2 uncontrolled': -4 },
       bp: { 'Normal': 0, 'Elevated': -0.5, 'Stage 1': -1.5, 'Stage 2': -3 },
+      cholesterol: {
+        'Optimal (<200 mg/dL)': 0,
+        'Borderline high (200-239 mg/dL)': -1,
+        'High (240+ mg/dL)': -3,
+        'On medication': -1.5
+      },
       mentalHealth: { 'None': 0, 'Mild anxiety/depression': -0.5, 'Moderate': -1.5, 'Severe': -3 }
     };
 
@@ -844,7 +859,7 @@
       wellness: { max: 0.9, keys: ['meditation', 'nature', 'sun'], labels: 'Wellness Practices' },
       management: { max: 1.35, keys: ['checkups', 'conditions', 'family'], labels: 'Health Management' },
       socioeconomic: { max: 2.25, keys: ['education', 'marital', 'income'], labels: 'Socioeconomic' },
-      medical: { max: 10, keys: ['heart', 'cancer', 'diabetes', 'bp', 'mentalHealth'], labels: 'Medical Preconditions' }
+      medical: { max: 10, keys: ['heart', 'cancer', 'diabetes', 'bp', 'cholesterol', 'mentalHealth'], labels: 'Medical Preconditions' }
     };
 
     const impactDescriptors = {
@@ -888,6 +903,7 @@
       cancer: 'Address cancer risk factors',
       diabetes: 'Improve diabetes control',
       bp: 'Control blood pressure',
+      cholesterol: 'Improve cholesterol profile',
       mentalHealth: 'Support mental health'
     };
 
@@ -988,7 +1004,7 @@
         'cardio','strength','steps','sauna','diet','vegetables','processed','water','fish',
         'sleepQuality','sleepConsistency','smoking','alcohol','stress','social','meditation',
         'nature','sun','checkups','conditions','family','education','marital','income',
-        'diabetes','bp','mentalHealth'
+        'diabetes','bp','cholesterol','mentalHealth'
       ];
       const numbers = ['sleepHours'];
 
@@ -1022,7 +1038,7 @@
         wellness: clamp(values.meditation + values.nature + values.sun, -1, 2),
         management: clamp(values.checkups + values.conditions + values.family, -5, 3),
         socioeconomic: clamp(values.education + values.marital + values.income, -5, 5),
-        medical: clamp(values.heart + values.cancer + values.diabetes + values.bp + values.mentalHealth, -12, 0)
+        medical: clamp(values.heart + values.cancer + values.diabetes + values.bp + values.cholesterol + values.mentalHealth, -12, 0)
       };
       return impacts;
     }
@@ -1075,7 +1091,7 @@
         meditation: 0.6, nature: 0.35, sun: 0.35,
         checkups: 0.7, conditions: 0, family: 4,
         education: 2.2, marital: 1.5, income: 1.5,
-        heart: 0, cancer: 0, diabetes: 0, bp: 0, mentalHealth: 0
+        heart: 0, cancer: 0, diabetes: 0, bp: 0, cholesterol: 0, mentalHealth: 0
       };
 
       const currentScores = {
@@ -1198,7 +1214,7 @@
         wellness: values.meditation + values.nature + values.sun,
         management: values.checkups + values.conditions + values.family,
         socioeconomic: values.education + values.marital + values.income,
-        medical: values.heart + values.cancer + values.diabetes + values.bp + values.mentalHealth
+        medical: values.heart + values.cancer + values.diabetes + values.bp + values.cholesterol + values.mentalHealth
       };
     }
 
