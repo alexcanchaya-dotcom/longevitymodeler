@@ -8,23 +8,25 @@
     :root {
       --bg-start: #3d1c5b;
       --bg-end: #1a73e8;
-      --card-bg: rgba(255, 255, 255, 0.15);
+      --card-bg: rgba(255, 255, 255, 0.12);
       --card-border: rgba(255, 255, 255, 0.25);
       --text-primary: #f5f7ff;
       --text-secondary: #d6dbf5;
-      --accent: #5c8df6;
+      --accent: #5e8bfd;
       --accent-strong: #4a7de8;
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
-      color: var(--text-primary);
       min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), transparent 25%),
+                  radial-gradient(circle at 80% 10%, rgba(255,255,255,0.08), transparent 22%),
+                  linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      color: var(--text-primary);
       display: flex;
       justify-content: center;
       padding: 32px 16px 48px;
@@ -36,9 +38,9 @@
       background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
       border: 1px solid var(--card-border);
       border-radius: 20px;
-      padding: 32px;
+      padding: clamp(18px, 3vw, 32px);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
 
     header {
@@ -53,27 +55,39 @@
     }
 
     p.lead {
-      margin: 8px 0 0;
+      margin: 10px 0 0;
       color: var(--text-secondary);
+      font-size: 15px;
     }
 
-    .grid {
+    .section-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 18px;
     }
 
     .section {
       border: 1px solid var(--card-border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 18px 16px 14px;
       background: var(--card-bg);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
     }
 
     .section h2 {
       margin: 0 0 14px;
       font-size: 18px;
       letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .inputs-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: end;
     }
 
     label {
@@ -93,260 +107,966 @@
       color: #fff;
       font-size: 14px;
       outline: none;
-      transition: border 0.2s ease, background 0.2s ease;
+      transition: border 0.2s ease, background 0.2s ease, transform 0.1s ease;
     }
 
     input[type="number"]:focus,
     select:focus {
       border-color: rgba(255,255,255,0.55);
       background: rgba(255,255,255,0.12);
-    }
-
-    .row {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      align-items: end;
+      transform: translateY(-1px);
     }
 
     .radio-group {
-      display: flex;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
     }
 
     .radio-group label {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       padding: 10px 12px;
       border: 1px solid rgba(255,255,255,0.25);
       background: rgba(255,255,255,0.05);
       border-radius: 10px;
       cursor: pointer;
       color: var(--text-primary);
-      flex: 1;
       justify-content: center;
       transition: border 0.2s ease, background 0.2s ease;
+      font-weight: 600;
     }
 
-    .radio-group input {
-      accent-color: var(--accent);
-    }
+    .radio-group input { accent-color: var(--accent); }
 
     .radio-group label:hover {
       border-color: rgba(255,255,255,0.6);
       background: rgba(255,255,255,0.12);
     }
 
-    button#calculate {
-      width: 100%;
-      padding: 14px;
+    #calculate {
+      width: min(360px, 100%);
+      display: block;
+      margin: 16px auto 0;
+      padding: 14px 16px;
       border: none;
       border-radius: 14px;
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       color: #fff;
       background: linear-gradient(135deg, #5e8bfd, #4478f1);
       box-shadow: 0 12px 24px rgba(68, 120, 241, 0.35);
       cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
-      margin-top: 10px;
     }
 
-    button#calculate:hover {
+    #calculate:hover {
       transform: translateY(-1px);
       box-shadow: 0 14px 28px rgba(68, 120, 241, 0.45);
     }
 
-    button#calculate:active {
+    #calculate:active { transform: translateY(0); }
+
+    .results-wrapper {
+      margin-top: 24px;
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .results-wrapper.visible {
+      display: block;
+      opacity: 1;
       transform: translateY(0);
     }
 
-    .result {
-      margin-top: 24px;
+    .result-card {
       padding: 18px 16px;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 1px solid rgba(255,255,255,0.25);
-      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
-      display: none;
-    }
-
-    .result h3 {
-      margin: 0;
-      font-size: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
     }
 
     .lifespan-value {
-      font-size: 36px;
-      font-weight: 700;
+      font-size: clamp(34px, 4vw, 44px);
+      font-weight: 800;
       letter-spacing: 0.5px;
-      margin: 10px 0 6px;
+      margin: 6px 0 4px;
       color: #ffffff;
     }
 
-    .note {
+    .result-subtitle {
       color: var(--text-secondary);
-      margin: 0;
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .impact-card {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .impact-card h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .impact-value {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #5e8bfd, #81a4ff);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .recommendations {
+      margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 12px;
+    }
+
+    .recommendations h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      margin: 4px 6px 4px 0;
+      font-size: 13px;
+    }
+
+    .lifespan-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .remaining-years {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .disclaimer {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #fcd6a6;
+      line-height: 1.5;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
     }
 
     @media (max-width: 640px) {
-      .container { padding: 22px 18px; }
-      button#calculate { font-size: 16px; }
-      .radio-group { flex-direction: column; }
+      body { padding: 18px 10px 24px; }
+      .container { padding: 14px 12px; }
+      .section-grid { grid-template-columns: 1fr; }
+      .inputs-grid { grid-template-columns: 1fr; }
+      .radio-group { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Longevity Calculator</h1>
-      <p class="lead">Estimate your potential lifespan based on lifestyle and demographics.</p>
+      <h1>Longevity & Vitality Insights</h1>
+      <p class="lead">Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.</p>
     </header>
 
-    <div class="grid">
-      <section class="section" aria-labelledby="basic-section">
-        <h2 id="basic-section">Basic Demographics</h2>
-        <div class="row">
+    <div class="section-grid">
+      <section class="section">
+        <h2>🧑 Basic Demographics</h2>
+        <div class="inputs-grid">
           <div>
             <label for="age">Age (18-100)</label>
-            <input type="number" id="age" name="age" min="18" max="100" placeholder="Enter age" required>
+            <input type="number" id="age" min="18" max="100" value="35">
           </div>
           <div>
             <label>Gender</label>
             <div class="radio-group">
-              <label><input type="radio" name="gender" value="male"> Male</label>
+              <label><input type="radio" name="gender" value="male" checked> Male</label>
               <label><input type="radio" name="gender" value="female"> Female</label>
             </div>
           </div>
-        </div>
-        <div class="row">
           <div>
             <label for="height">Height (cm)</label>
-            <input type="number" id="height" name="height" min="100" max="250" placeholder="e.g., 175" required>
+            <input type="number" id="height" min="120" max="230" value="175">
           </div>
           <div>
             <label for="weight">Weight (kg)</label>
-            <input type="number" id="weight" name="weight" min="30" max="250" placeholder="e.g., 70" required>
+            <input type="number" id="weight" min="35" max="200" value="72">
           </div>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="lifestyle-section">
-        <h2 id="lifestyle-section">Lifestyle Factors</h2>
-        <div class="row">
+      <section class="section">
+        <h2>🏃 Physical Activity</h2>
+        <div class="inputs-grid">
           <div>
-            <label for="exercise">Exercise frequency</label>
-            <select id="exercise" name="exercise">
-              <option value="never">Never</option>
-              <option value="1-2">1-2x week</option>
-              <option value="3-4">3-4x week</option>
-              <option value="5+">5+ week</option>
+            <label for="cardio">Cardio exercise frequency</label>
+            <select id="cardio">
+              <option>Never</option>
+              <option>1-2x/week</option>
+              <option selected>3-4x/week</option>
+              <option>5+x/week</option>
             </select>
           </div>
           <div>
-            <label for="smoking">Smoking status</label>
-            <select id="smoking" name="smoking">
-              <option value="never">Never</option>
-              <option value="former">Former</option>
-              <option value="current">Current</option>
+            <label for="strength">Strength training frequency</label>
+            <select id="strength">
+              <option>Never</option>
+              <option>1-2x/week</option>
+              <option selected>3-4x/week</option>
+              <option>5+x/week</option>
+            </select>
+          </div>
+          <div>
+            <label for="steps">Daily steps average</label>
+            <select id="steps">
+              <option>&lt;3000</option>
+              <option>3000-5000</option>
+              <option>5000-8000</option>
+              <option selected>8000-10000</option>
+              <option>10000+</option>
+            </select>
+          </div>
+          <div>
+            <label for="sauna">Sauna usage</label>
+            <select id="sauna">
+              <option>Never</option>
+              <option>1x/week</option>
+              <option selected>2-3x/week</option>
+              <option>4+x/week</option>
             </select>
           </div>
         </div>
-        <div class="row">
+      </section>
+
+      <section class="section">
+        <h2>🥗 Nutrition & Diet</h2>
+        <div class="inputs-grid">
           <div>
-            <label for="alcohol">Alcohol consumption</label>
-            <select id="alcohol" name="alcohol">
-              <option value="none">None</option>
-              <option value="light">Light</option>
-              <option value="moderate">Moderate</option>
-              <option value="heavy">Heavy</option>
+            <label for="diet">Diet type</label>
+            <select id="diet">
+              <option>Standard Western</option>
+              <option>Mediterranean</option>
+              <option>Plant-based</option>
+              <option>Keto/Low-carb</option>
+              <option selected>Balanced/Whole foods</option>
             </select>
           </div>
           <div>
-            <label for="sleep">Sleep hours (4-12)</label>
-            <input type="number" id="sleep" name="sleep" min="4" max="12" placeholder="e.g., 8" required>
+            <label for="vegetables">Daily vegetable servings</label>
+            <select id="vegetables">
+              <option>0-1</option>
+              <option>2-3</option>
+              <option selected>4-5</option>
+              <option>6+</option>
+            </select>
+          </div>
+          <div>
+            <label for="processed">Processed food consumption</label>
+            <select id="processed">
+              <option>Daily</option>
+              <option>Several times/week</option>
+              <option selected>Rarely</option>
+              <option>Never</option>
+            </select>
+          </div>
+          <div>
+            <label for="water">Water intake</label>
+            <select id="water">
+              <option>&lt;4 cups</option>
+              <option>4-6 cups</option>
+              <option>6-8 cups</option>
+              <option selected>8+ cups</option>
+            </select>
+          </div>
+          <div>
+            <label for="fish">Fish consumption</label>
+            <select id="fish">
+              <option>Never</option>
+              <option>1x/month</option>
+              <option selected>1x/week</option>
+              <option>2+x/week</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>😴 Sleep & Recovery</h2>
+        <div class="inputs-grid">
+          <div>
+            <label for="sleepHours">Sleep hours (4-12)</label>
+            <input type="number" id="sleepHours" min="4" max="12" value="7.5" step="0.5">
+          </div>
+          <div>
+            <label for="sleepQuality">Sleep quality</label>
+            <select id="sleepQuality">
+              <option>Poor</option>
+              <option>Fair</option>
+              <option selected>Good</option>
+              <option>Excellent</option>
+            </select>
+          </div>
+          <div>
+            <label for="sleepConsistency">Sleep schedule consistency</label>
+            <select id="sleepConsistency">
+              <option>Very irregular</option>
+              <option>Somewhat irregular</option>
+              <option selected>Mostly consistent</option>
+              <option>Very consistent</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🌿 Lifestyle & Habits</h2>
+        <div class="inputs-grid">
+          <div>
+            <label for="smoking">Smoking status</label>
+            <select id="smoking">
+              <option>Current</option>
+              <option>Former</option>
+              <option selected>Never</option>
+            </select>
+          </div>
+          <div>
+            <label for="alcohol">Alcohol consumption</label>
+            <select id="alcohol">
+              <option>None</option>
+              <option selected>Light (1-7/week)</option>
+              <option>Moderate (8-14/week)</option>
+              <option>Heavy (15+/week)</option>
+            </select>
+          </div>
+          <div>
+            <label for="stress">Stress level</label>
+            <select id="stress">
+              <option>Very high</option>
+              <option>High</option>
+              <option selected>Moderate</option>
+              <option>Low</option>
+              <option>Very low</option>
+            </select>
+          </div>
+          <div>
+            <label for="social">Social connections</label>
+            <select id="social">
+              <option>Isolated</option>
+              <option>Few friends</option>
+              <option selected>Moderate social life</option>
+              <option>Very social</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🧘 Wellness Practices</h2>
+        <div class="inputs-grid">
+          <div>
+            <label for="meditation">Meditation / mindfulness</label>
+            <select id="meditation">
+              <option>Never</option>
+              <option>Occasionally</option>
+              <option>Weekly</option>
+              <option selected>Daily</option>
+            </select>
+          </div>
+          <div>
+            <label for="nature">Time in nature</label>
+            <select id="nature">
+              <option>Rarely</option>
+              <option>Monthly</option>
+              <option selected>Weekly</option>
+              <option>Daily</option>
+            </select>
+          </div>
+          <div>
+            <label for="sun">Sun exposure</label>
+            <select id="sun">
+              <option>Minimal</option>
+              <option>Moderate with sunscreen</option>
+              <option>Moderate without sunscreen</option>
+              <option>Excessive</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🏥 Health Management</h2>
+        <div class="inputs-grid">
+          <div>
+            <label for="checkups">Medical checkups</label>
+            <select id="checkups">
+              <option>Never</option>
+              <option>Every 2+ years</option>
+              <option selected>Annually</option>
+              <option>Every 6 months</option>
+            </select>
+          </div>
+          <div>
+            <label for="conditions">Chronic conditions</label>
+            <select id="conditions">
+              <option>None</option>
+              <option>1 condition</option>
+              <option>2-3 conditions</option>
+              <option>4+ conditions</option>
+            </select>
+          </div>
+          <div>
+            <label for="family">Family longevity history</label>
+            <select id="family">
+              <option>Poor (&lt;70 avg)</option>
+              <option>Fair (70-80 avg)</option>
+              <option>Good (80-85 avg)</option>
+              <option selected>Excellent (85+ avg)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🌐 Socioeconomic Factors</h2>
+        <div class="inputs-grid">
+          <div>
+            <label for="education">Education level</label>
+            <select id="education">
+              <option>Less than high school</option>
+              <option>High school</option>
+              <option>Some college</option>
+              <option>Bachelor's degree</option>
+              <option selected>Graduate degree</option>
+            </select>
+          </div>
+          <div>
+            <label for="marital">Marital status</label>
+            <select id="marital">
+              <option>Single/Never married</option>
+              <option selected>Married/Partnered</option>
+              <option>Divorced/Separated</option>
+              <option>Widowed</option>
+            </select>
+          </div>
+          <div>
+            <label for="income">Income level</label>
+            <select id="income">
+              <option>Below poverty line</option>
+              <option>Lower middle class</option>
+              <option selected>Middle class</option>
+              <option>Upper middle class</option>
+              <option>High income</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🩺 Medical Preconditions</h2>
+        <div class="inputs-grid">
+          <div>
+            <label>History of heart disease</label>
+            <div class="radio-group">
+              <label><input type="radio" name="heart" value="no" checked> No</label>
+              <label><input type="radio" name="heart" value="yes"> Yes</label>
+            </div>
+          </div>
+          <div>
+            <label>History of cancer</label>
+            <div class="radio-group">
+              <label><input type="radio" name="cancer" value="no" checked> No</label>
+              <label><input type="radio" name="cancer" value="yes"> Yes</label>
+            </div>
+          </div>
+          <div>
+            <label for="diabetes">Diabetes</label>
+            <select id="diabetes">
+              <option>None</option>
+              <option>Pre-diabetic</option>
+              <option>Type 1</option>
+              <option>Type 2 controlled</option>
+              <option>Type 2 uncontrolled</option>
+            </select>
+          </div>
+          <div>
+            <label for="bp">High blood pressure</label>
+            <select id="bp">
+              <option>None</option>
+              <option>Controlled with medication</option>
+              <option>Uncontrolled</option>
+            </select>
+          </div>
+          <div>
+            <label for="mentalHealth">Mental health conditions</label>
+            <select id="mentalHealth">
+              <option>None</option>
+              <option>Well-managed</option>
+              <option>Some challenges</option>
+              <option>Severe</option>
+            </select>
           </div>
         </div>
       </section>
     </div>
 
-    <button id="calculate" type="button">Calculate</button>
+    <button id="calculate">Calculate Longevity Insights</button>
 
-    <div class="result" id="result" aria-live="polite">
-      <h3>Estimated Lifespan</h3>
-      <div class="lifespan-value" id="lifespan">-- years</div>
-      <p class="note" id="explanation"></p>
+    <div class="results-wrapper" id="results">
+      <div class="result-card">
+        <div class="lifespan-row">
+          <div>
+            <div class="result-subtitle">Estimated lifespan</div>
+            <div class="lifespan-value" id="lifespanValue">-- years</div>
+          </div>
+          <div class="remaining-years" id="remainingYears"></div>
+        </div>
+        <div class="result-subtitle" id="encouragement">Your lifestyle choices can meaningfully shift this estimate.</div>
+
+        <div class="impact-grid" id="impactGrid"></div>
+
+        <div class="recommendations">
+          <h3>Top opportunities to improve</h3>
+          <div id="recommendationChips"></div>
+        </div>
+
+        <div class="disclaimer">
+          <span>⚠️</span>
+          <span>DISCLAIMER: This calculator provides estimates based on population studies and should not be considered medical advice. Individual results vary significantly. Always consult healthcare professionals for personalized health guidance. This tool is for educational and entertainment purposes only.</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const inputs = {
-      age: document.getElementById('age'),
-      height: document.getElementById('height'),
-      weight: document.getElementById('weight'),
-      sleep: document.getElementById('sleep'),
+    const optionValues = {
+      cardio: { 'Never': 0, '1-2x/week': 1, '3-4x/week': 2, '5+x/week': 3 },
+      strength: { 'Never': 0, '1-2x/week': 1, '3-4x/week': 2, '5+x/week': 3 },
+      steps: { '<3000': 0, '3000-5000': 1, '5000-8000': 2, '8000-10000': 3, '10000+': 4 },
+      sauna: { 'Never': 0, '1x/week': 1, '2-3x/week': 2, '4+x/week': 3 },
+      diet: { 'Standard Western': 0, 'Mediterranean': 2, 'Plant-based': 1.5, 'Keto/Low-carb': 1, 'Balanced/Whole foods': 2 },
+      vegetables: { '0-1': 0, '2-3': 0.5, '4-5': 1, '6+': 1 },
+      processed: { 'Daily': -1, 'Several times/week': -0.5, 'Rarely': 0.5, 'Never': 1 },
+      water: { '<4 cups': -0.5, '4-6 cups': 0, '6-8 cups': 0.25, '8+ cups': 0.5 },
+      fish: { 'Never': 0, '1x/month': 0.25, '1x/week': 0.5, '2+x/week': 0.5 },
+      sleepQuality: { 'Poor': 0, 'Fair': 0.5, 'Good': 1, 'Excellent': 1 },
+      sleepConsistency: { 'Very irregular': 0, 'Somewhat irregular': 0.5, 'Mostly consistent': 1, 'Very consistent': 1 },
+      smoking: { 'Current': -10, 'Former': -2, 'Never': 0 },
+      alcohol: { 'None': 1, 'Light (1-7/week)': 1, 'Moderate (8-14/week)': -0.5, 'Heavy (15+/week)': -2 },
+      stress: { 'Very high': -3, 'High': -2, 'Moderate': 0, 'Low': 1, 'Very low': 2 },
+      social: { 'Isolated': -1, 'Few friends': 0, 'Moderate social life': 1.5, 'Very social': 3 },
+      meditation: { 'Never': 0, 'Occasionally': 0.25, 'Weekly': 0.5, 'Daily': 1 },
+      nature: { 'Rarely': 0, 'Monthly': 0.25, 'Weekly': 0.5, 'Daily': 0.5 },
+      sun: { 'Minimal': 0, 'Moderate with sunscreen': 0.5, 'Moderate without sunscreen': 0.5, 'Excessive': -0.5 },
+      checkups: { 'Never': 0, 'Every 2+ years': 0.25, 'Annually': 0.75, 'Every 6 months': 1 },
+      conditions: { 'None': 0, '1 condition': -1, '2-3 conditions': -1.5, '4+ conditions': -2 },
+      family: { 'Poor (<70 avg)': -5, 'Fair (70-80 avg)': -1, 'Good (80-85 avg)': 1, 'Excellent (85+ avg)': 5 },
+      education: { 'Less than high school': -2, 'High school': 0, 'Some college': 1, 'Bachelor\'s degree': 2, 'Graduate degree': 3 },
+      marital: { 'Single/Never married': -1, 'Married/Partnered': 2, 'Divorced/Separated': -0.5, 'Widowed': 0 },
+      income: { 'Below poverty line': -3, 'Lower middle class': -1, 'Middle class': 0, 'Upper middle class': 1, 'High income': 2 },
+      diabetes: { 'None': 0, 'Pre-diabetic': -1, 'Type 1': -2, 'Type 2 controlled': -1.5, 'Type 2 uncontrolled': -4 },
+      bp: { 'None': 0, 'Controlled with medication': -0.5, 'Uncontrolled': -2 },
+      mentalHealth: { 'None': 0, 'Well-managed': 0, 'Some challenges': -1, 'Severe': -2 }
     };
 
-    const selects = {
-      exercise: document.getElementById('exercise'),
-      smoking: document.getElementById('smoking'),
-      alcohol: document.getElementById('alcohol'),
+    const categoryWeights = {
+      activity: { max: 6, keys: ['cardio', 'strength', 'steps', 'sauna'], labels: 'Physical activity' },
+      nutrition: { max: 5, keys: ['diet', 'vegetables', 'processed', 'water', 'fish'], labels: 'Nutrition' },
+      sleep: { max: 3, keys: ['sleepHours', 'sleepQuality', 'sleepConsistency'], labels: 'Sleep & Recovery' },
+      lifestyle: { max: 6, keys: ['smoking', 'alcohol', 'stress', 'social'], labels: 'Lifestyle & Habits' },
+      wellness: { max: 2, keys: ['meditation', 'nature', 'sun'], labels: 'Wellness Practices' },
+      management: { max: 3, keys: ['checkups', 'conditions', 'family'], labels: 'Health Management' },
+      socioeconomic: { max: 5, keys: ['education', 'marital', 'income'], labels: 'Socioeconomic' },
+      medical: { max: 10, keys: ['heart', 'cancer', 'diabetes', 'bp', 'mentalHealth'], labels: 'Medical Preconditions' }
     };
 
-    const resultCard = document.getElementById('result');
-    const lifespanEl = document.getElementById('lifespan');
-    const explanationEl = document.getElementById('explanation');
+    const impactDescriptors = {
+      activity: 'Move regularly with cardio, resistance training, and daily steps while adding heat exposure like sauna.',
+      nutrition: 'Favor whole foods, fiber, hydration, and omega-3 rich fish while minimizing processed items.',
+      sleep: 'Aim for consistent, quality sleep in a quiet, dark environment.',
+      lifestyle: 'Eliminate smoking, moderate alcohol, manage stress, and nurture social ties.',
+      wellness: 'Layer in mindfulness, nature time, and sensible sun habits.',
+      management: 'Stay proactive with checkups and condition management, leveraging family history awareness.',
+      socioeconomic: 'Education, stable relationships, and financial security often support healthier choices and access.',
+      medical: 'Work closely with clinicians to manage or mitigate existing conditions.'
+    };
 
-    function validateBasic() {
-      const gender = document.querySelector('input[name="gender"]:checked');
-      const age = Number(inputs.age.value);
-      const height = Number(inputs.height.value);
-      const weight = Number(inputs.weight.value);
-      const sleep = Number(inputs.sleep.value);
+    const recommendationLabels = {
+      cardio: 'Increase cardio frequency',
+      strength: 'Add more strength sessions',
+      steps: 'Increase daily steps',
+      sauna: 'Include sauna sessions',
+      diet: 'Shift toward Mediterranean/whole foods',
+      vegetables: 'Boost vegetable servings',
+      processed: 'Reduce processed foods',
+      water: 'Improve hydration',
+      fish: 'Add omega-3 rich fish',
+      sleepHours: 'Optimize sleep duration',
+      sleepQuality: 'Improve sleep quality',
+      sleepConsistency: 'Keep sleep schedule regular',
+      smoking: 'Eliminate smoking',
+      alcohol: 'Moderate alcohol',
+      stress: 'Lower stress levels',
+      social: 'Strengthen social connections',
+      meditation: 'Practice mindfulness',
+      nature: 'Spend time in nature',
+      sun: 'Favor moderate sun with protection',
+      checkups: 'Increase medical checkups',
+      conditions: 'Better manage chronic conditions',
+      family: 'Factor family history into choices',
+      education: 'Pursue additional education/skills',
+      marital: 'Cultivate supportive partnerships',
+      income: 'Improve financial stability/access',
+      heart: 'Address heart disease risk',
+      cancer: 'Address cancer risk factors',
+      diabetes: 'Improve diabetes control',
+      bp: 'Control blood pressure',
+      mentalHealth: 'Support mental health'
+    };
 
-      if (!gender) return { valid: false, message: 'Please select a gender.' };
-      if (!age || age < 18 || age > 100) return { valid: false, message: 'Age must be between 18 and 100.' };
-      if (!height || height < 100 || height > 250) return { valid: false, message: 'Height should be between 100 and 250 cm.' };
-      if (!weight || weight < 30 || weight > 250) return { valid: false, message: 'Weight should be between 30 and 250 kg.' };
-      if (sleep && (sleep < 4 || sleep > 12)) return { valid: false, message: 'Sleep hours should be between 4 and 12.' };
-      return { valid: true };
+    function getNumericValue(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+
+      if (el.type === 'number') {
+        const val = parseFloat(el.value);
+        return isFinite(val) ? val : 0;
+      }
+
+      if (el.tagName === 'SELECT') {
+        const text = el.value;
+        return optionValues[id]?.[text] ?? 0;
+      }
+
+      return 0;
+    }
+
+    function getRadioValue(name) {
+      const selected = document.querySelector(`input[name="${name}"]:checked`);
+      if (!selected) return 0;
+      const key = name === 'heart' || name === 'cancer' ? name : selected.value;
+      if (name === 'heart') return selected.value === 'yes' ? -3 : 0;
+      if (name === 'cancer') return selected.value === 'yes' ? -2 : 0;
+      return optionValues[name]?.[selected.value] ?? 0;
+    }
+
+    function calculateHoursScore(hours) {
+      if (!isFinite(hours)) return 0;
+      if (hours >= 7 && hours <= 9) return 1;
+      if (hours >= 6 && hours < 7) return 0.5;
+      if (hours > 9 && hours <= 10) return 0.25;
+      return 0;
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function normalize(value, max) {
+      if (max === 0) return 0;
+      return clamp((value / max) * 100, 0, 100);
+    }
+
+    function getBaseLifespan() {
+      const gender = document.querySelector('input[name="gender"]:checked')?.value || 'male';
+      return gender === 'female' ? 83 : 78;
+    }
+
+    function buildImpactCard(title, value, progress, descriptor) {
+      const div = document.createElement('div');
+      div.className = 'impact-card';
+
+      const header = document.createElement('h3');
+      header.textContent = title;
+
+      const valueSpan = document.createElement('div');
+      valueSpan.className = 'impact-value';
+      valueSpan.textContent = `${value >= 0 ? '+' : ''}${value.toFixed(1)} yrs`;
+
+      const progressContainer = document.createElement('div');
+      progressContainer.className = 'progress-container';
+
+      const progressBar = document.createElement('div');
+      progressBar.className = 'progress-bar';
+      progressBar.style.width = `${progress}%`;
+
+      const descriptorText = document.createElement('div');
+      descriptorText.className = 'result-subtitle';
+      descriptorText.style.marginTop = '8px';
+      descriptorText.textContent = descriptor;
+
+      progressContainer.appendChild(progressBar);
+      div.appendChild(header);
+      div.appendChild(valueSpan);
+      div.appendChild(progressContainer);
+      div.appendChild(descriptorText);
+      return div;
+    }
+
+    function collectInputs() {
+      const radios = ['heart', 'cancer'];
+      const selectKeys = [
+        'cardio','strength','steps','sauna','diet','vegetables','processed','water','fish',
+        'sleepQuality','sleepConsistency','smoking','alcohol','stress','social','meditation',
+        'nature','sun','checkups','conditions','family','education','marital','income',
+        'diabetes','bp','mentalHealth'
+      ];
+      const numbers = ['sleepHours'];
+
+      const values = {};
+
+      radios.forEach(key => { values[key] = getRadioValue(key); });
+      selectKeys.forEach(key => { values[key] = getNumericValue(key); });
+      numbers.forEach(key => { values[key] = getNumericValue(key); });
+
+      values.sleepHoursScore = calculateHoursScore(values.sleepHours);
+      return values;
+    }
+
+    function buildCategoryImpacts(values) {
+      const impacts = {
+        activity: clamp(
+          (values.cardio * 2/3) +
+          (values.strength * 2/3) +
+          (values.steps * 0.25) +
+          (values.sauna * 0.33),
+          -6, 6),
+        nutrition: clamp(
+          (values.diet) +
+          (values.vegetables) +
+          (values.processed) +
+          (values.water) +
+          (values.fish),
+          -5, 5),
+        sleep: clamp(values.sleepHoursScore + values.sleepQuality + values.sleepConsistency, -3, 3),
+        lifestyle: clamp(values.smoking + values.alcohol + values.stress + values.social, -10, 6),
+        wellness: clamp(values.meditation + values.nature + values.sun, -1, 2),
+        management: clamp(values.checkups + values.conditions + values.family, -5, 3),
+        socioeconomic: clamp(values.education + values.marital + values.income, -5, 5),
+        medical: clamp(values.heart + values.cancer + values.diabetes + values.bp + values.mentalHealth, -12, 0)
+      };
+      return impacts;
     }
 
     function calculateLifespan() {
-      const validation = validateBasic();
-      if (!validation.valid) {
-        alert(validation.message);
+      const values = collectInputs();
+      const base = getBaseLifespan();
+      const impacts = buildCategoryImpacts(values);
+
+      const totalAdjustment = Object.values(impacts).reduce((a, b) => a + b, 0);
+      const lifespan = clamp(base + totalAdjustment, 40, 110);
+
+      const age = getNumericValue('age');
+      const remaining = isFinite(age) ? clamp(lifespan - age, -10, 90) : null;
+
+      document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} years`;
+      document.getElementById('remainingYears').textContent = isFinite(remaining)
+        ? `${remaining.toFixed(1)} years ${remaining >= 0 ? 'remaining' : 'beyond current age'}`
+        : '';
+
+      document.getElementById('encouragement').textContent =
+        totalAdjustment >= 0
+          ? 'Great job! Your current habits are adding years—keep them strong and refine the gaps.'
+          : 'Your choices can add years—focus on the biggest opportunities to improve your estimate.';
+
+      buildImpactGrid(impacts);
+      buildRecommendations(buildImprovements(values, impacts));
+
+      const resultWrapper = document.getElementById('results');
+      resultWrapper.classList.add('visible');
+      resultWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function buildImpactGrid(impacts) {
+      const grid = document.getElementById('impactGrid');
+      grid.innerHTML = '';
+
+      Object.entries(categoryWeights).forEach(([key, meta]) => {
+        const value = impacts[key] ?? 0;
+        const progress = normalize(value, meta.max);
+        grid.appendChild(buildImpactCard(meta.labels, value, progress, impactDescriptors[key]));
+      });
+    }
+
+    function buildImprovements(values, impacts) {
+      const improvements = [];
+
+      const targetRanges = {
+        cardio: 3, strength: 3, steps: 4, sauna: 3,
+        diet: 2, vegetables: 1, processed: 1, water: 0.5, fish: 0.5,
+        sleepHoursScore: 1, sleepQuality: 1, sleepConsistency: 1,
+        smoking: 0, alcohol: 1, stress: 2, social: 3,
+        meditation: 1, nature: 0.5, sun: 0.5,
+        checkups: 1, conditions: 0, family: 5,
+        education: 3, marital: 2, income: 2,
+        heart: 0, cancer: 0, diabetes: 0, bp: 0, mentalHealth: 0
+      };
+
+      const currentScores = {
+        ...values,
+        sleepHours: undefined,
+        heart: values.heart,
+        cancer: values.cancer
+      };
+
+      Object.entries(targetRanges).forEach(([factor, target]) => {
+        const current = currentScores[factor] ?? 0;
+        const gap = target - current;
+        const potentialGain = Math.max(0, gap);
+
+        if (potentialGain > 0.15) {
+          improvements.push({
+            factor,
+            potentialGain: Math.min(potentialGain, 3),
+            category: Object.entries(categoryWeights).find(([, meta]) => meta.keys.includes(factor))?.[0]
+          });
+        }
+      });
+
+      improvements.sort((a, b) => b.potentialGain - a.potentialGain);
+      return improvements.slice(0, 3);
+    }
+
+    function buildRecommendations(improvements) {
+      const container = document.getElementById('recommendationChips');
+      container.innerHTML = '';
+
+      if (!improvements.length) {
+        container.textContent = 'You are performing strongly across key areas—maintain your habits!';
         return;
       }
 
-      const gender = document.querySelector('input[name="gender"]:checked').value;
-      let lifespan = gender === 'male' ? 78 : 83;
+      improvements.forEach(item => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = `${recommendationLabels[item.factor]} (+${item.potentialGain.toFixed(1)} yrs)`;
+        container.appendChild(chip);
+      });
+    }
 
-      const exercise = selects.exercise.value;
-      const smoking = selects.smoking.value;
-      const alcohol = selects.alcohol.value;
-      const sleep = Number(inputs.sleep.value);
+    function prepareImpactBreakdown(values) {
+      const impacts = buildCategoryImpacts(values);
+      return impacts;
+    }
 
-      if (exercise === '3-4') lifespan += 2;
-      if (exercise === '5+') lifespan += 4;
+    function init() {
+      // Placeholder for future initialization logic if needed
+    }
 
-      if (smoking === 'current') lifespan -= 10;
-      if (smoking === 'former') lifespan -= 5;
+    init();
 
-      if (alcohol === 'heavy') lifespan -= 2;
-      if (alcohol === 'moderate') lifespan -= 1;
+    function recalcOnChange() {
+      const resultWrapper = document.getElementById('results');
+      if (resultWrapper.classList.contains('visible')) {
+        calculateLifespan();
+      }
+    }
 
-      if (sleep >= 7 && sleep <= 9) lifespan += 2;
-      if (sleep < 6 || sleep > 10) lifespan -= 2;
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', recalcOnChange);
+      el.addEventListener('input', recalcOnChange);
+    });
 
-      const age = Number(inputs.age.value);
-      const adjusted = Math.max(20, Math.round(lifespan));
-      const remaining = Math.max(0, adjusted - age);
+    function applyDefaults() {
+      const radioDefaults = { heart: 'no', cancer: 'no' };
+      Object.entries(radioDefaults).forEach(([name, value]) => {
+        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (radio) radio.checked = true;
+      });
+    }
 
-      lifespanEl.textContent = `${adjusted} years`;
-      explanationEl.textContent = `Based on your profile, you may have roughly ${remaining} more years. Individual outcomes vary—use these insights to support sustainable healthy habits.`;
-      resultCard.style.display = 'block';
-      resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    applyDefaults();
+
+    function buildDiagnosis(values) {
+      return {
+        activity: values.cardio + values.strength + values.steps + values.sauna,
+        nutrition: values.diet + values.vegetables + values.processed + values.water + values.fish,
+        sleep: values.sleepHoursScore + values.sleepQuality + values.sleepConsistency,
+        lifestyle: values.smoking + values.alcohol + values.stress + values.social,
+        wellness: values.meditation + values.nature + values.sun,
+        management: values.checkups + values.conditions + values.family,
+        socioeconomic: values.education + values.marital + values.income,
+        medical: values.heart + values.cancer + values.diabetes + values.bp + values.mentalHealth
+      };
+    }
+
+    function calculateRemainingYears(lifespan, currentAge) {
+      return clamp(lifespan - currentAge, -10, 90);
+    }
+
+    function calculateEncouragement(totalAdjustment) {
+      return totalAdjustment >= 0
+        ? 'Great job! Your current habits are adding years—keep them strong and refine the gaps.'
+        : 'Your choices can add years—focus on the biggest opportunities to improve your estimate.';
+    }
+
+    function renderResults(lifespan, remaining, impacts) {
+      document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} years`;
+      document.getElementById('remainingYears').textContent = isFinite(remaining)
+        ? `${remaining.toFixed(1)} years ${remaining >= 0 ? 'remaining' : 'beyond current age'}`
+        : '';
+
+      const totalAdjustment = Object.values(impacts).reduce((a, b) => a + b, 0);
+      document.getElementById('encouragement').textContent = calculateEncouragement(totalAdjustment);
+
+      buildImpactGrid(impacts);
+      buildRecommendations(buildImprovements(collectInputs(), impacts));
+    }
+
+    function calculateAndRender() {
+      const values = collectInputs();
+      const base = getBaseLifespan();
+      const impacts = buildCategoryImpacts(values);
+      const totalAdjustment = Object.values(impacts).reduce((a, b) => a + b, 0);
+      const lifespan = clamp(base + totalAdjustment, 40, 110);
+      const age = getNumericValue('age');
+      const remaining = isFinite(age) ? calculateRemainingYears(lifespan, age) : null;
+
+      renderResults(lifespan, remaining, impacts);
+
+      const resultWrapper = document.getElementById('results');
+      resultWrapper.classList.add('visible');
+      resultWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     document.getElementById('calculate').addEventListener('click', calculateLifespan);
