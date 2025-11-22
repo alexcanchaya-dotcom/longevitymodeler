@@ -60,6 +60,22 @@
       font-size: 15px;
     }
 
+    .top-note {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #fcd6a6;
+    }
+
+    .top-note a {
+      color: #ffd59f;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .top-note a:hover {
+      text-decoration: underline;
+    }
+
     .section-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -299,6 +315,49 @@
       align-items: flex-start;
     }
 
+    .disclaimer-section {
+      margin-top: 28px;
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .disclaimer-section h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .disclaimer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .disclaimer-block {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .disclaimer-block h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .disclaimer-block ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
     @media (max-width: 640px) {
       body { padding: 18px 10px 24px; }
       .container { padding: 14px 12px; }
@@ -313,6 +372,7 @@
     <header>
       <h1>Longevity & Vitality Insights</h1>
       <p class="lead">Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.</p>
+      <p class="top-note">For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.</p>
     </header>
 
     <div class="section-grid">
@@ -678,7 +738,38 @@
 
         <div class="disclaimer">
           <span>⚠️</span>
-          <span>DISCLAIMER: This calculator provides estimates based on population studies and should not be considered medical advice. Individual results vary significantly. Always consult healthcare professionals for personalized health guidance. This tool is for educational and entertainment purposes only.</span>
+          <span>This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-section" id="disclaimer">
+      <h2>⚠️ Important Disclaimers</h2>
+      <div class="disclaimer-grid">
+        <div class="disclaimer-block">
+          <h3>Medical Disclaimer</h3>
+          <ul>
+            <li>This calculator provides estimates for informational and educational purposes only.</li>
+            <li>Results are not medical advice, diagnosis, or treatment recommendations.</li>
+            <li>Do not use this calculator as a substitute for professional medical advice.</li>
+            <li>Always consult with qualified healthcare providers for medical decisions.</li>
+            <li>Individual results may vary significantly based on many factors.</li>
+          </ul>
+        </div>
+        <div class="disclaimer-block">
+          <h3>Accuracy Disclaimer</h3>
+          <ul>
+            <li>Estimates are based on statistical models and research data.</li>
+            <li>No guarantee of accuracy or specific outcomes.</li>
+            <li>Many factors affecting longevity cannot be fully captured.</li>
+          </ul>
+        </div>
+        <div class="disclaimer-block">
+          <h3>Liability Disclaimer</h3>
+          <ul>
+            <li>Website owners assume no liability for decisions made based on calculator results.</li>
+            <li>Users assume all risks associated with using this information.</li>
+          </ul>
         </div>
       </div>
     </div>
