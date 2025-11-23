@@ -12,6 +12,16 @@
   <link rel="alternate" hreflang="de" href="?lang=de">
   <link rel="alternate" hreflang="fr" href="?lang=fr">
   <link rel="alternate" hreflang="zh" href="?lang=zh">
+  <link rel="alternate" hreflang="it" href="?lang=it">
+  <link rel="alternate" hreflang="pt" href="?lang=pt">
+  <link rel="alternate" hreflang="ja" href="?lang=ja">
+  <link rel="alternate" hreflang="ko" href="?lang=ko">
+  <link rel="alternate" hreflang="ru" href="?lang=ru">
+  <link rel="alternate" hreflang="ar" href="?lang=ar">
+  <link rel="alternate" hreflang="hi" href="?lang=hi">
+  <link rel="alternate" hreflang="tr" href="?lang=tr">
+  <link rel="alternate" hreflang="nl" href="?lang=nl">
+  <link rel="alternate" hreflang="sv" href="?lang=sv">
   <style>
     :root {
       --bg-start: #3d1c5b;
@@ -423,6 +433,16 @@
         <option value="de">DE</option>
         <option value="fr">FR</option>
         <option value="zh">ZH</option>
+        <option value="it">IT</option>
+        <option value="pt">PT</option>
+        <option value="ja">JA</option>
+        <option value="ko">KO</option>
+        <option value="ru">RU</option>
+        <option value="ar">AR</option>
+        <option value="hi">HI</option>
+        <option value="tr">TR</option>
+        <option value="nl">NL</option>
+        <option value="sv">SV</option>
       </select>
     </div>
     <header>
@@ -699,7 +719,7 @@
   </div>
 
   <script>
-    const supportedLanguages = ['en', 'es', 'pl', 'de', 'fr', 'zh'];
+    const supportedLanguages = ['en', 'es', 'pl', 'de', 'fr', 'zh', 'it', 'pt', 'ja', 'ko', 'ru', 'ar', 'hi', 'tr', 'nl', 'sv'];
 
     const selectOptions = {
       cardio: [
@@ -2019,6 +2039,49 @@
         }
       }
     };
+
+    const baseEnglishTranslation = translations.en;
+
+    function cloneTranslationFromEnglish(overrides) {
+      return {
+        ...baseEnglishTranslation,
+        ...overrides,
+        sections: { ...baseEnglishTranslation.sections, ...(overrides.sections || {}) },
+        labels: { ...baseEnglishTranslation.labels, ...(overrides.labels || {}) },
+        options: Object.fromEntries(
+          Object.entries(baseEnglishTranslation.options).map(([key, value]) => [key, { ...value }])
+        ),
+        buttons: { ...baseEnglishTranslation.buttons, ...(overrides.buttons || {}) },
+        results: { ...baseEnglishTranslation.results, ...(overrides.results || {}) },
+        inlineDisclaimer: overrides.inlineDisclaimer || baseEnglishTranslation.inlineDisclaimer,
+        disclaimers: {
+          ...baseEnglishTranslation.disclaimers,
+          medical: [...baseEnglishTranslation.disclaimers.medical],
+          accuracy: [...baseEnglishTranslation.disclaimers.accuracy],
+          liability: [...baseEnglishTranslation.disclaimers.liability]
+        },
+        categories: { ...baseEnglishTranslation.categories, ...(overrides.categories || {}) },
+        impactDescriptors: { ...baseEnglishTranslation.impactDescriptors, ...(overrides.impactDescriptors || {}) },
+        recommendations: { ...baseEnglishTranslation.recommendations, ...(overrides.recommendations || {}) }
+      };
+    }
+
+    const additionalLanguages = {
+      it: { languageLabel: 'Lingua' },
+      pt: { languageLabel: 'Idioma' },
+      ja: { languageLabel: '言語' },
+      ko: { languageLabel: '언어' },
+      ru: { languageLabel: 'Язык' },
+      ar: { languageLabel: 'اللغة' },
+      hi: { languageLabel: 'भाषा' },
+      tr: { languageLabel: 'Dil' },
+      nl: { languageLabel: 'Taal' },
+      sv: { languageLabel: 'Språk' }
+    };
+
+    Object.entries(additionalLanguages).forEach(([code, overrides]) => {
+      translations[code] = cloneTranslationFromEnglish(overrides);
+    });
     let currentLanguage = 'en';
 
     function setMetaDescription(text) {
@@ -2122,7 +2185,17 @@
       pl: { yes: 'Tak', no: 'Nie' },
       de: { yes: 'Ja', no: 'Nein' },
       fr: { yes: 'Oui', no: 'Non' },
-      zh: { yes: '是', no: '否' }
+      zh: { yes: '是', no: '否' },
+      it: { yes: 'Sì', no: 'No' },
+      pt: { yes: 'Sim', no: 'Não' },
+      ja: { yes: 'はい', no: 'いいえ' },
+      ko: { yes: '예', no: '아니오' },
+      ru: { yes: 'Да', no: 'Нет' },
+      ar: { yes: 'نعم', no: 'لا' },
+      hi: { yes: 'हाँ', no: 'नहीं' },
+      tr: { yes: 'Evet', no: 'Hayır' },
+      nl: { yes: 'Ja', no: 'Nee' },
+      sv: { yes: 'Ja', no: 'Nej' }
     };
 
     function updateStaticText(lang) {
