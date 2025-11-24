@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1645864365855421" crossorigin="anonymous"></script>
+      
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8X91LZ3XL4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-8X91LZ3XL4');
+    </script>
   <title>Longevity Insights Calculator</title>
   <link rel="alternate" hreflang="x-default" href="?lang=en">
   <link rel="alternate" hreflang="en" href="?lang=en">
@@ -1304,6 +1314,11 @@
             'Website owners assume no liability for decisions made based on calculator results.',
             'Users assume all risks associated with using this information.'
           ]
+                          affiliateTitle: 'Affiliate Disclosure',
+                affiliate: [
+                    'As an Amazon Associate, we earn from qualifying purchases.',
+                    'Links to products may be affiliate links. If you purchase through these links, we may earn a commission at no additional cost to you.'
+                ]
         },
         categories: {
           activity: 'Physical activity',
@@ -1480,6 +1495,11 @@
             'Los propietarios del sitio no asumen responsabilidad por decisiones basadas en los resultados.',
             'Los usuarios asumen todos los riesgos asociados con usar esta información.'
           ]
+                          affiliateTitle: 'Divulgación de Afiliados',
+                affiliate: [
+                    'Como Asociado de Amazon, ganamos con las compras que califican.',
+                    'Los enlaces a productos pueden ser enlaces de afiliados. Si compras a través de estos enlaces, podemos ganar una comisión sin costo adicional para ti.'
+                ]
         },
         categories: {
           activity: 'Actividad física',
@@ -4397,6 +4417,15 @@
 
     function renderResults(lifespan, remaining, impacts, { scrollToResults = false } = {}) {
       const t = translations[currentLanguage];
+          
+    // Track calculation completion
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'calculation_complete', {
+            'event_category': 'calculator',
+            'event_label': 'Calculation Completed',
+            'lifespan': lifespan.toFixed(1)
+        });
+    }
       document.getElementById('lifespanValue').textContent = `${lifespan.toFixed(1)} ${t.results.yearsLabel}`;
       document.getElementById('remainingYears').textContent = isFinite(remaining)
         ? `${remaining.toFixed(1)} ${remaining >= 0 ? t.results.remainingPositive : t.results.remainingNegative}`
@@ -4498,7 +4527,15 @@
       el.addEventListener('input', recalcOnChange);
     });
 
-    document.getElementById('calculate').addEventListener('click', () => calculateLifespan({ scrollToResults: true }));
+    document.getElementById('calculate').addEventListener('click', () => calculateLifespan({
+          // Track calculator usage
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'calculate_click', {
+            'event_category': 'calculator',
+            'event_label': 'Calculate Lifespan Button'
+        });
+    }
+    scrollToResults: true }));
     document.getElementById('reset').addEventListener('click', resetForm);
 
     document.getElementById('languagePicker').addEventListener('change', (e) => {
