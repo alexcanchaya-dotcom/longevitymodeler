@@ -4524,7 +4524,7 @@
             if (!recommendations || recommendations.length === 0) return;
             
             const topRecommendation = recommendations[0];
-            const product = getProductForRecommendation(topRecommendation.text);
+            const product = getProductForRecommendation(topRecommendation.factor);
             
             if (!product || product.amazonLink === "#") {
                 document.getElementById('productCard').style.display = 'none';
