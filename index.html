@@ -716,6 +716,48 @@
           </ul>
         </div>
       </div>
+
+                  <!-- Product Recommendation Section -->
+            <div class="product-recommendation" id="productCard" style="display: none;">
+                <div class="product-tag">💡 Recommended Tool</div>
+                
+                <div class="product-content">
+                    <div class="product-image">
+                        <img id="productImage" src="" alt="">
+                        <span class="product-badge" id="productBadge"></span>
+                    </div>
+                    
+                    <div class="product-info">
+                        <h3 id="productName"></h3>
+                        <p class="product-subtitle" id="productDescription"></p>
+                        
+                        <div class="product-rating">
+                            <span class="stars" id="productStars"></span>
+                            <span class="rating-text">
+                                <span id="productRating"></span>/5 
+                                (<span id="productReviews"></span> reviews)
+                            </span>
+                            <span class="product-price" id="productPrice"></span>
+                        </div>
+                        
+                        <a href="#" id="productLink" class="product-cta" target="_blank" rel="nofollow noopener">
+                            View on Amazon →
+                        </a>
+                        
+                        <p class="product-why">
+                            <strong>Why we recommend it:</strong> 
+                            <span id="productWhy"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FTC Disclosure -->
+            <div class="ftc-disclosure">
+                <p><small>
+                    <strong>Affiliate Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.
+                </small></p>
+            </div>
     </div>
   </div>
 
@@ -4311,5 +4353,54 @@
     applyLanguage(initialLang);
     applyDefaults();
   </script>
+
+      <!-- Affiliate Products -->
+    <script src="products.js"></script>
+    <script>
+        // Display product recommendation after calculation
+        function displayProductRecommendation(recommendations) {
+            if (!recommendations || recommendations.length === 0) return;
+            
+            const topRecommendation = recommendations[0];
+            const product = getProductForRecommendation(topRecommendation.text);
+            
+            if (!product || product.amazonLink === "#") {
+                document.getElementById('productCard').style.display = 'none';
+                return;
+            }
+            
+            // Populate product card
+            document.getElementById('productImage').src = product.imageUrl;
+            document.getElementById('productImage').alt = product.name;
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productDescription').textContent = product.description;
+            document.getElementById('productRating').textContent = product.rating;
+            document.getElementById('productReviews').textContent = product.reviewCount;
+            document.getElementById('productPrice').textContent = product.price;
+            document.getElementById('productLink').href = product.amazonLink;
+            document.getElementById('productWhy').textContent = product.whyRecommend;
+            
+            // Set star rating
+            const rating = parseFloat(product.rating);
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            let starsHTML = '\u2605'.repeat(fullStars);
+            if (halfStar) starsHTML += '\u2BEA';
+            starsHTML += '\u2606'.repeat(5 - Math.ceil(rating));
+            document.getElementById('productStars').textContent = starsHTML;
+            
+            // Show/hide badge
+            const badgeEl = document.getElementById('productBadge');
+            if (product.badge) {
+                badgeEl.textContent = product.badge;
+                badgeEl.style.display = 'block';
+            } else {
+                badgeEl.style.display = 'none';
+            }
+            
+            // Show product card
+            document.getElementById('productCard').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
