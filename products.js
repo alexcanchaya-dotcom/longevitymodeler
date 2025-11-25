@@ -10,7 +10,7 @@ const affiliateProducts = {
     rating: "4.5",
     reviewCount: "132,865",
     amazonLink: "https://amzn.to/3LW2jF4",
-    imageUrl: "https://m.media-amazon.com/images/I/81sF0Q3FGXL._AC_SL1500_.jpg",
+    imageUrl: "https://images-na.ssl-images-amazon.com/images/I/81sF0Q3FGXL._AC_SL1500_.jpg",
     badge: "Best Seller",
     whyRecommend: "Affordable, portable, and perfect for building the cardiovascular habits that could add years to your life expectancy.",
     triggers: ["cardio", "exercise", "fitness", "strength", "activity"]
