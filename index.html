@@ -651,19 +651,39 @@
         <div class="inputs-grid">
           <div>
             <label for="cardio" id="labelCardio">Cardio exercise frequency</label>
-            <select id="cardio"></select>
+            <select id="cardio">
+              <option value="never">Never</option>
+              <option value="1-2">1-2x/week</option>
+              <option value="3-4" selected>3-4x/week</option>
+              <option value="5plus">5+x/week</option>
+            </select>
           </div>
           <div>
             <label for="strength" id="labelStrength">Strength training frequency</label>
-            <select id="strength"></select>
+            <select id="strength">
+              <option value="never">Never</option>
+              <option value="1-2">1-2x/week</option>
+              <option value="3-4" selected>3-4x/week</option>
+              <option value="5plus">5+x/week</option>
+            </select>
           </div>
           <div>
             <label for="steps" id="labelSteps">Daily steps average</label>
-            <select id="steps"></select>
+            <select id="steps">
+              <option value="lt5k">&lt;5000</option>
+              <option value="5-8k">5000-8000</option>
+              <option value="8-10k" selected>8000-10000</option>
+              <option value="10kplus">10000+</option>
+            </select>
           </div>
           <div>
             <label for="sauna" id="labelSauna">Sauna usage</label>
-            <select id="sauna"></select>
+            <select id="sauna">
+              <option value="never">Never</option>
+              <option value="1x">1x/week</option>
+              <option value="2-3" selected>2-3x/week</option>
+              <option value="4plus">4+x/week</option>
+            </select>
           </div>
         </div>
       </section>
@@ -673,23 +693,49 @@
         <div class="inputs-grid">
           <div>
             <label for="diet" id="labelDiet">Diet type</label>
-            <select id="diet"></select>
+            <select id="diet">
+              <option value="standard">Standard</option>
+              <option value="balanced" selected>Balanced/Whole foods</option>
+              <option value="mediterranean">Mediterranean</option>
+              <option value="plant">Vegetarian/Vegan</option>
+              <option value="keto">Keto/Low-carb</option>
+            </select>
           </div>
           <div>
             <label for="vegetables" id="labelVegetables">Daily vegetable servings</label>
-            <select id="vegetables"></select>
+            <select id="vegetables">
+              <option value="lt2">&lt;2</option>
+              <option value="2-3">2-3</option>
+              <option value="4-5" selected>4-5</option>
+              <option value="6plus">6+</option>
+            </select>
           </div>
           <div>
             <label for="processed" id="labelProcessed">Ultra-processed foods consumption</label>
-            <select id="processed"></select>
+            <select id="processed">
+              <option value="daily">Daily</option>
+              <option value="several">Several times/week</option>
+              <option value="rarely" selected>Rarely</option>
+              <option value="never">Never</option>
+            </select>
           </div>
           <div>
             <label for="water" id="labelWater">Water intake</label>
-            <select id="water"></select>
+            <select id="water">
+              <option value="lt4">&lt;4 cups</option>
+              <option value="4-6">4-6 cups</option>
+              <option value="6-8">6-8 cups</option>
+              <option value="8plus" selected>8+ cups</option>
+            </select>
           </div>
           <div>
             <label for="fish" id="labelFish">Fish consumption</label>
-            <select id="fish"></select>
+            <select id="fish">
+              <option value="never">Never</option>
+              <option value="1x" selected>1x/week</option>
+              <option value="2-3">2-3x/week</option>
+              <option value="4plus">4+x/week</option>
+            </select>
           </div>
         </div>
       </section>
@@ -703,11 +749,21 @@
           </div>
           <div>
             <label for="sleepQuality" id="labelSleepQuality">Sleep quality</label>
-            <select id="sleepQuality"></select>
+            <select id="sleepQuality">
+              <option value="poor">Poor</option>
+              <option value="fair">Fair</option>
+              <option value="good" selected>Good</option>
+              <option value="excellent">Excellent</option>
+            </select>
           </div>
           <div>
             <label for="sleepConsistency" id="labelSleepConsistency">Sleep schedule consistency</label>
-            <select id="sleepConsistency"></select>
+            <select id="sleepConsistency">
+              <option value="veryIrregular">Very irregular</option>
+              <option value="somewhatIrregular">Somewhat irregular</option>
+              <option value="mostly" selected>Mostly consistent</option>
+              <option value="veryConsistent">Very consistent</option>
+            </select>
           </div>
         </div>
       </section>
@@ -717,19 +773,40 @@
         <div class="inputs-grid">
           <div>
             <label for="smoking" id="labelSmoking">Smoking status</label>
-            <select id="smoking"></select>
+            <select id="smoking">
+              <option value="never" selected>Never</option>
+              <option value="former5">Former (5+ years)</option>
+              <option value="formerRecent">Former (&lt;5 years)</option>
+              <option value="current">Current</option>
+            </select>
           </div>
           <div>
             <label for="alcohol" id="labelAlcohol">Alcohol consumption</label>
-            <select id="alcohol"></select>
+            <select id="alcohol">
+              <option value="none">None</option>
+              <option value="light" selected>Light (1-7/week)</option>
+              <option value="moderate">Moderate (8-14/week)</option>
+              <option value="heavy">Heavy (15+/week)</option>
+            </select>
           </div>
           <div>
             <label for="stress" id="labelStress">Stress level</label>
-            <select id="stress"></select>
+            <select id="stress">
+              <option value="veryHigh">Very high</option>
+              <option value="high">High</option>
+              <option value="moderate" selected>Moderate</option>
+              <option value="low">Low</option>
+              <option value="veryLow">Very low</option>
+            </select>
           </div>
           <div>
             <label for="social" id="labelSocial">Social connections</label>
-            <select id="social"></select>
+            <select id="social">
+              <option value="isolated">Isolated</option>
+              <option value="few">Few friends</option>
+              <option value="moderate" selected>Moderate social life</option>
+              <option value="very">Very social</option>
+            </select>
           </div>
         </div>
       </section>
@@ -739,15 +816,30 @@
         <div class="inputs-grid">
           <div>
             <label for="meditation" id="labelMeditation">Meditation / mindfulness</label>
-            <select id="meditation"></select>
+            <select id="meditation">
+              <option value="never">Never</option>
+              <option value="occasionally">Occasionally</option>
+              <option value="weekly">Weekly</option>
+              <option value="daily" selected>Daily</option>
+            </select>
           </div>
           <div>
             <label for="nature" id="labelNature">Time in nature</label>
-            <select id="nature"></select>
+            <select id="nature">
+              <option value="rarely">Rarely</option>
+              <option value="monthly">Monthly</option>
+              <option value="weekly" selected>Weekly</option>
+              <option value="daily">Daily</option>
+            </select>
           </div>
           <div>
             <label for="sun" id="labelSun">Sun exposure</label>
-            <select id="sun"></select>
+            <select id="sun">
+              <option value="minimal">Minimal</option>
+              <option value="moderateScreen" selected>Moderate with sunscreen</option>
+              <option value="moderateNoScreen">Moderate without sunscreen</option>
+              <option value="excessive">Excessive</option>
+            </select>
           </div>
         </div>
       </section>
@@ -757,15 +849,30 @@
         <div class="inputs-grid">
           <div>
             <label for="checkups" id="labelCheckups">Medical checkups</label>
-            <select id="checkups"></select>
+            <select id="checkups">
+              <option value="never">Never</option>
+              <option value="twoYears">Every 2+ years</option>
+              <option value="annual" selected>Annually</option>
+              <option value="sixMonths">Every 6 months</option>
+            </select>
           </div>
           <div>
             <label for="conditions" id="labelConditions">Chronic conditions</label>
-            <select id="conditions"></select>
+            <select id="conditions">
+              <option value="none" selected>None</option>
+              <option value="one">1 condition</option>
+              <option value="twoThree">2-3 conditions</option>
+              <option value="fourPlus">4+ conditions</option>
+            </select>
           </div>
           <div>
             <label for="family" id="labelFamily">Family longevity history</label>
-            <select id="family"></select>
+            <select id="family">
+              <option value="poor">Poor (&lt;70 avg)</option>
+              <option value="fair">Fair (70-80 avg)</option>
+              <option value="good">Good (80-85 avg)</option>
+              <option value="excellent" selected>Excellent (85+ avg)</option>
+            </select>
           </div>
         </div>
       </section>
@@ -775,15 +882,32 @@
         <div class="inputs-grid">
           <div>
             <label for="education" id="labelEducation">Education level</label>
-            <select id="education"></select>
+            <select id="education">
+              <option value="lessHS">Less than high school</option>
+              <option value="highSchool">High school</option>
+              <option value="someCollege">Some college</option>
+              <option value="bachelor">Bachelor's degree</option>
+              <option value="graduate" selected>Graduate degree</option>
+            </select>
           </div>
           <div>
             <label for="marital" id="labelMarital">Marital status</label>
-            <select id="marital"></select>
+            <select id="marital">
+              <option value="single">Single/Never married</option>
+              <option value="married" selected>Married/Partnered</option>
+              <option value="divorced">Divorced/Separated</option>
+              <option value="widowed">Widowed</option>
+            </select>
           </div>
           <div>
             <label for="income" id="labelIncome">Income level</label>
-            <select id="income"></select>
+            <select id="income">
+              <option value="poverty">Below poverty line</option>
+              <option value="lowerMiddle">Lower middle class</option>
+              <option value="middle" selected>Middle class</option>
+              <option value="upperMiddle">Upper middle class</option>
+              <option value="high">High income</option>
+            </select>
           </div>
         </div>
       </section>
@@ -807,19 +931,40 @@
           </div>
           <div>
             <label for="diabetes" id="labelDiabetes">Diabetes</label>
-            <select id="diabetes"></select>
+            <select id="diabetes">
+              <option value="none" selected>None</option>
+              <option value="prediabetic">Pre-diabetic</option>
+              <option value="type1">Type 1</option>
+              <option value="type2controlled">Type 2 controlled</option>
+              <option value="type2uncontrolled">Type 2 uncontrolled</option>
+            </select>
           </div>
           <div>
             <label for="bp" id="labelBp">High blood pressure</label>
-            <select id="bp"></select>
+            <select id="bp">
+              <option value="normal" selected>Normal</option>
+              <option value="elevated">Elevated</option>
+              <option value="stage1">Stage 1</option>
+              <option value="stage2">Stage 2</option>
+            </select>
           </div>
           <div>
             <label for="cholesterol" id="labelCholesterol">Cholesterol levels</label>
-            <select id="cholesterol"></select>
+            <select id="cholesterol">
+              <option value="optimal" selected>Optimal (&lt;200 mg/dL)</option>
+              <option value="borderline">Borderline high (200-239 mg/dL)</option>
+              <option value="high">High (240+ mg/dL)</option>
+              <option value="medication">On medication</option>
+            </select>
           </div>
           <div>
             <label for="mentalHealth" id="labelMentalHealth">Mental health conditions</label>
-            <select id="mentalHealth"></select>
+            <select id="mentalHealth">
+              <option value="none" selected>None</option>
+              <option value="mild">Mild anxiety/depression</option>
+              <option value="moderate">Moderate</option>
+              <option value="severe">Severe</option>
+            </select>
           </div>
         </div>
       </section>
