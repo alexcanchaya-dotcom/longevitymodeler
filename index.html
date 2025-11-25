@@ -4672,15 +4672,17 @@
       el.addEventListener('input', recalcOnChange);
     });
 
-    document.getElementById('calculate').addEventListener('click', () => calculateLifespan({
-          // Track calculator usage
-    if (typeof gtag !== 'undefined') {
+    document.getElementById('calculate').addEventListener('click', () => {
+      // Track calculator usage
+      if (typeof gtag !== 'undefined') {
         gtag('event', 'calculate_click', {
-            'event_category': 'calculator',
-            'event_label': 'Calculate Lifespan Button'
+          'event_category': 'calculator',
+          'event_label': 'Calculate Lifespan Button'
         });
-    }
-    scrollToResults: true }));
+      }
+
+      calculateLifespan({ scrollToResults: true });
+    });
     document.getElementById('reset').addEventListener('click', resetForm);
 
     document.getElementById('languagePicker').addEventListener('change', (e) => {
