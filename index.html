@@ -641,15 +641,15 @@
             <div style="display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin-bottom: 15px;">
                 <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #1e3a8a; font-weight: 500;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    No signup required
+                    <span data-i18n="trustBadges.noSignup">No signup required</span>
                 </span>
                 <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #1e3a8a; font-weight: 500;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    100% Private
+                    <span data-i18n="trustBadges.private">100% Private</span>
                 </span>
                 <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #1e3a8a; font-weight: 500;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                    Science-backed
+                    <span data-i18n="trustBadges.science">Science-backed</span>
                 </span>
             </div>
         </div>
@@ -1112,7 +1112,7 @@
             <!-- FTC Disclosure -->
             <div class="ftc-disclosure">
                 <p><small>
-                    <strong>Affiliate Disclosure:</strong> As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.
+                    <strong data-i18n="affiliateDisclosure.title">Affiliate Disclosure:</strong> <span data-i18n="affiliateDisclosure.body">As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.</span>
                 </small></p>
             </div>
     </div>
@@ -1390,6 +1390,23 @@
         pageTitle: 'Longevity Insights Calculator',
         pageSubtitle: 'Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.',
         topNote: 'For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.',
+        trustBadges: {
+          noSignup: 'No signup required',
+          private: '100% Private',
+          science: 'Science-backed'
+        },
+        footer: {
+          home: 'Home',
+          calculator: 'Biological Age Calculator',
+          about: 'About Us',
+          contact: 'Contact Us',
+          privacy: 'Privacy Policy',
+          terms: 'Terms of Service'
+        },
+        affiliateDisclosure: {
+          title: 'Affiliate Disclosure:',
+          body: 'As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no additional cost to you. I only recommend products I believe will genuinely help improve your longevity.'
+        },
         sections: {
           demographics: '🧑 Basic Demographics',
           activity: '🏃 Physical Activity',
@@ -1571,6 +1588,23 @@
         pageTitle: 'Calculadora de Longevidad',
         pageSubtitle: 'Estimador integral basado en ciencia que destaca factores modificables que influyen en la esperanza de vida.',
         topNote: 'Solo para fines educativos — <a href="#disclaimer">revise los avisos importantes</a>.',
+        trustBadges: {
+          noSignup: 'No se requiere registro',
+          private: '100% Privado',
+          science: 'Respaldado por la ciencia'
+        },
+        footer: {
+          home: 'Inicio',
+          calculator: 'Calculadora de Edad Biológica',
+          about: 'Sobre nosotros',
+          contact: 'Contáctanos',
+          privacy: 'Política de Privacidad',
+          terms: 'Términos del Servicio'
+        },
+        affiliateDisclosure: {
+          title: 'Divulgación de afiliados:',
+          body: 'Como asociado de Amazon, gano con las compras que califican. Esto significa que si haces clic en un enlace y realizas una compra, puedo recibir una pequeña comisión sin costo adicional para ti. Solo recomiendo productos que creo que realmente ayudarán a mejorar tu longevidad.'
+        },
         sections: {
           demographics: '🧑 Datos Demográficos Básicos',
           activity: '🏃 Actividad Física',
@@ -1928,6 +1962,23 @@
         pageTitle: 'Langlebigkeitsrechner',
         pageSubtitle: 'Umfassender, wissenschaftlich fundierter Schätzer, der modifizierbare Faktoren hervorhebt, die die Lebensspanne beeinflussen.',
         topNote: 'Nur zu Bildungszwecken — <a href="#disclaimer">wichtige Hinweise ansehen</a>.',
+        trustBadges: {
+          noSignup: 'Keine Anmeldung erforderlich',
+          private: '100% privat',
+          science: 'Wissenschaftlich fundiert'
+        },
+        footer: {
+          home: 'Startseite',
+          calculator: 'Rechner für biologisches Alter',
+          about: 'Über uns',
+          contact: 'Kontakt',
+          privacy: 'Datenschutzrichtlinie',
+          terms: 'Nutzungsbedingungen'
+        },
+        affiliateDisclosure: {
+          title: 'Affiliate-Hinweis:',
+          body: 'Als Amazon-Partner verdiene ich an qualifizierten Käufen. Wenn du auf einen Link klickst und einen Kauf tätigst, erhalte ich möglicherweise eine kleine Provision ohne zusätzliche Kosten für dich. Ich empfehle nur Produkte, von denen ich überzeugt bin, dass sie deine Langlebigkeit wirklich unterstützen.'
+        },
         sections: {
           demographics: '🧑 Grundlegende Demografische Daten',
           activity: '🏃 Körperliche Aktivität',
@@ -2104,6 +2155,23 @@
         pageTitle: 'Calculateur de Longévité',
         pageSubtitle: 'Estimateur complet et scientifique mettant en évidence les facteurs modifiables qui influencent la durée de vie.',
         topNote: 'À des fins éducatives seulement — <a href="#disclaimer">consultez les avertissements importants</a>.',
+        trustBadges: {
+          noSignup: 'Aucune inscription requise',
+          private: '100 % privé',
+          science: 'Fondé sur la science'
+        },
+        footer: {
+          home: 'Accueil',
+          calculator: 'Calculateur d\'âge biologique',
+          about: 'À propos de nous',
+          contact: 'Contactez-nous',
+          privacy: 'Politique de confidentialité',
+          terms: 'Conditions d\'utilisation'
+        },
+        affiliateDisclosure: {
+          title: 'Divulgation d\'affiliation :',
+          body: 'En tant qu\'associé Amazon, je gagne des commissions sur les achats admissibles. Cela signifie que si vous cliquez sur un lien et effectuez un achat, je peux recevoir une petite commission sans frais supplémentaires pour vous. Je recommande uniquement des produits qui peuvent réellement améliorer votre longévité.'
+        },
         sections: {
           demographics: '🧑 Données Démographiques de Base',
           activity: '🏃 Activité Physique',
@@ -2632,6 +2700,23 @@
         pageTitle: 'Calculadora de Longevidade',
         pageSubtitle: 'Estimador abrangente e baseado em ciência que destaca fatores modificáveis que influenciam a longevidade.',
         topNote: 'Somente para fins educativos — <a href="#disclaimer">consulte os avisos importantes</a>.',
+        trustBadges: {
+          noSignup: 'Não é necessário cadastro',
+          private: '100% Privado',
+          science: 'Baseado em ciência'
+        },
+        footer: {
+          home: 'Início',
+          calculator: 'Calculadora de Idade Biológica',
+          about: 'Sobre nós',
+          contact: 'Contato',
+          privacy: 'Política de Privacidade',
+          terms: 'Termos de Serviço'
+        },
+        affiliateDisclosure: {
+          title: 'Divulgação de afiliados:',
+          body: 'Como Associado da Amazon, ganho com compras qualificadas. Isso significa que, se você clicar em um link e fizer uma compra, posso receber uma pequena comissão sem custo adicional para você. Só recomendo produtos que acredito que realmente ajudarão a melhorar sua longevidade.'
+        },
         sections: {
           demographics: '🧑 Dados demográficos básicos',
           activity: '🏃 Atividade física',
@@ -4245,6 +4330,26 @@
       if (node) node.textContent = text;
     }
 
+    function getNestedTranslation(source, key) {
+      return key.split('.').reduce((acc, part) => acc?.[part], source);
+    }
+
+    function applyTranslations(lang) {
+      const t = translations[lang] || translations.en;
+      const fallback = translations.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const value = getNestedTranslation(t, key) ?? getNestedTranslation(fallback, key);
+        if (value !== undefined) {
+          if (el.dataset.i18nTarget === 'html') {
+            el.innerHTML = value;
+          } else {
+            el.textContent = value;
+          }
+        }
+      });
+    }
+
     function updateDisclaimers(lang) {
       const t = translations[lang];
       setText('disclaimerHeader', t.sections.disclaimers);
@@ -4350,12 +4455,13 @@
       setText('calculate', t.buttons.calculate);
       setText('reset', t.buttons.reset);
       setText('resultEstimateLabel', t.results.estimated);
-      setText('recommendationsTitle', t.results.topOpportunities);
-      document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
-      document.getElementById('lifespanValue').textContent = `-- ${t.results.yearsLabel}`;
-      document.getElementById('remainingYears').textContent = '';
-      document.getElementById('inlineDisclaimer').textContent = t.inlineDisclaimer;
-    }
+        setText('recommendationsTitle', t.results.topOpportunities);
+        document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
+        document.getElementById('lifespanValue').textContent = `-- ${t.results.yearsLabel}`;
+        document.getElementById('remainingYears').textContent = '';
+        document.getElementById('inlineDisclaimer').textContent = t.inlineDisclaimer;
+        applyTranslations(lang);
+      }
 
     function updateBinaryLabels(lang) {
       const labels = yesNoLabels[lang] || yesNoLabels.en;
@@ -4741,9 +4847,11 @@
       window.history.replaceState({}, '', newUrl);
     });
 
-    const initialLang = detectLanguage();
-    applyLanguage(initialLang);
-    applyDefaults();
+    document.addEventListener('DOMContentLoaded', () => {
+      const initialLang = detectLanguage();
+      applyLanguage(initialLang);
+      applyDefaults();
+    });
   </script>
 
       <!-- Affiliate Products -->
@@ -4797,12 +4905,12 @@
   
     <!-- Footer Navigation -->
     <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); text-align: center; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-        <a href="/" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;">Home</a>
-              <a href="/biological-age-calculator.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;">Biological Age Calculator</a>
-        <a href="/about.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;">About Us</a>
-        <a href="/contact.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;">Contact Us</a>
-        <a href="/privacy.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;">Privacy Policy</a>
-        <a href="/terms.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;">Terms of Service</a>
+        <a href="/" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.home">Home</a>
+              <a href="/biological-age-calculator.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.calculator">Biological Age Calculator</a>
+        <a href="/about.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.about">About Us</a>
+        <a href="/contact.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.contact">Contact Us</a>
+        <a href="/privacy.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="/terms.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.terms">Terms of Service</a>
     </div>
 </body>
 </html>
