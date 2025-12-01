@@ -4946,9 +4946,11 @@
       window.history.replaceState({}, '', newUrl);
     });
 
-    const initialLang = detectLanguage();
-    applyLanguage(initialLang);
-    applyDefaults();
+    document.addEventListener('DOMContentLoaded', () => {
+      const initialLang = detectLanguage();
+      applyLanguage(initialLang);
+      applyDefaults();
+    });
   </script>
 
       <!-- Affiliate Products -->
