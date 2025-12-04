@@ -10,10 +10,141 @@
     <meta property="og:url" content="https://longevitymodeler.com/about.html">
     <meta property="og:title" content="About Us - Longevity Insights Calculator">
     <meta property="og:description" content="Learn about Longevity Modeler - a free, science-backed calculator helping people understand factors affecting lifespan and make informed health decisions.">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3.1.1/dist/cookieconsent.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3.1.1/dist/cookieconsent.umd.js"></script>
+    <style>
+        :root {
+          --cc-bg: #24163f;
+          --cc-text: #f5f7ff;
+          --cc-btn-primary-bg: #5e8bfd;
+          --cc-btn-primary-text: #ffffff;
+          --cc-btn-primary-border: #5e8bfd;
+          --cc-btn-secondary-bg: transparent;
+          --cc-btn-secondary-text: #f5f7ff;
+          --cc-btn-secondary-border: #f5f7ff;
+          --cc-toggle-bg-off: #4a2f72;
+          --cc-toggle-bg-on: #5e8bfd;
+          --cc-toggle-knob-bg: #ffffff;
+          --cc-toggle-knob-icon-color: #5e8bfd;
+          --cc-cookie-category-block-bg: rgba(255, 255, 255, 0.06);
+          --cc-cookie-category-block-border: rgba(255, 255, 255, 0.2);
+        }
+      </style>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          functionality_storage: 'granted',
+          security_storage: 'granted',
+          wait_for_update: 500
+        });
+
+        function updateConsentFromPreferences() {
+          const analyticsAllowed = window.CookieConsent && CookieConsent.acceptedCategory('analytics');
+          const advertisingAllowed = window.CookieConsent && CookieConsent.acceptedCategory('advertising');
+
+          gtag('consent', 'update', {
+            ad_storage: advertisingAllowed ? 'granted' : 'denied',
+            ad_user_data: advertisingAllowed ? 'granted' : 'denied',
+            ad_personalization: advertisingAllowed ? 'granted' : 'denied',
+            analytics_storage: analyticsAllowed ? 'granted' : 'denied'
+          });
+        }
+
+        window.addEventListener('load', function () {
+          if (!window.CookieConsent) return;
+          CookieConsent.run({
+            useGpc: true,
+            categories: {
+              necessary: {
+                enabled: true,
+                readOnly: true
+              },
+              analytics: {},
+              advertising: {}
+            },
+            guiOptions: {
+              consentModal: {
+                layout: 'bar',
+                position: 'bottom center',
+                equalWeightButtons: true
+              },
+              preferencesModal: {
+                layout: 'bar',
+                position: 'left',
+                equalWeightButtons: true
+              }
+            },
+            language: {
+              default: 'en',
+              translations: {
+                en: {
+                  consentModal: {
+                    title: 'We value your privacy',
+                    description: 'We use cookies to improve your experience, measure performance, and serve relevant ads. Manage your choices anytime. Read more in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.',
+                    acceptAllBtn: 'Accept all',
+                    rejectAllBtn: 'Reject all',
+                    manageBtn: 'Manage preferences'
+                  },
+                  preferencesModal: {
+                    title: 'Cookie preferences',
+                    acceptAllBtn: 'Accept all',
+                    rejectAllBtn: 'Reject all',
+                    savePreferencesBtn: 'Save preferences',
+                    closeIconLabel: 'Close',
+                    sections: [
+                      {
+                        title: 'Cookie usage',
+                        description: 'Select which categories of cookies you want to allow. We always use strictly necessary cookies to keep the site secure and functional.'
+                      },
+                      {
+                        title: 'Necessary',
+                        linkedCategory: 'necessary',
+                        description: 'Required for core site functionality and cannot be disabled.'
+                      },
+                      {
+                        title: 'Analytics (Google Analytics)',
+                        linkedCategory: 'analytics',
+                        description: 'Helps us understand site traffic and usage to improve the experience.'
+                      },
+                      {
+                        title: 'Advertising (Google AdSense)',
+                        linkedCategory: 'advertising',
+                        description: 'Used to deliver personalized ads and measure their performance.'
+                      },
+                      {
+                        title: 'Learn more',
+                        description: 'You can review the full details in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.'
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            onFirstConsent: updateConsentFromPreferences,
+            onConsent: updateConsentFromPreferences,
+            onChange: updateConsentFromPreferences
+          });
+        });
+      </script>
+
+      <script type="text/plain" data-cookiecategory="advertising" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1645864365855421" crossorigin="anonymous"></script>
+      <script type="text/plain" data-cookiecategory="analytics" async src="https://www.googletagmanager.com/gtag/js?id=G-8X91LZ3XL4"></script>
+      <script type="text/plain" data-cookiecategory="analytics">
+        gtag('js', new Date());
+        gtag('config', 'G-8X91LZ3XL4');
+      </script>
+
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="https://longevitymodeler.com/about.html">
     <meta name="twitter:title" content="About Us - Longevity Insights Calculator">
-    <meta name="twitter:description" content="Learn about Longevity Modeler - a free, science-backed calculator helping people understand factors affecting lifespan.">    <title>About Us - Longevity Insights Calculator</title>
+    <meta name="twitter:description" content="Learn about Longevity Modeler - a free, science-backed calculator helping people understand factors affecting lifespan.">
+    <title>About Us - Longevity Insights Calculator</title>
     <style>
         * {
             margin: 0;
