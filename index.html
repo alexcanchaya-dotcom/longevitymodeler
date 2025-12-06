@@ -60,81 +60,97 @@
       });
     }
 
-    window.addEventListener('load', function () {
-      if (!window.CookieConsent) return;
-      CookieConsent.run({
-        useGpc: true,
-        categories: {
-          necessary: {
-            enabled: true,
-            readOnly: true
-          },
-          analytics: {},
-          advertising: {}
-        },
-        guiOptions: {
-          consentModal: {
-            layout: 'bar',
-            position: 'bottom center',
-            equalWeightButtons: true
-          },
-          preferencesModal: {
-            layout: 'bar',
-            position: 'left',
-            equalWeightButtons: true
-          }
-        },
-        language: {
-          default: 'en',
-          translations: {
-            en: {
+    (function initCookieConsentWithRetry() {
+      var maxTries = 20;
+      var tries = 0;
+
+      function tryInit() {
+        if (window.CookieConsent && typeof window.CookieConsent.run === 'function') {
+          CookieConsent.run({
+            useGpc: true,
+            categories: {
+              necessary: {
+                enabled: true,
+                readOnly: true
+              },
+              analytics: {},
+              advertising: {}
+            },
+            guiOptions: {
               consentModal: {
-                title: 'We value your privacy',
-                description: 'We use cookies to improve your experience, measure performance, and serve relevant ads. Manage your choices anytime. Read more in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.',
-                acceptAllBtn: 'Accept all',
-                rejectAllBtn: 'Reject all',
-                manageBtn: 'Manage preferences'
+                layout: 'bar',
+                position: 'bottom center',
+                equalWeightButtons: true
               },
               preferencesModal: {
-                title: 'Cookie preferences',
-                acceptAllBtn: 'Accept all',
-                rejectAllBtn: 'Reject all',
-                savePreferencesBtn: 'Save preferences',
-                closeIconLabel: 'Close',
-                sections: [
-                  {
-                    title: 'Cookie usage',
-                    description: 'Select which categories of cookies you want to allow. We always use strictly necessary cookies to keep the site secure and functional.'
-                  },
-                  {
-                    title: 'Necessary',
-                    linkedCategory: 'necessary',
-                    description: 'Required for core site functionality and cannot be disabled.'
-                  },
-                  {
-                    title: 'Analytics (Google Analytics)',
-                    linkedCategory: 'analytics',
-                    description: 'Helps us understand site traffic and usage to improve the experience.'
-                  },
-                  {
-                    title: 'Advertising (Google AdSense)',
-                    linkedCategory: 'advertising',
-                    description: 'Used to deliver personalized ads and measure their performance.'
-                  },
-                  {
-                    title: 'Learn more',
-                    description: 'You can review the full details in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.'
-                  }
-                ]
+                layout: 'bar',
+                position: 'left',
+                equalWeightButtons: true
               }
-            }
-          }
-        },
-        onFirstConsent: updateConsentFromPreferences,
-        onConsent: updateConsentFromPreferences,
-        onChange: updateConsentFromPreferences
-      });
-    });
+            },
+            language: {
+              default: 'en',
+              translations: {
+                en: {
+                  consentModal: {
+                    title: 'We value your privacy',
+                    description: 'We use cookies to improve your experience, measure performance, and serve relevant ads. Manage your choices anytime. Read more in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.',
+                    acceptAllBtn: 'Accept all',
+                    rejectAllBtn: 'Reject all',
+                    manageBtn: 'Manage preferences'
+                  },
+                  preferencesModal: {
+                    title: 'Cookie preferences',
+                    acceptAllBtn: 'Accept all',
+                    rejectAllBtn: 'Reject all',
+                    savePreferencesBtn: 'Save preferences',
+                    closeIconLabel: 'Close',
+                    sections: [
+                      {
+                        title: 'Cookie usage',
+                        description: 'Select which categories of cookies you want to allow. We always use strictly necessary cookies to keep the site secure and functional.'
+                      },
+                      {
+                        title: 'Necessary',
+                        linkedCategory: 'necessary',
+                        description: 'Required for core site functionality and cannot be disabled.'
+                      },
+                      {
+                        title: 'Analytics (Google Analytics)',
+                        linkedCategory: 'analytics',
+                        description: 'Helps us understand site traffic and usage to improve the experience.'
+                      },
+                      {
+                        title: 'Advertising (Google AdSense)',
+                        linkedCategory: 'advertising',
+                        description: 'Used to deliver personalized ads and measure their performance.'
+                      },
+                      {
+                        title: 'Learn more',
+                        description: 'You can review the full details in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.'
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            onFirstConsent: updateConsentFromPreferences,
+            onConsent: updateConsentFromPreferences,
+            onChange: updateConsentFromPreferences
+          });
+          return;
+        }
+
+        tries++;
+        if (tries < maxTries) {
+          setTimeout(tryInit, 250);
+        } else {
+          console.warn('CookieConsent did not load in time.');
+        }
+      }
+
+      window.addEventListener('load', tryInit);
+    })();
   </script>
 
   <script type="text/plain" data-cookiecategory="advertising" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1645864365855421" crossorigin="anonymous"></script>
