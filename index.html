@@ -15,8 +15,8 @@
     <meta property="og:description" content="Free lifespan calculator based on 50+ longevity studies. Get personalized insights on health factors that influence your life expectancy with science-backed recommendations.">
     <meta property="og:site_name" content="Longevity Insights Calculator">
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3.1.1/dist/cookieconsent.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3.1.1/dist/cookieconsent.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.0.1/dist/cookieconsent.css">
+  <script defer src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.0.1/dist/cookieconsent.umd.js"></script>
   <style>
     :root {
       --cc-bg: #24163f;
@@ -60,12 +60,7 @@
       });
     }
 
-    (function initCookieConsentWithRetry() {
-      var maxTries = 20;
-      var tries = 0;
-
-      function tryInit() {
-        if (window.CookieConsent && typeof window.CookieConsent.run === 'function') {
+    <script>
           CookieConsent.run({
             useGpc: true,
             categories: {
@@ -138,19 +133,6 @@
             onConsent: updateConsentFromPreferences,
             onChange: updateConsentFromPreferences
           });
-          return;
-        }
-
-        tries++;
-        if (tries < maxTries) {
-          setTimeout(tryInit, 250);
-        } else {
-          console.warn('CookieConsent did not load in time.');
-        }
-      }
-
-      window.addEventListener('load', tryInit);
-    })();
   </script>
 
   <script type="text/plain" data-cookiecategory="advertising" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1645864365855421" crossorigin="anonymous"></script>
