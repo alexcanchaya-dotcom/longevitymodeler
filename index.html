@@ -4917,7 +4917,7 @@
 </body>
       <script>
       // Initialize cookie consent manager
-      if (document.readyState === 'loading') {
+      <!-- if (document.readyState === 'loading') { -->
         document.addEventListener('DOMContentLoaded', function() {
           new CookieConsentManager().init();
         });
@@ -4926,3 +4926,84 @@
       }
     </script>
 </html>
+ -->
+
+     <!-- Simple Cookie Consent Banner - Inline Implementation -->
+    <style>
+      .simple-cookie-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.95);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        z-index: 99999;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+      }
+      .simple-cookie-banner p {
+        margin: 0 0 15px 0;
+        font-size: 14px;
+      }
+      .simple-cookie-btn {
+        margin: 0 10px;
+        padding: 10px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .simple-cookie-accept {
+        background: #4CAF50;
+        color: white;
+      }
+      .simple-cookie-reject {
+        background: #f44336;
+        color: white;
+      }
+    </style>
+    
+    <script>
+      (function() {
+        // Check if consent already given
+        if (localStorage.getItem('cookieConsent')) {
+          return;
+        }
+        
+        // Create banner
+        var banner = document.createElement('div');
+        banner.className = 'simple-cookie-banner';
+        banner.innerHTML = '<p>We use cookies to improve your experience and analyze site usage. Your privacy is important to us.</p>' +
+          '<button class="simple-cookie-btn simple-cookie-accept" onclick="acceptCookies()">Accept All</button>' +
+          '<button class="simple-cookie-btn simple-cookie-reject" onclick="rejectCookies()">Reject All</button>';
+        
+        // Add to page when loaded
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function() {
+            document.body.appendChild(banner);
+          });
+        } else {
+          document.body.appendChild(banner);
+        }
+        
+        // Accept function
+        window.acceptCookies = function() {
+          localStorage.setItem('cookieConsent', JSON.stringify({
+            accepted: true,
+            timestamp: new Date().toISOString()
+          }));
+          document.querySelector('.simple-cookie-banner').remove();
+        };
+        
+        // Reject function
+        window.rejectCookies = function() {
+          localStorage.setItem('cookieConsent', JSON.stringify({
+            accepted: false,
+            timestamp: new Date().toISOString()
+          }));
+          document.querySelector('.simple-cookie-banner').remove();
+        };
+      })();
+    </script>
