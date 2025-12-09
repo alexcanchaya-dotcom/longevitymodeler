@@ -4915,4 +4915,14 @@
     </div>
       <script src="js/cookie-consent.js"></script>
 </body>
+      <script>
+      // Initialize cookie consent manager
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          new CookieConsentManager().init();
+        });
+      } else {
+        new CookieConsentManager().init();
+      }
+    </script>
 </html>
