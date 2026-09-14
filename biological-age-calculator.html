@@ -28,6 +28,11 @@
           --cc-cookie-category-block-bg: rgba(255, 255, 255, 0.06);
           --cc-cookie-category-block-border: rgba(255, 255, 255, 0.2);
         }
+        #cc-main .cm__btn--secondary {
+          background: rgba(255, 255, 255, 0.14) !important;
+          color: #f5f7ff !important;
+          border: 1px solid #f5f7ff !important;
+        }
       </style>
       <script>
         window.dataLayer = window.dataLayer || [];
@@ -68,8 +73,8 @@
             },
             guiOptions: {
               consentModal: {
-                layout: 'bar',
-                position: 'bottom center',
+                layout: 'box',
+                position: 'bottom right',
                 equalWeightButtons: true
               },
               preferencesModal: {
