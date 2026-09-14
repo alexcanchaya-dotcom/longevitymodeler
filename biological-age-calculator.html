@@ -183,6 +183,7 @@
         <div class="calculator-card">
             <h2 class="section-title">Enter Your Blood Biomarkers</h2>
             <p style="color:#a5b4fc; margin-bottom:20px;">Values from a recent blood test (standard lab panel)</p>
+            <p style="color:#fbbf24; background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.35); border-radius:10px; padding:12px 14px; margin-bottom:20px; font-size:0.95rem;">Check units before you calculate. This form expects SI lab units: albumin in g/L (not g/dL), creatinine in µmol/L (not mg/dL), glucose in mmol/L (not mg/dL), and CRP in mg/L. Those are the units the Levine PhenoAge coefficients use, except CRP, which is converted to mg/dL for the log term.</p>
             
             <div class="input-grid">
                 <div class="input-group">
@@ -248,8 +249,8 @@
 
         <div class="methodology" id="disclaimer">
             <h3>Methodology & Disclaimer</h3>
-            <p>This calculator implements the PhenoAge algorithm from <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5940111/" target="_blank">Levine et al. 2018</a>. PhenoAge uses 9 blood biomarkers plus chronological age to estimate biological aging.</p>
-            <p style="margin-top:10px;"><strong>Important:</strong> This is for educational purposes only. Results should not replace professional medical advice. Consult healthcare professionals for health decisions.</p>
+            <p>This calculator implements the PhenoAge algorithm from <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5940111/" target="_blank">Levine et al. 2018</a>. PhenoAge uses 9 blood biomarkers plus chronological age to estimate biological aging. Enter SI units as labeled (albumin g/L, creatinine µmol/L, glucose mmol/L, CRP mg/L). CRP is converted to mg/dL for the log term; the other coefficients use the SI values directly.</p>
+            <p style="margin-top:10px;"><strong>Important:</strong> This is an educational estimate only. It is not a diagnosis and should not replace professional medical advice. Consult healthcare professionals for health decisions.</p>
             <p style="margin-top:10px;">Biomarker coefficients are based on mortality risk modeling from NHANES III data. Individual results may vary based on lab methods and timing of blood draw.</p>
         </div>
     </div>
@@ -260,6 +261,7 @@
         <a href="how-it-works.html">How It Works</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
+        <p style="margin: 16px 0 0; font-size: 14px; color: #c7d2fe;">Sister site: <a href="https://wealthmodeler.com">Wealth Modeler</a> — free finance calculators.</p>
     </footer>
 
     <script>
@@ -284,9 +286,9 @@
             return;
         }
 
-        // Convert units: creatinine from umol/L to mg/dL (divide by 88.4)
-        const creatinine_mgdl = creatinine / 88.4;
-        // CRP: mg/L to mg/dL (divide by 10)
+        // Levine / Liu PhenoAge coefficients expect SI units for the first
+        // three markers: albumin g/L, creatinine µmol/L, glucose mmol/L,
+        // plus ln(CRP in mg/dL). The form labels match those units.
         const crp_mgdl = crp / 10;
 
         // Levine PhenoAge coefficients
@@ -304,10 +306,10 @@
 
         // Calculate xb (linear predictor)
         const xb = b0
-            + (b_albumin * (albumin / 10))  // convert g/L to g/dL
-            + (b_creatinine * (creatinine_mgdl * 88.401))
-            + (b_glucose * (glucose * 0.0555))  // convert mmol/L to mg/dL factor
-            + (b_crp * Math.log(crp_mgdl * 10 + 0.1))
+            + (b_albumin * albumin)
+            + (b_creatinine * creatinine)
+            + (b_glucose * glucose)
+            + (b_crp * Math.log(Math.max(crp_mgdl, 0.001)))
             + (b_lymphocyte * lymphocyte)
             + (b_mcv * mcv)
             + (b_rdw * rdw)
@@ -318,7 +320,11 @@
         // Calculate M (mortality score)
         const gamma = -1.51714;
         const lambda = 0.0076927;
-        const M = 1 - Math.exp((Math.exp(gamma) * Math.exp(xb)) / lambda);
+        const M = 1 - Math.exp((gamma * Math.exp(xb)) / lambda);
+        if (!(M > 0 && M < 1)) {
+            alert('Could not compute an estimate from these values. Check that you entered SI units as labeled.');
+            return;
+        }
 
         // Calculate Phenotypic Age
         const alpha = 141.50225;
@@ -338,11 +344,14 @@
         chronoAgeEl.textContent = 'Chronological Age: ' + age + ' years';
 
         if (diff < 0) {
-            ageDiffEl.textContent = Math.abs(diff).toFixed(1) + ' years younger than your chronological age';
+            ageDiffEl.textContent = Math.abs(diff).toFixed(1) + ' years younger than your chronological age in this estimate';
             ageDiffEl.className = 'age-diff younger';
-        } else {
-            ageDiffEl.textContent = diff.toFixed(1) + ' years older than your chronological age';
+        } else if (diff > 0) {
+            ageDiffEl.textContent = diff.toFixed(1) + ' years older than your chronological age in this estimate';
             ageDiffEl.className = 'age-diff older';
+        } else {
+            ageDiffEl.textContent = 'About the same as your chronological age in this estimate';
+            ageDiffEl.className = 'age-diff';
         }
 
         resultCard.classList.add('show');
