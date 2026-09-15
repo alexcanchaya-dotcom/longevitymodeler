@@ -20,17 +20,140 @@
     <meta name="twitter:url" content="https://longevitymodeler.com/">
     <meta name="twitter:title" content="Free Longevity Calculator - Science-Based Life Expectancy Tool">
     <meta name="twitter:description" content="Free lifespan calculator based on 50+ longevity studies. Get personalized insights on health factors that influence your life expectancy.">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1645864365855421" crossorigin="anonymous"></script>
-      
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8X91LZ3XL4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <link rel="stylesheet" href="vendor/vanilla-cookieconsent/cookieconsent.css">
+    <script defer src="vendor/vanilla-cookieconsent/cookieconsent.umd.js"></script>
+    <style>
+        :root {
+          --cc-bg: #24163f;
+          --cc-primary-color: #f5f7ff;
+          --cc-secondary-color: #d6dbf5;
+          --cc-btn-primary-bg: #5e8bfd;
+          --cc-btn-primary-color: #ffffff;
+          --cc-btn-primary-border-color: #5e8bfd;
+          --cc-btn-secondary-bg: rgba(255, 255, 255, 0.12);
+          --cc-btn-secondary-color: #f5f7ff;
+          --cc-btn-secondary-border-color: #f5f7ff;
+          --cc-toggle-off-bg: #4a2f72;
+          --cc-toggle-on-bg: #5e8bfd;
+          --cc-toggle-on-knob-bg: #ffffff;
+          --cc-toggle-off-knob-bg: #ffffff;
+          --cc-cookie-category-block-bg: rgba(255, 255, 255, 0.06);
+          --cc-cookie-category-block-border: rgba(255, 255, 255, 0.2);
+        }
+        #cc-main .cm__btn--secondary {
+          background: rgba(255, 255, 255, 0.14) !important;
+          color: #f5f7ff !important;
+          border: 1px solid #f5f7ff !important;
+        }
+      </style>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          functionality_storage: 'granted',
+          security_storage: 'granted',
+          wait_for_update: 500
+        });
 
-      gtag('config', 'G-8X91LZ3XL4');
-    </script>
+        function updateConsentFromPreferences() {
+          const analyticsAllowed = window.CookieConsent && CookieConsent.acceptedCategory('analytics');
+          const advertisingAllowed = window.CookieConsent && CookieConsent.acceptedCategory('advertising');
+
+          gtag('consent', 'update', {
+            ad_storage: advertisingAllowed ? 'granted' : 'denied',
+            ad_user_data: advertisingAllowed ? 'granted' : 'denied',
+            ad_personalization: advertisingAllowed ? 'granted' : 'denied',
+            analytics_storage: analyticsAllowed ? 'granted' : 'denied'
+          });
+        }
+
+        window.addEventListener('load', function () {
+          if (!window.CookieConsent) return;
+          CookieConsent.run({
+            useGpc: true,
+            categories: {
+              necessary: {
+                enabled: true,
+                readOnly: true
+              },
+              analytics: {},
+              advertising: {}
+            },
+            guiOptions: {
+              consentModal: {
+                layout: 'box',
+                position: 'bottom right',
+                equalWeightButtons: true
+              },
+              preferencesModal: {
+                layout: 'bar',
+                position: 'left',
+                equalWeightButtons: true
+              }
+            },
+            language: {
+              default: 'en',
+              translations: {
+                en: {
+                  consentModal: {
+                    title: 'We value your privacy',
+                    description: 'We use cookies to improve your experience, measure performance, and serve relevant ads. Manage your choices anytime. Read more in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.',
+                    acceptAllBtn: 'Accept all',
+                    acceptNecessaryBtn: 'Reject all',
+                    showPreferencesBtn: 'Manage preferences'
+                  },
+                  preferencesModal: {
+                    title: 'Cookie preferences',
+                    acceptAllBtn: 'Accept all',
+                    acceptNecessaryBtn: 'Reject all',
+                    savePreferencesBtn: 'Save preferences',
+                    closeIconLabel: 'Close',
+                    sections: [
+                      {
+                        title: 'Cookie usage',
+                        description: 'Select which categories of cookies you want to allow. We always use strictly necessary cookies to keep the site secure and functional.'
+                      },
+                      {
+                        title: 'Necessary',
+                        linkedCategory: 'necessary',
+                        description: 'Required for core site functionality and cannot be disabled.'
+                      },
+                      {
+                        title: 'Analytics (Google Analytics)',
+                        linkedCategory: 'analytics',
+                        description: 'Helps us understand site traffic and usage to improve the experience.'
+                      },
+                      {
+                        title: 'Advertising (Google AdSense and Adsterra)',
+                        linkedCategory: 'advertising',
+                        description: 'Used to deliver ads and measure their performance. These scripts do not load unless you accept advertising cookies.'
+                      },
+                      {
+                        title: 'Learn more',
+                        description: 'You can review the full details in our <a href="/privacy.html" target="_blank">Privacy Policy</a>.'
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            onFirstConsent: updateConsentFromPreferences,
+            onConsent: updateConsentFromPreferences,
+            onChange: updateConsentFromPreferences
+          });
+        });
+      </script>
+
+      <script type="text/plain" data-category="advertising" data-cookiecategory="advertising" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1645864365855421" crossorigin="anonymous"></script>
+      <script type="text/plain" data-category="analytics" data-cookiecategory="analytics" async src="https://www.googletagmanager.com/gtag/js?id=G-8X91LZ3XL4"></script>
+      <script type="text/plain" data-category="analytics" data-cookiecategory="analytics">
+        gtag('js', new Date());
+        gtag('config', 'G-8X91LZ3XL4');
+      </script>
   <title>Longevity Insights Calculator</title>
   <link rel="alternate" hreflang="x-default" href="?lang=en">
   <link rel="alternate" hreflang="en" href="?lang=en">
@@ -74,7 +197,7 @@
       color: var(--text-primary);
       display: flex;
       justify-content: center;
-      padding: 32px 16px 48px;
+      padding: 32px 16px 120px;
     }
 
     .container {
@@ -606,7 +729,6 @@
         }
     }
   </style>
-      <link rel="stylesheet" href="css/cookie-consent.css">
 </head>
 <body>
   <div class="container">
@@ -1496,11 +1618,11 @@
           yearsLabel: 'years',
           remainingPositive: 'years remaining',
           remainingNegative: 'years beyond current age',
-          encouragementPositive: 'Great job! Your current habits are adding years—keep them strong and refine the gaps.',
+          encouragementPositive: 'Your current habits are adding years in this estimate—keep them going and refine the gaps.',
           encouragementNegative: 'Your choices can add years—focus on the biggest opportunities to improve your estimate.',
           defaultEncouragement: 'Your lifestyle choices can meaningfully shift this estimate.',
           topOpportunities: 'Top opportunities to improve',
-          strongPerformance: 'You are performing strongly across key areas—maintain your habits!'
+          strongPerformance: 'This estimate looks strong across key areas—keep up those habits.'
         },
         inlineDisclaimer: 'This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.',
         disclaimers: {
@@ -1694,7 +1816,7 @@
           yearsLabel: 'años',
           remainingPositive: 'años restantes',
           remainingNegative: 'años por encima de la edad actual',
-          encouragementPositive: '¡Buen trabajo! Tus hábitos actuales están sumando años; mantenlos fuertes y mejora los detalles.',
+          encouragementPositive: 'Tus hábitos actuales están sumando años en esta estimación; mantenlos y mejora los detalles.',
           encouragementNegative: 'Tus elecciones pueden sumar años: enfócate en las mejores oportunidades para mejorar tu estimación.',
           defaultEncouragement: 'Tus elecciones de estilo de vida pueden cambiar significativamente esta estimación.',
           topOpportunities: 'Principales oportunidades de mejora',
@@ -1875,7 +1997,7 @@
           yearsLabel: 'lat',
           remainingPositive: 'lat pozostało',
           remainingNegative: 'lat powyżej obecnego wieku',
-          encouragementPositive: 'Świetnie! Obecne nawyki dodają lat — utrzymuj je i doskonal szczegóły.',
+          encouragementPositive: 'Obecne nawyki dodają lat w tym szacunku — utrzymuj je i doskonal szczegóły.',
           encouragementNegative: 'Twoje wybory mogą dodać lat — skup się na największych możliwościach poprawy wyniku.',
           defaultEncouragement: 'Twoje wybory stylu życia mogą znacząco zmienić tę estymację.',
           topOpportunities: 'Najważniejsze obszary do poprawy',
@@ -2068,7 +2190,7 @@
           yearsLabel: 'Jahre',
           remainingPositive: 'verbleibende Jahre',
           remainingNegative: 'Jahre über dem aktuellen Alter',
-          encouragementPositive: 'Gut gemacht! Deine Gewohnheiten fügen Jahre hinzu – halte sie stark und optimiere Details.',
+          encouragementPositive: 'Deine Gewohnheiten fügen in dieser Schätzung Jahre hinzu – halte sie bei und optimiere Details.',
           encouragementNegative: 'Deine Entscheidungen können Jahre hinzufügen – konzentriere dich auf die größten Chancen zur Verbesserung.',
           defaultEncouragement: 'Deine Lebensstilentscheidungen können diese Schätzung deutlich verändern.',
           topOpportunities: 'Top-Möglichkeiten zur Verbesserung',
@@ -2261,7 +2383,7 @@
           yearsLabel: 'ans',
           remainingPositive: 'années restantes',
           remainingNegative: 'années au-delà de l’âge actuel',
-          encouragementPositive: 'Bravo ! Vos habitudes actuelles ajoutent des années — maintenez-les et optimisez les détails.',
+          encouragementPositive: 'Vos habitudes actuelles ajoutent des années dans cette estimation — maintenez-les et ajustez les détails.',
           encouragementNegative: 'Vos choix peuvent ajouter des années — concentrez-vous sur les meilleures opportunités pour améliorer votre estimation.',
           defaultEncouragement: 'Vos choix de vie peuvent modifier sensiblement cette estimation.',
           topOpportunities: 'Principales opportunités d’amélioration',
@@ -2437,7 +2559,7 @@
           yearsLabel: '年',
           remainingPositive: '剩余年数',
           remainingNegative: '超出现有年龄的年数',
-          encouragementPositive: '做得好！当前习惯在增加寿命—继续保持并优化细节。',
+          encouragementPositive: '按此估算，当前习惯在增加寿命—继续保持并优化细节。',
           encouragementNegative: '你的选择可以增加寿命—专注于提升估算的关键机会。',
           defaultEncouragement: '你的生活方式选择会显著影响此估算。',
           topOpportunities: '主要改进机会',
@@ -2613,7 +2735,7 @@
           yearsLabel: 'anni',
           remainingPositive: 'anni rimanenti',
           remainingNegative: 'anni oltre l’età attuale',
-          encouragementPositive: 'Ottimo lavoro! Le tue abitudini aggiungono anni — mantienile solide e ottimizza i dettagli.',
+          encouragementPositive: 'In questa stima le tue abitudini aggiungono anni — mantienile e ottimizza i dettagli.',
           encouragementNegative: 'Le tue scelte possono aggiungere anni — concentrati sulle maggiori opportunità di miglioramento.',
           defaultEncouragement: 'Le tue scelte di vita possono modificare sensibilmente questa stima.',
           topOpportunities: 'Principali opportunità di miglioramento',
@@ -2806,7 +2928,7 @@
           yearsLabel: 'anos',
           remainingPositive: 'anos restantes',
           remainingNegative: 'anos além da idade atual',
-          encouragementPositive: 'Excelente! Seus hábitos atuais adicionam anos — mantenha-os fortes e ajuste os detalhes.',
+          encouragementPositive: 'Nesta estimativa, seus hábitos atuais adicionam anos — mantenha-os e ajuste os detalhes.',
           encouragementNegative: 'Suas escolhas podem acrescentar anos — concentre-se nas maiores oportunidades de melhoria.',
           defaultEncouragement: 'Suas escolhas de estilo de vida podem alterar significativamente esta estimativa.',
           topOpportunities: 'Principais oportunidades de melhoria',
@@ -2982,7 +3104,7 @@
           yearsLabel: '年',
           remainingPositive: '残りの年数',
           remainingNegative: '現在の年齢を超える年数',
-          encouragementPositive: '素晴らしいです！現在の習慣が寿命を伸ばしています — 継続し、細部を磨きましょう。',
+          encouragementPositive: 'この推計では、現在の習慣が寿命を伸ばしています — 継続し、細部を整えましょう。',
           encouragementNegative: '選択次第で寿命を延ばせます — 改善の最大のチャンスに注目してください。',
           defaultEncouragement: '生活習慣はこの推計を大きく左右します。',
           topOpportunities: '改善の主な機会',
@@ -3158,7 +3280,7 @@
           yearsLabel: '년',
           remainingPositive: '남은 년수',
           remainingNegative: '현재 나이를 넘는 년수',
-          encouragementPositive: '잘하고 있습니다! 현재 습관이 수명을 늘리고 있습니다 — 꾸준히 유지하며 세부를 다듬으세요.',
+          encouragementPositive: '이 추정에서는 현재 습관이 수명을 늘리고 있습니다 — 꾸준히 유지하며 세부를 다듬으세요.',
           encouragementNegative: '선택을 바꾸면 수명을 늘릴 수 있습니다 — 가장 큰 개선 기회에 집중하세요.',
           defaultEncouragement: '생활 습관이 이 추정을 크게 바꿀 수 있습니다.',
           topOpportunities: '주요 개선 기회',
@@ -3334,7 +3456,7 @@
           yearsLabel: 'лет',
           remainingPositive: 'лет осталось',
           remainingNegative: 'лет сверх текущего возраста',
-          encouragementPositive: 'Отличная работа! Текущие привычки добавляют годы — сохраняйте их и улучшайте детали.',
+          encouragementPositive: 'В этой оценке текущие привычки добавляют годы — сохраняйте их и улучшайте детали.',
           encouragementNegative: 'Ваши выборы могут добавить годы — сосредоточьтесь на главных возможностях улучшения.',
           defaultEncouragement: 'Ваш образ жизни может заметно изменить эту оценку.',
           topOpportunities: 'Главные возможности для улучшения',
@@ -3510,7 +3632,7 @@
           yearsLabel: 'سنة',
           remainingPositive: 'سنوات متبقية',
           remainingNegative: 'سنوات بعد العمر الحالي',
-          encouragementPositive: 'عمل رائع! عاداتك الحالية تضيف سنوات — حافظ عليها وطور التفاصيل.',
+          encouragementPositive: 'في هذا التقدير، عاداتك الحالية تضيف سنوات — حافظ عليها وطور التفاصيل.',
           encouragementNegative: 'اختياراتك يمكن أن تضيف سنوات — ركز على أهم فرص التحسين.',
           defaultEncouragement: 'اختيارات نمط حياتك يمكن أن تغير هذه التقديرات بشكل ملحوظ.',
           topOpportunities: 'أهم فرص التحسين',
@@ -3686,7 +3808,7 @@
           yearsLabel: 'वर्ष',
           remainingPositive: 'शेष वर्ष',
           remainingNegative: 'वर्तमान आयु से अधिक वर्ष',
-          encouragementPositive: 'बहुत अच्छा! आपकी वर्तमान आदतें वर्षों को जोड़ रही हैं — इन्हें बनाए रखें और विवरण सुधारें।',
+          encouragementPositive: 'इस अनुमान में आपकी वर्तमान आदतें वर्षों को जोड़ रही हैं — इन्हें बनाए रखें और विवरण सुधारें।',
           encouragementNegative: 'आपकी पसंद वर्षों को जोड़ सकती है — सुधार की सबसे बड़ी संभावनाओं पर ध्यान दें।',
           defaultEncouragement: 'आपकी जीवनशैली के विकल्प इस अनुमान को अर्थपूर्ण रूप से बदल सकते हैं।',
           topOpportunities: 'सुधार की शीर्ष संभावनाएँ',
@@ -3862,7 +3984,7 @@
           yearsLabel: 'yıl',
           remainingPositive: 'kalan yıl',
           remainingNegative: 'mevcut yaşı aşan yıl',
-          encouragementPositive: 'Harika! Alışkanlıklarınız yıllar ekliyor — sürdürün ve detayları iyileştirin.',
+          encouragementPositive: 'Bu tahminde alışkanlıklarınız yıllar ekliyor — sürdürün ve detayları iyileştirin.',
           encouragementNegative: 'Seçimleriniz yıllar kazandırabilir — en büyük iyileştirme fırsatlarına odaklanın.',
           defaultEncouragement: 'Yaşam tarzı seçimleriniz bu tahmini anlamlı şekilde değiştirebilir.',
           topOpportunities: 'Başlıca iyileştirme fırsatları',
@@ -4038,7 +4160,7 @@
           yearsLabel: 'jaar',
           remainingPositive: 'resterende jaren',
           remainingNegative: 'jaren boven huidige leeftijd',
-          encouragementPositive: 'Goed bezig! Je huidige gewoonten voegen jaren toe — houd ze vol en verfijn de details.',
+          encouragementPositive: 'In deze schatting voegen je huidige gewoonten jaren toe — houd ze vol en verfijn de details.',
           encouragementNegative: 'Je keuzes kunnen jaren toevoegen — focus op de grootste verbeterkansen.',
           defaultEncouragement: 'Je levensstijlkeuzes kunnen deze schatting aanzienlijk verschuiven.',
           topOpportunities: 'Belangrijkste verbeterkansen',
@@ -4214,7 +4336,7 @@
           yearsLabel: 'år',
           remainingPositive: 'återstående år',
           remainingNegative: 'år över nuvarande ålder',
-          encouragementPositive: 'Bra jobbat! Dina vanor lägger till år — behåll dem och finslipa detaljerna.',
+          encouragementPositive: 'I denna uppskattning lägger dina vanor till år — behåll dem och finslipa detaljerna.',
           encouragementNegative: 'Dina val kan lägga till år — fokusera på de största förbättringsmöjligheterna.',
           defaultEncouragement: 'Dina livsstilsval kan påverka denna uppskattning avsevärt.',
           topOpportunities: 'Största förbättringsmöjligheter',
@@ -4912,103 +5034,11 @@
         <a href="/contact.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.contact">Contact Us</a>
         <a href="/privacy.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.privacy">Privacy Policy</a>
         <a href="/terms.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.terms">Terms of Service</a>
+        <p style="margin: 8px 0 0; font-size: 13px; color: #4a5568;">Sister site: <a href="https://wealthmodeler.com" style="color: #667eea; text-decoration: none; font-weight: 500;">Wealth Modeler</a> — free finance calculators.</p>
     </div>
-      <script src="js/cookie-consent.js"></script>
-      
-    <!-- Adsterra Native Banner -->
-    <script async="async" data-cfasync="false" 
-    src="https://pl28303337.effectgatecpm.com/0ea0851237926ead7a37c53cfb0951a5/invoke.js"></script>
+
+    <!-- Adsterra Native Banner: loads only after advertising consent -->
+    <script type="text/plain" data-category="advertising" data-cookiecategory="advertising" async="async" data-cfasync="false" src="https://pl28303337.effectgatecpm.com/0ea0851237926ead7a37c53cfb0951a5/invoke.js"></script>
     <div id="container-0ea0851237926ead7a37c53cfb0951a5"></div>
 </body>
-      <script>
-      // Initialize cookie consent manager
-      <!-- if (document.readyState === 'loading') { -->
-        document.addEventListener('DOMContentLoaded', function() {
-          new CookieConsentManager().init();
-        });
-      } else {
-        new CookieConsentManager().init();
-      }
-    </script>
 </html>
- -->
-
-     <!-- Simple Cookie Consent Banner - Inline Implementation -->
-    <style>
-      .simple-cookie-banner {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.95);
-        color: white;
-        padding: 20px;
-        text-align: center;
-        z-index: 99999;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
-      }
-      .simple-cookie-banner p {
-        margin: 0 0 15px 0;
-        font-size: 14px;
-      }
-      .simple-cookie-btn {
-        margin: 0 10px;
-        padding: 10px 30px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: bold;
-      }
-      .simple-cookie-accept {
-        background: #4CAF50;
-        color: white;
-      }
-      .simple-cookie-reject {
-        background: #f44336;
-        color: white;
-      }
-    </style>
-    
-    <script>
-      (function() {
-        // Check if consent already given
-        if (localStorage.getItem('cookieConsent')) {
-          return;
-        }
-        
-        // Create banner
-        var banner = document.createElement('div');
-        banner.className = 'simple-cookie-banner';
-        banner.innerHTML = '<p>We use cookies to improve your experience and analyze site usage. Your privacy is important to us.</p>' +
-          '<button class="simple-cookie-btn simple-cookie-accept" onclick="acceptCookies()">Accept All</button>' +
-          '<button class="simple-cookie-btn simple-cookie-reject" onclick="rejectCookies()">Reject All</button>';
-        
-        // Add to page when loaded
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', function() {
-            document.body.appendChild(banner);
-          });
-        } else {
-          document.body.appendChild(banner);
-        }
-        
-        // Accept function
-        window.acceptCookies = function() {
-          localStorage.setItem('cookieConsent', JSON.stringify({
-            accepted: true,
-            timestamp: new Date().toISOString()
-          }));
-          document.querySelector('.simple-cookie-banner').remove();
-        };
-        
-        // Reject function
-        window.rejectCookies = function() {
-          localStorage.setItem('cookieConsent', JSON.stringify({
-            accepted: false,
-            timestamp: new Date().toISOString()
-          }));
-          document.querySelector('.simple-cookie-banner').remove();
-        };
-      })();
-    </script>
