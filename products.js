@@ -76,7 +76,7 @@ const affiliateProducts = {
     description: 'A basic check for daily exercise and activity — not a longevity gadget. Placeholder listing — Site Engineer to swap the live Amazon SKU.',
     amazonLink: '#PLACEHOLDER-SITE-ENGINEER-SWAP-pedometer',
     imageUrl: '',
-    whyRecommend: 'A simple activity check can help you notice whether you are moving enough. Framed as exercise / activity, even if the form control is steps.',
+    whyRecommend: 'A simple activity check can help you notice whether you are moving enough.',
     isPlaceholder: true
   },
   sleep_mask: {
