@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free lifespan calculator based on 50+ longevity studies. Get personalized insights on health factors that influence your life expectancy with science-backed recommendations.">  
+    <meta name="description" content="Educational lifespan estimate from lifestyle answers. Not medical advice.">
       <meta name="keywords" content="longevity calculator, life expectancy calculator, lifespan estimator, health assessment, aging science, preventive health, wellness calculator, longevity research">
     <link rel="canonical" href="https://longevitymodeler.com/">
     <meta name="author" content="Longevity Modeler">
@@ -11,15 +11,22 @@
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://longevitymodeler.com/">
-    <meta property="og:title" content="Free Longevity Calculator - Science-Based Life Expectancy Tool">
-    <meta property="og:description" content="Free lifespan calculator based on 50+ longevity studies. Get personalized insights on health factors that influence your life expectancy with science-backed recommendations.">
+    <meta property="og:title" content="Free Longevity Insights Calculator | Longevity Modeler">
+    <meta property="og:description" content="Educational lifespan estimate from lifestyle answers. Not medical advice.">
     <meta property="og:site_name" content="Longevity Insights Calculator">
+    <meta property="og:image" content="https://longevitymodeler.com/assets/og-image.png">
+    <meta property="og:image:alt" content="Free Longevity Insights Calculator | Longevity Modeler">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://longevitymodeler.com/">
-    <meta name="twitter:title" content="Free Longevity Calculator - Science-Based Life Expectancy Tool">
-    <meta name="twitter:description" content="Free lifespan calculator based on 50+ longevity studies. Get personalized insights on health factors that influence your life expectancy.">
+    <meta name="twitter:title" content="Free Longevity Insights Calculator | Longevity Modeler">
+    <meta name="twitter:description" content="Educational lifespan estimate from lifestyle answers. Not medical advice.">
+    <meta name="twitter:image" content="https://longevitymodeler.com/assets/og-image.png">
+    <meta name="twitter:image:alt" content="Free Longevity Insights Calculator | Longevity Modeler">
     <link rel="stylesheet" href="vendor/vanilla-cookieconsent/cookieconsent.css">
     <script defer src="vendor/vanilla-cookieconsent/cookieconsent.umd.js"></script>
     <style>
@@ -482,6 +489,60 @@
     .recommendations h3 {
       margin: 0 0 10px;
       font-size: 15px;
+    }
+
+    .levers-note {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0 0 12px;
+    }
+
+    .lever-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lever-card {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .lever-card h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .lever-rank {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      min-width: 1.2em;
+    }
+
+    .lever-tip {
+      margin: 0 0 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .lever-cite {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+
+    .lever-cite a {
+      color: #d7e2ff;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
 
     .chip {
@@ -1146,8 +1207,9 @@
         <div class="impact-grid" id="impactGrid"></div>
 
         <div class="recommendations">
-          <h3 id="recommendationsTitle">Top opportunities to improve</h3>
-          <div id="recommendationChips"></div>
+          <h3 id="recommendationsTitle">Your top 3 levers this run</h3>
+          <p class="levers-note" id="leversNote">Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.</p>
+          <div id="recommendationChips" class="lever-list"></div>
                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);">
            <h3 style="margin: 0 0 12px; font-size: 15px;">📚 Learn More About Longevity</h3>
            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
@@ -1165,39 +1227,8 @@
           <span id="inlineDisclaimer">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
         </div>
       </div>
-    </div>
 
-    <div class="disclaimer-section" id="disclaimer">
-      <h2 id="disclaimerHeader">⚠️ Important Disclaimers</h2>
-      <div class="disclaimer-grid">
-        <div class="disclaimer-block">
-          <h3 id="medicalDisclaimerTitle">Medical Disclaimer</h3>
-          <ul>
-            <li id="medicalDisclaimer1">This calculator provides estimates for informational and educational purposes only.</li>
-            <li id="medicalDisclaimer2">Results are not medical advice, diagnosis, or treatment recommendations.</li>
-            <li id="medicalDisclaimer3">Do not use this calculator as a substitute for professional medical advice.</li>
-            <li id="medicalDisclaimer4">Always consult with qualified healthcare providers for medical decisions.</li>
-            <li id="medicalDisclaimer5">Individual results may vary significantly based on many factors.</li>
-          </ul>
-        </div>
-        <div class="disclaimer-block">
-          <h3 id="accuracyDisclaimerTitle">Accuracy Disclaimer</h3>
-          <ul>
-            <li id="accuracyDisclaimer1">Estimates are based on statistical models and research data.</li>
-            <li id="accuracyDisclaimer2">No guarantee of accuracy or specific outcomes.</li>
-            <li id="accuracyDisclaimer3">Many factors affecting longevity cannot be fully captured.</li>
-          </ul>
-        </div>
-        <div class="disclaimer-block">
-          <h3 id="liabilityDisclaimerTitle">Liability Disclaimer</h3>
-          <ul>
-            <li id="liabilityDisclaimer1">Website owners assume no liability for decisions made based on calculator results.</li>
-            <li id="liabilityDisclaimer2">Users assume all risks associated with using this information.</li>
-          </ul>
-        </div>
-      </div>
-
-                  <!-- Product Recommendation Section -->
+                  <!-- Product Recommendation Section: only after the free result -->
             <div class="product-recommendation" id="productCard" style="display: none;">
                 <div class="product-tag">💡 Recommended Tool</div>
                 
@@ -1233,11 +1264,42 @@
             </div>
 
             <!-- FTC Disclosure -->
-            <div class="ftc-disclosure">
+            <div class="ftc-disclosure" id="affiliateDisclosureBlock" style="display: none;">
                 <p><small>
                     <strong data-i18n="affiliateDisclosure.title">Affiliate Disclosure:</strong> <span data-i18n="affiliateDisclosure.body">As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.</span>
                 </small></p>
             </div>
+    </div>
+
+    <div class="disclaimer-section" id="disclaimer">
+      <h2 id="disclaimerHeader">⚠️ Important Disclaimers</h2>
+      <div class="disclaimer-grid">
+        <div class="disclaimer-block">
+          <h3 id="medicalDisclaimerTitle">Medical Disclaimer</h3>
+          <ul>
+            <li id="medicalDisclaimer1">This calculator provides estimates for informational and educational purposes only.</li>
+            <li id="medicalDisclaimer2">Results are not medical advice, diagnosis, or treatment recommendations.</li>
+            <li id="medicalDisclaimer3">Do not use this calculator as a substitute for professional medical advice.</li>
+            <li id="medicalDisclaimer4">Always consult with qualified healthcare providers for medical decisions.</li>
+            <li id="medicalDisclaimer5">Individual results may vary significantly based on many factors.</li>
+          </ul>
+        </div>
+        <div class="disclaimer-block">
+          <h3 id="accuracyDisclaimerTitle">Accuracy Disclaimer</h3>
+          <ul>
+            <li id="accuracyDisclaimer1">Estimates are based on statistical models and research data.</li>
+            <li id="accuracyDisclaimer2">No guarantee of accuracy or specific outcomes.</li>
+            <li id="accuracyDisclaimer3">Many factors affecting longevity cannot be fully captured.</li>
+          </ul>
+        </div>
+        <div class="disclaimer-block">
+          <h3 id="liabilityDisclaimerTitle">Liability Disclaimer</h3>
+          <ul>
+            <li id="liabilityDisclaimer1">Website owners assume no liability for decisions made based on calculator results.</li>
+            <li id="liabilityDisclaimer2">Users assume all risks associated with using this information.</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
     <!-- Load product database for affiliate recommendations -->
@@ -1495,6 +1557,144 @@
 
     const BONUS_SCALING = 0.45;
 
+    const CHANGEABLE_FACTORS = new Set([
+      'cardio', 'strength', 'steps', 'sauna',
+      'diet', 'vegetables', 'processed', 'water', 'fish',
+      'sleepHoursScore', 'sleepQuality', 'sleepConsistency',
+      'smoking', 'alcohol', 'stress', 'social',
+      'meditation', 'nature', 'sun',
+      'checkups', 'conditions',
+      'diabetes', 'bp', 'cholesterol', 'mentalHealth'
+    ]);
+
+    const LEVER_GUIDANCE = {
+      cardio: {
+        tip: 'Build toward regular moderate movement most days of the week.',
+        cite: 'Harvard T.H. Chan School of Public Health, 2018',
+        href: '/exercise-longevity.html'
+      },
+      strength: {
+        tip: 'Add two or three resistance sessions on non-consecutive days.',
+        cite: 'Exercise & Longevity research summary',
+        href: '/exercise-longevity.html'
+      },
+      steps: {
+        tip: 'Add walking to ordinary days and work toward more daily steps.',
+        cite: 'American Heart Association Physical Activity Guidelines',
+        href: '/exercise-longevity.html'
+      },
+      sauna: {
+        tip: 'If heat exposure is already part of your routine, a few calm sessions a week is the pattern this model looks at.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      diet: {
+        tip: 'Shift meals toward vegetables, olive oil, fish, and fewer packaged foods.',
+        cite: 'PREDIMED study',
+        href: '/nutrition-longevity.html'
+      },
+      vegetables: {
+        tip: 'Add one extra serving of vegetables on most days.',
+        cite: 'Nutrition & Aging research',
+        href: '/nutrition-longevity.html'
+      },
+      processed: {
+        tip: 'Swap one daily packaged item for a simple whole-food option.',
+        cite: 'Nutrition & Aging research',
+        href: '/nutrition-longevity.html'
+      },
+      water: {
+        tip: 'Keep water nearby and drink steadily through the day.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      fish: {
+        tip: 'Include fatty fish a couple of times a week if that fits your diet.',
+        cite: 'American Heart Association',
+        href: '/nutrition-longevity.html'
+      },
+      sleepHoursScore: {
+        tip: 'Keep a regular 7–9 hour sleep window when you can.',
+        cite: 'Nurses’ Health Study',
+        href: '/sleep-longevity.html'
+      },
+      sleepQuality: {
+        tip: 'Use a dark, quiet, cool room and wind down without screens.',
+        cite: 'Sleep Science for Longevity',
+        href: '/sleep-longevity.html'
+      },
+      sleepConsistency: {
+        tip: 'Wake at the same time most days, including weekends.',
+        cite: 'Whitehall II Study',
+        href: '/sleep-longevity.html'
+      },
+      smoking: {
+        tip: 'If you smoke, getting help to stop is the largest lifestyle move in this model.',
+        cite: 'Harvard T.H. Chan School of Public Health',
+        href: '/how-it-works.html'
+      },
+      alcohol: {
+        tip: 'If you drink, keep it light. This model does not reward heavy use.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      stress: {
+        tip: 'Try a short daily wind-down: a walk, quiet breathing, or time with someone you trust.',
+        cite: 'Psychosomatic Medicine, 2009',
+        href: '/results-guide.html'
+      },
+      social: {
+        tip: 'Plan one regular check-in or shared activity each week.',
+        cite: 'Brigham Young University meta-analysis',
+        href: '/results-guide.html'
+      },
+      meditation: {
+        tip: 'A few quiet minutes on most days is enough for this model.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      nature: {
+        tip: 'Spend a little time outdoors each week, even a short walk.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      sun: {
+        tip: 'Get brief daylight, not a burn. Use shade or protection when needed.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      checkups: {
+        tip: 'Keep routine visits so blood pressure, cholesterol, and other markers are known.',
+        cite: 'How this calculator works',
+        href: '/how-it-works.html'
+      },
+      conditions: {
+        tip: 'Work with a clinician on any long-term conditions. This model cannot replace that care.',
+        cite: 'Results guide',
+        href: '/results-guide.html'
+      },
+      diabetes: {
+        tip: 'Blood sugar management belongs with your clinician.',
+        cite: 'Results guide',
+        href: '/results-guide.html'
+      },
+      bp: {
+        tip: 'Have blood pressure checked and follow the plan you already have.',
+        cite: 'American Heart Association',
+        href: '/results-guide.html'
+      },
+      cholesterol: {
+        tip: 'Ask your clinician about diet, activity, and whether your current plan still fits.',
+        cite: 'Results guide',
+        href: '/results-guide.html'
+      },
+      mentalHealth: {
+        tip: 'Support from a qualified professional is the right next step.',
+        cite: 'Results guide',
+        href: '/results-guide.html'
+      }
+    };
+
     const categoryWeights = {
       activity: { max: 2.7, keys: ['cardio', 'strength', 'steps', 'sauna'] },
       nutrition: { max: 2.25, keys: ['diet', 'vegetables', 'processed', 'water', 'fish'] },
@@ -1508,7 +1708,7 @@
 
     const translations = {
       en: {
-        metaDescription: 'Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.',
+        metaDescription: 'Educational lifespan estimate from lifestyle answers. Not medical advice.',
         languageLabel: 'Language',
         pageTitle: 'Longevity Insights Calculator',
         pageSubtitle: 'Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.',
@@ -1621,7 +1821,8 @@
           encouragementPositive: 'Your current habits are adding years in this estimate—keep them going and refine the gaps.',
           encouragementNegative: 'Your choices can add years—focus on the biggest opportunities to improve your estimate.',
           defaultEncouragement: 'Your lifestyle choices can meaningfully shift this estimate.',
-          topOpportunities: 'Top opportunities to improve',
+          topOpportunities: 'Your top 3 levers this run',
+          leversNote: 'Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.',
           strongPerformance: 'This estimate looks strong across key areas—keep up those habits.'
         },
         inlineDisclaimer: 'This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.',
@@ -4578,7 +4779,8 @@
       setText('calculate', t.buttons.calculate);
       setText('reset', t.buttons.reset);
       setText('resultEstimateLabel', t.results.estimated);
-        setText('recommendationsTitle', t.results.topOpportunities);
+        setText('recommendationsTitle', t.results.topLevers || t.results.topOpportunities);
+        setText('leversNote', t.results.leversNote || translations.en.results.leversNote);
         document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
         document.getElementById('lifespanValue').textContent = `-- ${t.results.yearsLabel}`;
         document.getElementById('remainingYears').textContent = '';
@@ -4802,7 +5004,7 @@
         const gap = target - current;
         const potentialGain = Math.max(0, gap);
 
-        if (potentialGain > 0.15) {
+        if (potentialGain > 0.15 && CHANGEABLE_FACTORS.has(factor)) {
           const limitedGain = Math.min(potentialGain, 3);
           const scaledGain = limitedGain * BONUS_SCALING;
           improvements.push({
@@ -4821,17 +5023,52 @@
       const container = document.getElementById('recommendationChips');
       container.innerHTML = '';
       const t = translations[currentLanguage];
+      const en = translations.en;
 
       if (!improvements.length) {
         container.textContent = t.results.strongPerformance;
         return;
       }
 
-      improvements.forEach(item => {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.textContent = `${t.recommendations[item.factor]} (+${item.potentialGain.toFixed(1)} yrs)`;
-        container.appendChild(chip);
+      improvements.forEach((item, index) => {
+        const guide = LEVER_GUIDANCE[item.factor] || {};
+        const card = document.createElement('article');
+        card.className = 'lever-card';
+
+        const heading = document.createElement('h4');
+        const rank = document.createElement('span');
+        rank.className = 'lever-rank';
+        rank.textContent = String(index + 1);
+        heading.appendChild(rank);
+        const title = document.createElement('span');
+        const labelKey = item.factor === 'sleepHoursScore' ? 'sleepHours' : item.factor;
+        title.textContent = t.recommendations?.[labelKey] || en.recommendations[labelKey] || item.factor;
+        heading.appendChild(title);
+        card.appendChild(heading);
+
+        if (guide.tip) {
+          const tip = document.createElement('p');
+          tip.className = 'lever-tip';
+          tip.textContent = guide.tip;
+          card.appendChild(tip);
+        }
+
+        if (guide.cite) {
+          const cite = document.createElement('p');
+          cite.className = 'lever-cite';
+          cite.appendChild(document.createTextNode('Source: '));
+          if (guide.href) {
+            const link = document.createElement('a');
+            link.href = guide.href;
+            link.textContent = guide.cite;
+            cite.appendChild(link);
+          } else {
+            cite.appendChild(document.createTextNode(guide.cite));
+          }
+          card.appendChild(cite);
+        }
+
+        container.appendChild(card);
       });
     }
 
@@ -4873,6 +5110,7 @@
       document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
       document.getElementById('impactGrid').innerHTML = '';
       document.getElementById('recommendationChips').innerHTML = '';
+      hideProductRecommendation();
     }
 
     function applyDefaults() {
@@ -4981,14 +5219,26 @@
     <script src="products.js"></script>
     <script>
         // Display product recommendation after calculation
+        function hideProductRecommendation() {
+            const card = document.getElementById('productCard');
+            const disclosure = document.getElementById('affiliateDisclosureBlock');
+            if (card) card.style.display = 'none';
+            if (disclosure) disclosure.style.display = 'none';
+        }
+
         function displayProductRecommendation(recommendations) {
-            if (!recommendations || recommendations.length === 0) return;
+            if (!recommendations || recommendations.length === 0) {
+                hideProductRecommendation();
+                return;
+            }
             
             const topRecommendation = recommendations[0];
-            const product = getProductForRecommendation(topRecommendation.factor);
+            const product = typeof getProductForRecommendation === 'function'
+              ? getProductForRecommendation(topRecommendation.factor)
+              : null;
             
             if (!product || product.amazonLink === "#") {
-                document.getElementById('productCard').style.display = 'none';
+                hideProductRecommendation();
                 return;
             }
             
@@ -5021,8 +5271,10 @@
                 badgeEl.style.display = 'none';
             }
             
-            // Show product card
+            // Show product card only after the free result
             document.getElementById('productCard').style.display = 'block';
+            const disclosure = document.getElementById('affiliateDisclosureBlock');
+            if (disclosure) disclosure.style.display = 'block';
         }
     </script>
   
