@@ -632,10 +632,30 @@
       .language-select { position: static; justify-content: flex-end; margin-bottom: 10px; }
     }
 
-        /* Product Recommendation Card Styles */
+        /* Habit-tool cards sit under top levers, not the legal block */
+    .habit-tools {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .habit-tools[hidden] {
+        display: none !important;
+    }
+
+    .habit-tools-heading {
+        margin: 0 0 10px;
+        font-size: 15px;
+    }
+
+    .habit-tools-cards {
+        display: grid;
+        gap: 12px;
+    }
+
     .product-recommendation {
-        margin-top: 24px;
-        padding: 20px;
+        margin-top: 0;
+        padding: 16px;
         border-radius: 16px;
         border: 1px solid rgba(255, 255, 255, 0.25);
         background: linear-gradient(160deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
@@ -707,29 +727,32 @@
         line-height: 1.4;
     }
 
-    .product-rating {
+    .product-placeholder-note {
+        display: inline-block;
+        margin: 0 0 12px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: rgba(255, 213, 159, 0.16);
+        color: #ffd59f;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+
+    .product-image-fallback {
+        width: 100%;
+        min-height: 120px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px dashed rgba(255, 255, 255, 0.25);
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 14px;
-        flex-wrap: wrap;
-    }
-
-    .stars {
-        color: #ffc107;
-        font-size: 16px;
-        letter-spacing: 2px;
-    }
-
-    .rating-text {
+        justify-content: center;
         color: var(--text-secondary);
-        font-size: 13px;
-    }
-
-    .product-price {
-        font-weight: 700;
-        color: #4caf50;
-        font-size: 16px;
+        font-size: 12px;
+        text-align: center;
+        padding: 12px;
     }
 
     .product-cta {
@@ -764,8 +787,15 @@
         color: var(--text-primary);
     }
 
+    .habit-tools-medical {
+        margin: 14px 0 0;
+        font-size: 12px;
+        color: #fcd6a6;
+        line-height: 1.5;
+    }
+
     .ftc-disclosure {
-        margin-top: 20px;
+        margin-top: 12px;
         padding: 14px;
         background: rgba(255, 214, 166, 0.1);
         border-left: 3px solid #ffd59f;
@@ -1210,6 +1240,20 @@
           <h3 id="recommendationsTitle">Your top 3 levers this run</h3>
           <p class="levers-note" id="leversNote">Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.</p>
           <div id="recommendationChips" class="lever-list"></div>
+
+          <div class="habit-tools" id="habitTools" hidden>
+            <h3 class="habit-tools-heading" id="habitToolsTitle">Habit tools</h3>
+            <div class="habit-tools-cards" id="habitToolsCards"></div>
+            <div class="habit-tools-legal">
+              <p class="habit-tools-medical" id="habitToolsMedical">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations.</p>
+              <div class="ftc-disclosure" id="affiliateDisclosureBlock">
+                <p><small>
+                    <strong data-i18n="affiliateDisclosure.title">Affiliate Disclosure:</strong> <span data-i18n="affiliateDisclosure.body">As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.</span>
+                </small></p>
+              </div>
+            </div>
+          </div>
+
                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);">
            <h3 style="margin: 0 0 12px; font-size: 15px;">📚 Learn More About Longevity</h3>
            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
@@ -1227,48 +1271,6 @@
           <span id="inlineDisclaimer">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
         </div>
       </div>
-
-                  <!-- Product Recommendation Section: only after the free result -->
-            <div class="product-recommendation" id="productCard" style="display: none;">
-                <div class="product-tag">💡 Recommended Tool</div>
-                
-                <div class="product-content">
-                    <div class="product-image">
-                        <img id="productImage" src="" alt="">
-                        <span class="product-badge" id="productBadge"></span>
-                    </div>
-                    
-                    <div class="product-info">
-                        <h3 id="productName"></h3>
-                        <p class="product-subtitle" id="productDescription"></p>
-                        
-                        <div class="product-rating">
-                            <span class="stars" id="productStars"></span>
-                            <span class="rating-text">
-                                <span id="productRating"></span>/5 
-                                (<span id="productReviews"></span> reviews)
-                            </span>
-                            <span class="product-price" id="productPrice"></span>
-                        </div>
-                        
-                        <a href="#" id="productLink" class="product-cta" target="_blank" rel="nofollow noopener">
-                            View on Amazon →
-                        </a>
-                        
-                        <p class="product-why">
-                            <strong>Why we recommend it:</strong> 
-                            <span id="productWhy"></span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FTC Disclosure -->
-            <div class="ftc-disclosure" id="affiliateDisclosureBlock" style="display: none;">
-                <p><small>
-                    <strong data-i18n="affiliateDisclosure.title">Affiliate Disclosure:</strong> <span data-i18n="affiliateDisclosure.body">As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.</span>
-                </small></p>
-            </div>
     </div>
 
     <div class="disclaimer-section" id="disclaimer">
@@ -1579,7 +1581,7 @@
         href: '/exercise-longevity.html'
       },
       steps: {
-        tip: 'Add walking to ordinary days and work toward more daily steps.',
+        tip: 'Add walking and other daily exercise / activity to ordinary days.',
         cite: 'American Heart Association Physical Activity Guidelines',
         href: '/exercise-longevity.html'
       },
@@ -1875,7 +1877,7 @@
         recommendations: {
           cardio: 'Increase cardio frequency',
           strength: 'Add more strength sessions',
-          steps: 'Increase daily steps',
+          steps: 'Increase daily exercise and activity',
           sauna: 'Include sauna sessions',
           diet: 'Shift toward Mediterranean/whole foods',
           vegetables: 'Boost vegetable servings',
@@ -5016,7 +5018,7 @@
       });
 
       improvements.sort((a, b) => b.potentialGain - a.potentialGain);
-      return improvements.slice(0, 3);
+      return improvements;
     }
 
     function buildRecommendations(improvements) {
@@ -5024,13 +5026,14 @@
       container.innerHTML = '';
       const t = translations[currentLanguage];
       const en = translations.en;
+      const topLevers = improvements.slice(0, 3);
 
-      if (!improvements.length) {
+      if (!topLevers.length) {
         container.textContent = t.results.strongPerformance;
         return;
       }
 
-      improvements.forEach((item, index) => {
+      topLevers.forEach((item, index) => {
         const guide = LEVER_GUIDANCE[item.factor] || {};
         const card = document.createElement('article');
         card.className = 'lever-card';
@@ -5110,7 +5113,7 @@
       document.getElementById('encouragement').textContent = t.results.defaultEncouragement;
       document.getElementById('impactGrid').innerHTML = '';
       document.getElementById('recommendationChips').innerHTML = '';
-      hideProductRecommendation();
+      hideHabitTools();
     }
 
     function applyDefaults() {
@@ -5167,10 +5170,9 @@
       const remaining = calculateRemainingYears(lifespan, values.age);
 
       renderResults(lifespan, remaining, impacts, { scrollToResults });
-      
-    // Display product recommendation based on top improvement opportunity
-    const improvements = buildImprovements(values, impacts);
-    displayProductRecommendation(improvements);
+
+      const improvements = buildImprovements(values, impacts);
+      displayHabitTools(improvements);
     }
 
     function recalcOnChange() {
@@ -5215,66 +5217,116 @@
     });
   </script>
 
-      <!-- Affiliate Products -->
-    <script src="products.js"></script>
     <script>
-        // Display product recommendation after calculation
+        function hideHabitTools() {
+            const section = document.getElementById('habitTools');
+            const cards = document.getElementById('habitToolsCards');
+            if (cards) cards.innerHTML = '';
+            if (section) section.hidden = true;
+        }
+
         function hideProductRecommendation() {
-            const card = document.getElementById('productCard');
-            const disclosure = document.getElementById('affiliateDisclosureBlock');
-            if (card) card.style.display = 'none';
-            if (disclosure) disclosure.style.display = 'none';
+            hideHabitTools();
+        }
+
+        function renderHabitToolCard(product) {
+            const card = document.createElement('article');
+            card.className = 'product-recommendation';
+            card.dataset.productId = product.id;
+            card.dataset.matchedCategory = product.matchedCategory || '';
+
+            const tag = document.createElement('div');
+            tag.className = 'product-tag';
+            tag.textContent = product.matchedLabel
+                ? `Matched to ${product.matchedLabel}`
+                : 'Habit tool';
+            card.appendChild(tag);
+
+            const content = document.createElement('div');
+            content.className = 'product-content';
+
+            const imageWrap = document.createElement('div');
+            imageWrap.className = 'product-image';
+            if (product.imageUrl) {
+                const img = document.createElement('img');
+                img.src = product.imageUrl;
+                img.alt = product.name;
+                imageWrap.appendChild(img);
+            } else {
+                const fallback = document.createElement('div');
+                fallback.className = 'product-image-fallback';
+                fallback.textContent = 'Amazon image pending SKU';
+                imageWrap.appendChild(fallback);
+            }
+            content.appendChild(imageWrap);
+
+            const info = document.createElement('div');
+            info.className = 'product-info';
+
+            const title = document.createElement('h3');
+            title.textContent = product.name;
+            info.appendChild(title);
+
+            const subtitle = document.createElement('p');
+            subtitle.className = 'product-subtitle';
+            subtitle.textContent = product.description;
+            info.appendChild(subtitle);
+
+            if (product.isPlaceholder) {
+                const note = document.createElement('span');
+                note.className = 'product-placeholder-note';
+                note.textContent = 'Placeholder — Site Engineer to swap Amazon SKU';
+                info.appendChild(note);
+            }
+
+            const link = document.createElement('a');
+            link.className = 'product-cta';
+            link.textContent = 'View on Amazon.';
+            link.rel = 'nofollow noopener sponsored';
+            const href = product.amazonLink || '#';
+            link.href = href;
+            if (href.startsWith('http')) {
+                link.target = '_blank';
+            }
+            info.appendChild(link);
+
+            const why = document.createElement('p');
+            why.className = 'product-why';
+            const whyLabel = document.createElement('strong');
+            whyLabel.textContent = 'Why we recommend it: ';
+            why.appendChild(whyLabel);
+            why.appendChild(document.createTextNode(product.whyRecommend || ''));
+            info.appendChild(why);
+
+            content.appendChild(info);
+            card.appendChild(content);
+            return card;
+        }
+
+        function displayHabitTools(improvements) {
+            const section = document.getElementById('habitTools');
+            const list = document.getElementById('habitToolsCards');
+            if (!section || !list || typeof getHabitToolsForImprovements !== 'function') {
+                hideHabitTools();
+                return;
+            }
+
+            const tools = getHabitToolsForImprovements(improvements, { maxCards: 3 });
+            list.innerHTML = '';
+
+            if (!tools.length) {
+                section.hidden = true;
+                return;
+            }
+
+            tools.forEach((product) => {
+                list.appendChild(renderHabitToolCard(product));
+            });
+            section.hidden = false;
         }
 
         function displayProductRecommendation(recommendations) {
-            if (!recommendations || recommendations.length === 0) {
-                hideProductRecommendation();
-                return;
-            }
-            
-            const topRecommendation = recommendations[0];
-            const product = typeof getProductForRecommendation === 'function'
-              ? getProductForRecommendation(topRecommendation.factor)
-              : null;
-            
-            if (!product || product.amazonLink === "#") {
-                hideProductRecommendation();
-                return;
-            }
-            
-            // Populate product card
-            document.getElementById('productImage').src = product.imageUrl;
-            document.getElementById('productImage').alt = product.name;
-            document.getElementById('productName').textContent = product.name;
-            document.getElementById('productDescription').textContent = product.description;
-            document.getElementById('productRating').textContent = product.rating;
-            document.getElementById('productReviews').textContent = product.reviewCount;
-            document.getElementById('productPrice').textContent = product.price;
-            document.getElementById('productLink').href = product.amazonLink;
-            document.getElementById('productWhy').textContent = product.whyRecommend;
-            
-            // Set star rating
-            const rating = parseFloat(product.rating);
-            const fullStars = Math.floor(rating);
-            const halfStar = rating % 1 >= 0.5;
-            let starsHTML = '\u2605'.repeat(fullStars);
-            if (halfStar) starsHTML += '\u2BEA';
-            starsHTML += '\u2606'.repeat(5 - Math.ceil(rating));
-            document.getElementById('productStars').textContent = starsHTML;
-            
-            // Show/hide badge
-            const badgeEl = document.getElementById('productBadge');
-            if (product.badge) {
-                badgeEl.textContent = product.badge;
-                badgeEl.style.display = 'block';
-            } else {
-                badgeEl.style.display = 'none';
-            }
-            
-            // Show product card only after the free result
-            document.getElementById('productCard').style.display = 'block';
-            const disclosure = document.getElementById('affiliateDisclosureBlock');
-            if (disclosure) disclosure.style.display = 'block';
+            displayHabitTools(recommendations);
         }
     </script>
   
