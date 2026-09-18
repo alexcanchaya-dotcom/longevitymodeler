@@ -5005,11 +5005,9 @@
         const potentialGain = Math.max(0, gap);
 
         if (potentialGain > 0.15 && CHANGEABLE_FACTORS.has(factor)) {
-          const limitedGain = Math.min(potentialGain, 3);
-          const scaledGain = limitedGain * BONUS_SCALING;
           improvements.push({
             factor,
-            potentialGain: scaledGain,
+            potentialGain,
             category: Object.entries(categoryWeights).find(([, meta]) => meta.keys.includes(factor))?.[0]
           });
         }
