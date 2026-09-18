@@ -64,7 +64,7 @@ const affiliateProducts = {
     id: 'walking_shoes',
     categories: ['move', 'bmi'],
     name: 'Brooks Men’s Ghost Max Cushion Neutral Running & Walking Shoe',
-    description: 'Everyday walk gear for more exercise and activity. Size and color variants are on Amazon — pick your size on the product page.',
+    description: 'Everyday walk gear for more exercise and activity. Size, color, and sex variants are chosen on Amazon — pick your size on the product page, or the matching women’s Ghost Max listing if needed.',
     amazonLink: 'https://www.amazon.com/dp/B0CGKPMLP7?tag=longevitymode-20',
     imageUrl: '',
     whyRecommend: 'Comfortable walk gear makes it easier to build an exercise and activity habit.',
