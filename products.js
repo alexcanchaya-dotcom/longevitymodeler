@@ -8,8 +8,9 @@
 // - If a BMI / weight gap appears (refine screen or screen 1): walk gear and/or
 //   a simple scale only. No pills.
 // - No hardcoded prices or review counts.
-// - Do not invent Amazon product claims. New SKUs without a real Associates
-//   short link are clearly marked PLACEHOLDER for Site Engineer to swap.
+// - Do not invent Amazon product claims. Catalog SKUs use real Amazon.com
+//   product pages tagged with longevitymode-20. Fit Simplify bands keep the
+//   existing amzn.to short link.
 
 const AMAZON_STORE_ID = 'longevitymode-20';
 
@@ -62,52 +63,52 @@ const affiliateProducts = {
   walking_shoes: {
     id: 'walking_shoes',
     categories: ['move', 'bmi'],
-    name: 'Walking shoes',
-    description: 'Everyday walk gear for more exercise and activity. Placeholder listing — Site Engineer to swap the live Amazon SKU.',
-    amazonLink: '#PLACEHOLDER-SITE-ENGINEER-SWAP-walking-shoes',
+    name: 'Brooks Men’s Ghost Max Cushion Neutral Running & Walking Shoe',
+    description: 'Everyday walk gear for more exercise and activity. Size and color variants are on Amazon — pick your size on the product page.',
+    amazonLink: 'https://www.amazon.com/dp/B0CGKPMLP7?tag=longevitymode-20',
     imageUrl: '',
     whyRecommend: 'Comfortable walk gear makes it easier to build an exercise and activity habit.',
-    isPlaceholder: true
+    isPlaceholder: false
   },
   pedometer: {
     id: 'pedometer',
     categories: ['move'],
-    name: 'Simple activity watch / pedometer',
-    description: 'A basic check for daily exercise and activity — not a longevity gadget. Placeholder listing — Site Engineer to swap the live Amazon SKU.',
-    amazonLink: '#PLACEHOLDER-SITE-ENGINEER-SWAP-pedometer',
+    name: 'Fitbit Inspire 3 activity tracker',
+    description: 'A simple activity check for daily movement — not a longevity gadget.',
+    amazonLink: 'https://www.amazon.com/dp/B0B5F9SZW7?tag=longevitymode-20',
     imageUrl: '',
     whyRecommend: 'A simple activity check can help you notice whether you are moving enough.',
-    isPlaceholder: true
+    isPlaceholder: false
   },
   sleep_mask: {
     id: 'sleep_mask',
     categories: ['sleep'],
-    name: 'Sleep mask',
-    description: 'Blocks light for darker nights. Not a supplement or sleep-clinic kit. Placeholder listing — Site Engineer to swap the live Amazon SKU.',
-    amazonLink: '#PLACEHOLDER-SITE-ENGINEER-SWAP-sleep-mask',
+    name: 'Clementine Silk Organic Sleep Mask (Black)',
+    description: 'Blocks light for darker nights. Not a supplement or sleep-clinic kit.',
+    amazonLink: 'https://www.amazon.com/dp/B09GRR4D9G?tag=longevitymode-20',
     imageUrl: '',
     whyRecommend: 'A non-pill sleep tool when sleep is one of your top habit gaps.',
-    isPlaceholder: true
+    isPlaceholder: false
   },
   blackout_curtain: {
     id: 'blackout_curtain',
     categories: ['sleep'],
-    name: 'Blackout curtain',
-    description: 'Darkens the room for more consistent sleep. Not a pill or melatonin stack. Placeholder listing — Site Engineer to swap the live Amazon SKU.',
-    amazonLink: '#PLACEHOLDER-SITE-ENGINEER-SWAP-blackout-curtain',
+    name: 'Amazon Basics Room Darkening Blackout Curtains (52 x 84, Black, set of 2)',
+    description: 'Darkens the room for more consistent sleep. Not a pill or melatonin stack.',
+    amazonLink: 'https://www.amazon.com/dp/B0153TOMRY?tag=longevitymode-20',
     imageUrl: '',
     whyRecommend: 'Room darkness is a simple sleep-environment change — no supplements.',
-    isPlaceholder: true
+    isPlaceholder: false
   },
   scale: {
     id: 'scale',
     categories: ['bmi'],
-    name: 'Simple bathroom scale',
-    description: 'A basic weight check — no smart-longevity kit and no pills. Placeholder listing — Site Engineer to swap the live Amazon SKU.',
-    amazonLink: '#PLACEHOLDER-SITE-ENGINEER-SWAP-scale',
+    name: 'Etekcity Digital Bathroom Scale',
+    description: 'A basic weight check — no smart-longevity kit and no pills.',
+    amazonLink: 'https://www.amazon.com/dp/B00F3J9G1W?tag=longevitymode-20',
     imageUrl: '',
     whyRecommend: 'If a BMI or weight gap is on screen, walk gear and/or a simple scale are the only tools we show. No pills.',
-    isPlaceholder: true
+    isPlaceholder: false
   }
 };
 
