@@ -396,6 +396,26 @@
 
     .action-button:active { transform: translateY(0); }
 
+    .action-button:disabled,
+    .action-button:disabled:hover {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .first-screen-hint {
+      margin: 8px 0 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .first-screen-hint[hidden] {
+      display: none;
+    }
+
     #reset {
       background: linear-gradient(135deg, #8a9ccf, #6d7fb8);
       box-shadow: 0 12px 24px rgba(109, 127, 184, 0.35);
@@ -981,19 +1001,20 @@
       <div class="inputs-grid">
         <div>
           <label for="age" id="labelAge">Age (18-100)</label>
-          <input type="number" id="age" min="18" max="100" value="35">
+          <input type="number" id="age" min="18" max="100" inputmode="numeric">
         </div>
         <div>
           <label id="labelGender">Sex</label>
           <div class="radio-group">
-            <label><input type="radio" name="gender" value="male" checked> <span id="genderMale">Male</span></label>
+            <label><input type="radio" name="gender" value="male"> <span id="genderMale">Male</span></label>
             <label><input type="radio" name="gender" value="female"> <span id="genderFemale">Female</span></label>
           </div>
         </div>
         <div>
           <label for="smoking" id="labelSmoking">Smoking status</label>
           <select id="smoking">
-            <option value="never" selected>Never</option>
+            <option value="" selected disabled>Choose…</option>
+            <option value="never">Never</option>
             <option value="former5">Former (5+ years)</option>
             <option value="formerRecent">Former (&lt;5 years)</option>
             <option value="current">Current</option>
@@ -1001,14 +1022,15 @@
         </div>
         <div>
           <label for="sleepHours" id="labelSleepHours">Sleep hours (4-12)</label>
-          <input type="number" id="sleepHours" min="4" max="12" value="7.5" step="0.5">
+          <input type="number" id="sleepHours" min="4" max="12" step="0.5" inputmode="decimal">
         </div>
         <div>
           <label for="activityLevel" id="labelActivity">Exercise / activity</label>
           <select id="activityLevel">
+            <option value="" selected disabled>Choose…</option>
             <option value="low">Little or none</option>
             <option value="some">Some (1–2 days / week)</option>
-            <option value="regular" selected>Regular (3–4 days / week)</option>
+            <option value="regular">Regular (3–4 days / week)</option>
             <option value="high">Frequent (5+ days / week)</option>
           </select>
         </div>
@@ -1016,9 +1038,10 @@
     </section>
 
     <div class="button-row">
-      <button id="calculate" class="action-button">See my estimate</button>
-      <button id="reset" class="action-button">Reset Form</button>
+      <button id="calculate" class="action-button" type="button" disabled>See my estimate</button>
+      <button id="reset" class="action-button" type="button">Reset Form</button>
     </div>
+    <p class="first-screen-hint" id="firstScreenHint">Answer age, sex, smoking, sleep, and exercise to see your estimate.</p>
 
     <div class="results-wrapper" id="results">
       <div class="result-card">
@@ -1655,8 +1678,22 @@
       high: { cardio: '5plus', strength: '5plus', steps: '10kplus' }
     };
 
+    function choosePlaceholderLabel(lang) {
+      const t = translations[lang] || translations.en;
+      return t.choosePlaceholder || translations.en.choosePlaceholder;
+    }
+
+    function prependChooseOption(select, lang) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.disabled = true;
+      opt.textContent = choosePlaceholderLabel(lang);
+      select.insertBefore(opt, select.firstChild);
+    }
+
     function applyActivityPreset(level) {
-      const preset = ACTIVITY_PRESETS[level] || ACTIVITY_PRESETS.regular;
+      const preset = ACTIVITY_PRESETS[level];
+      if (!preset) return;
       Object.entries(preset).forEach(([id, value]) => {
         const el = document.getElementById(id);
         if (el) el.value = value;
@@ -1670,13 +1707,14 @@
       const labels = t.activityOptions || translations.en.activityOptions;
       const previous = select.value;
       select.innerHTML = '';
+      prependChooseOption(select, lang);
       ['low', 'some', 'regular', 'high'].forEach((value) => {
         const opt = document.createElement('option');
         opt.value = value;
         opt.textContent = labels[value];
         select.appendChild(opt);
       });
-      select.value = ACTIVITY_PRESETS[previous] ? previous : 'regular';
+      select.value = ACTIVITY_PRESETS[previous] ? previous : '';
     }
 
     function openRefineForm() {
@@ -1986,7 +2024,9 @@
           mentalHealth: { none: 'None', mild: 'Mild anxiety/depression', moderate: 'Moderate', severe: 'Severe' }
         },
         buttons: { calculate: 'See my estimate', reset: 'Reset Form', refine: 'Refine my number' },
+        choosePlaceholder: 'Choose…',
         firstScreenNote: 'Five answers. No email. You get a free number first; more detail is optional after.',
+        firstScreenHint: 'Answer age, sex, smoking, sleep, and exercise to see your estimate.',
         refineNote: 'Optional. Extra answers can move this estimate. Unasked fields stay at the form defaults until you change them.',
         refineInlineHint: ' with the rest of the form — height, diet, sleep quality, and more.',
         activityOptions: {
@@ -4822,9 +4862,14 @@
           opt.textContent = t.options[id][option.value];
           select.appendChild(opt);
         });
+        if (id === 'smoking') {
+          prependChooseOption(select, lang);
+        }
         const defaultValue = DEFAULT_INPUTS.selects[id];
         if (previous && optionValues[id]?.[previous] !== undefined) {
           select.value = previous;
+        } else if (id === 'smoking') {
+          select.value = '';
         } else if (defaultValue !== undefined) {
           select.value = defaultValue;
         }
@@ -4951,6 +4996,7 @@
 
       setText('sectionFirstScreen', t.sections.firstScreen || translations.en.sections.firstScreen);
       setText('firstScreenNote', t.firstScreenNote || translations.en.firstScreenNote);
+      setText('firstScreenHint', t.firstScreenHint || translations.en.firstScreenHint);
       setText('refineSummary', t.buttons.refine || translations.en.buttons.refine);
       setText('refineNumber', t.buttons.refine || translations.en.buttons.refine);
       setText('refineNote', t.refineNote || translations.en.refineNote);
@@ -4995,6 +5041,7 @@
       updateBinaryLabels(currentLanguage);
       updateStaticText(currentLanguage);
       updateDisclaimers(currentLanguage);
+      syncFirstScreenGate();
       rebuildImpactGridIfVisible();
     }
 
@@ -5304,28 +5351,57 @@
       hideHabitTools();
     }
 
+    function isFirstScreenComplete() {
+      const age = parseFloat(document.getElementById('age')?.value);
+      const sleepHours = parseFloat(document.getElementById('sleepHours')?.value);
+      const smoking = document.getElementById('smoking')?.value;
+      const activity = document.getElementById('activityLevel')?.value;
+      const gender = document.querySelector('input[name="gender"]:checked');
+      return Boolean(
+        isFinite(age) && age >= 18 && age <= 100 &&
+        gender &&
+        smoking && optionValues.smoking[smoking] !== undefined &&
+        isFinite(sleepHours) && sleepHours >= 4 && sleepHours <= 12 &&
+        ACTIVITY_PRESETS[activity]
+      );
+    }
+
+    function syncFirstScreenGate() {
+      const ready = isFirstScreenComplete();
+      const button = document.getElementById('calculate');
+      const hint = document.getElementById('firstScreenHint');
+      if (button) button.disabled = !ready;
+      if (hint) hint.hidden = ready;
+      return ready;
+    }
+
     function applyDefaults() {
-      document.getElementById('age').value = DEFAULT_INPUTS.age;
       document.getElementById('height').value = DEFAULT_INPUTS.height;
       document.getElementById('weight').value = DEFAULT_INPUTS.weight;
-      document.getElementById('sleepHours').value = DEFAULT_INPUTS.sleepHours;
 
       Object.entries(DEFAULT_INPUTS.selects).forEach(([key, value]) => {
+        if (key === 'smoking') return;
         const select = document.getElementById(key);
         if (select) select.value = value;
       });
 
+      document.getElementById('age').value = '';
+      document.getElementById('sleepHours').value = '';
+      const smoking = document.getElementById('smoking');
+      if (smoking) smoking.value = '';
       const activity = document.getElementById('activityLevel');
-      if (activity) activity.value = 'regular';
-      applyActivityPreset('regular');
+      if (activity) activity.value = '';
 
-      const genderRadio = document.querySelector(`input[name="gender"][value="${DEFAULT_INPUTS.gender}"]`);
-      if (genderRadio) genderRadio.checked = true;
+      document.querySelectorAll('input[name="gender"]').forEach((radio) => {
+        radio.checked = false;
+      });
 
       ['heart','cancer'].forEach(name => {
         const radio = document.querySelector(`input[name="${name}"][value="${DEFAULT_INPUTS[name]}"]`);
         if (radio) radio.checked = true;
       });
+
+      syncFirstScreenGate();
     }
 
     function resetForm() {
@@ -5355,6 +5431,8 @@
     }
 
     function calculateLifespan({ scrollToResults = false } = {}) {
+      if (!syncFirstScreenGate()) return;
+      applyActivityPreset(document.getElementById('activityLevel')?.value);
       const values = collectInputs();
       const impacts = buildCategoryImpacts(values);
       const totalAdjustment = sumAdjustment(impacts);
@@ -5370,6 +5448,7 @@
     }
 
     function recalcOnChange() {
+      if (!syncFirstScreenGate()) return;
       const resultWrapper = document.getElementById('results');
       if (resultWrapper.classList.contains('visible')) {
         calculateLifespan({ scrollToResults: false });
@@ -5382,6 +5461,8 @@
     });
 
     document.getElementById('calculate').addEventListener('click', () => {
+      if (!syncFirstScreenGate()) return;
+
       // Track calculator usage
       if (typeof gtag !== 'undefined') {
         gtag('event', 'calculate_click', {
