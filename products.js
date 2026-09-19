@@ -56,7 +56,7 @@ const affiliateProducts = {
     name: 'Fit Simplify Resistance Loop Exercise Bands',
     description: 'Portable bands for home strength and daily exercise / activity.',
     amazonLink: 'https://amzn.to/3LW2jF4',
-    imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/81sF0Q3FGXL._AC_SL1500_.jpg',
+    imageUrl: 'https://m.media-amazon.com/images/I/71S4-NjoTDL._AC_SL1500_.jpg',
     whyRecommend: 'A simple way to add resistance training when exercise or activity is one of your top habit gaps.',
     isPlaceholder: false
   },
@@ -66,7 +66,7 @@ const affiliateProducts = {
     name: 'Brooks Men’s Ghost Max Cushion Neutral Running & Walking Shoe',
     description: 'Everyday walk gear for more exercise and activity. Size, color, and sex variants are chosen on Amazon — pick your size on the product page, or the matching women’s Ghost Max listing if needed.',
     amazonLink: 'https://www.amazon.com/dp/B0CGKPMLP7?tag=longevitymode-20',
-    imageUrl: '',
+    imageUrl: 'https://m.media-amazon.com/images/I/81ZZnORVP4L._AC_SL1500_.jpg',
     whyRecommend: 'Comfortable walk gear makes it easier to build an exercise and activity habit.',
     isPlaceholder: false
   },
@@ -76,7 +76,7 @@ const affiliateProducts = {
     name: 'Fitbit Inspire 3 activity tracker',
     description: 'A simple activity check for daily movement — not a longevity gadget.',
     amazonLink: 'https://www.amazon.com/dp/B0B5F9SZW7?tag=longevitymode-20',
-    imageUrl: '',
+    imageUrl: 'https://m.media-amazon.com/images/I/51bmPvRJ18L._AC_SL1500_.jpg',
     whyRecommend: 'A simple activity check can help you notice whether you are moving enough.',
     isPlaceholder: false
   },
@@ -86,7 +86,7 @@ const affiliateProducts = {
     name: 'Clementine Silk Organic Sleep Mask (Black)',
     description: 'Blocks light for darker nights. Not a supplement or sleep-clinic kit.',
     amazonLink: 'https://www.amazon.com/dp/B09GRR4D9G?tag=longevitymode-20',
-    imageUrl: '',
+    imageUrl: 'assets/products/sleep_mask.jpg',
     whyRecommend: 'A non-pill sleep tool when sleep is one of your top habit gaps.',
     isPlaceholder: false
   },
@@ -96,7 +96,7 @@ const affiliateProducts = {
     name: 'Amazon Basics Room Darkening Blackout Curtains (52 x 84, Black, set of 2)',
     description: 'Darkens the room for more consistent sleep. Not a pill or melatonin stack.',
     amazonLink: 'https://www.amazon.com/dp/B0153TOMRY?tag=longevitymode-20',
-    imageUrl: '',
+    imageUrl: 'https://m.media-amazon.com/images/I/81UIJXGwfLL._AC_SL1500_.jpg',
     whyRecommend: 'Room darkness is a simple sleep-environment change — no supplements.',
     isPlaceholder: false
   },
@@ -106,7 +106,7 @@ const affiliateProducts = {
     name: 'Etekcity Digital Bathroom Scale',
     description: 'A basic weight check — no smart-longevity kit and no pills.',
     amazonLink: 'https://www.amazon.com/dp/B00F3J9G1W?tag=longevitymode-20',
-    imageUrl: '',
+    imageUrl: 'https://m.media-amazon.com/images/I/61XwieJFu4L._AC_SL1500_.jpg',
     whyRecommend: 'If a BMI or weight gap is on screen, walk gear and/or a simple scale are the only tools we show. No pills.',
     isPlaceholder: false
   }

@@ -190,6 +190,7 @@
       --accent: #5e8bfd;
       --accent-strong: #4a7de8;
       --shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      --site-footer-offset: 168px;
     }
 
     * { box-sizing: border-box; }
@@ -204,7 +205,7 @@
       color: var(--text-primary);
       display: flex;
       justify-content: center;
-      padding: 32px 16px 120px;
+      padding: 32px 16px var(--site-footer-offset);
     }
 
     .container {
@@ -624,7 +625,8 @@
     }
 
     @media (max-width: 640px) {
-      body { padding: 18px 10px 24px; }
+      :root { --site-footer-offset: 220px; }
+      body { padding: 18px 10px var(--site-footer-offset); }
       .container { padding: 14px 12px; }
       .section-grid { grid-template-columns: 1fr; }
       .inputs-grid { grid-template-columns: 1fr; }
@@ -635,7 +637,9 @@
         /* Habit-tool cards sit under top levers, not the legal block */
     .habit-tools {
         margin-top: 16px;
+        margin-bottom: 12px;
         padding-top: 12px;
+        padding-bottom: 8px;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
     }
 
@@ -757,6 +761,8 @@
 
     .product-cta {
         display: inline-block;
+        position: relative;
+        z-index: 1;
         padding: 10px 18px;
         background: linear-gradient(135deg, #4caf50, #45a049);
         color: white;
@@ -767,6 +773,7 @@
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
         margin-top: 8px;
+        scroll-margin-bottom: calc(var(--site-footer-offset) + 16px);
     }
 
     .product-cta:hover {
@@ -792,6 +799,19 @@
         font-size: 12px;
         color: #fcd6a6;
         line-height: 1.5;
+    }
+
+    .site-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px 20px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        z-index: 1000;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .ftc-disclosure {
@@ -5247,16 +5267,26 @@
 
             const imageWrap = document.createElement('div');
             imageWrap.className = 'product-image';
-            if (product.imageUrl) {
-                const img = document.createElement('img');
-                img.src = product.imageUrl;
-                img.alt = product.name;
-                imageWrap.appendChild(img);
-            } else {
+
+            function showProductNameFallback() {
+                imageWrap.replaceChildren();
                 const fallback = document.createElement('div');
                 fallback.className = 'product-image-fallback';
-                fallback.textContent = 'Amazon image pending SKU';
+                fallback.textContent = product.name || 'Habit tool';
                 imageWrap.appendChild(fallback);
+            }
+
+            if (product.imageUrl) {
+                const img = document.createElement('img');
+                img.alt = product.name || '';
+                img.onerror = function () {
+                    img.onerror = null;
+                    showProductNameFallback();
+                };
+                img.src = product.imageUrl;
+                imageWrap.appendChild(img);
+            } else {
+                showProductNameFallback();
             }
             content.appendChild(imageWrap);
 
@@ -5331,7 +5361,7 @@
     </script>
   
     <!-- Footer Navigation -->
-    <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); text-align: center; z-index: 1000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div class="site-footer">
         <a href="/" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.home">Home</a>
               <a href="/biological-age-calculator.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.calculator">Biological Age Calculator</a>
         <a href="/about.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.about">About Us</a>
