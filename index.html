@@ -5192,7 +5192,7 @@
       renderResults(lifespan, remaining, impacts, { scrollToResults });
 
       const improvements = buildImprovements(values, impacts);
-      displayHabitTools(improvements);
+      displayHabitTools(improvements, values);
     }
 
     function recalcOnChange() {
@@ -5333,7 +5333,7 @@
             return card;
         }
 
-        function displayHabitTools(improvements) {
+        function displayHabitTools(improvements, values) {
             const section = document.getElementById('habitTools');
             const list = document.getElementById('habitToolsCards');
             if (!section || !list || typeof getHabitToolsForImprovements !== 'function') {
@@ -5341,7 +5341,23 @@
                 return;
             }
 
-            const tools = getHabitToolsForImprovements(improvements, { maxCards: 3 });
+            const sleepTotal = values
+                ? (Number(values.sleepHoursScore) || 0)
+                    + (Number(values.sleepQuality) || 0)
+                    + (Number(values.sleepConsistency) || 0)
+                : undefined;
+
+            const tools = getHabitToolsForImprovements(improvements, {
+                maxCards: 3,
+                values: values ? {
+                    sleepHours: values.sleepHours,
+                    sleepHoursScore: values.sleepHoursScore,
+                    sleepQuality: values.sleepQuality,
+                    sleepConsistency: values.sleepConsistency
+                } : undefined,
+                // Unscaled hours + quality + consistency (max 2.6). Not the scaled impact bar.
+                categoryScores: typeof sleepTotal === 'number' ? { sleep: sleepTotal } : undefined
+            });
             list.innerHTML = '';
 
             if (!tools.length) {

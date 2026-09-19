@@ -158,8 +158,35 @@ function factorDisplayLabel(factor) {
   return key;
 }
 
-function getHabitToolsForImprovements(improvements, options) {
-  const maxCards = (options && options.maxCards) || 3;
+function isWeakSleepFromOptions(options) {
+  if (!options) return false;
+  if (options.sleepIsWeak === true) return true;
+
+  const values = options.values || {};
+  const hours = values.sleepHours;
+  if (typeof hours === 'number' && isFinite(hours) && (hours < 7 || hours > 9)) {
+    return true;
+  }
+  if (typeof values.sleepHoursScore === 'number' && values.sleepHoursScore < 1) {
+    return true;
+  }
+  if (typeof values.sleepQuality === 'number' && values.sleepQuality < 0.8) {
+    return true;
+  }
+  if (typeof values.sleepConsistency === 'number' && values.sleepConsistency < 0.8) {
+    return true;
+  }
+
+  // Unscaled diagnosis sleep total is hours + quality + consistency (max 2.6).
+  // A strong night is 2.6; anything clearly below that is a real gap.
+  const scores = options.categoryScores || {};
+  if (typeof scores.sleep === 'number' && scores.sleep < 2.4) {
+    return true;
+  }
+  return false;
+}
+
+function collectAllowableFactors(improvements) {
   const list = Array.isArray(improvements) ? improvements : [];
   const allowable = [];
   const seenFactors = new Set();
@@ -173,7 +200,33 @@ function getHabitToolsForImprovements(improvements, options) {
     if (seenFactors.has(key)) continue;
     seenFactors.add(key);
     allowable.push({ factor, category });
-    if (allowable.length >= 3) break;
+  }
+
+  return allowable;
+}
+
+function getHabitToolsForImprovements(improvements, options) {
+  const maxCards = (options && options.maxCards) || 3;
+  const allowable = collectAllowableFactors(improvements);
+
+  // Sleep hours/quality/consistency gaps are smaller than cardio/strength/steps
+  // in the points model, so they often sit below the top levers. Still treat a
+  // real sleep gap as allowable so move cannot take all three cards.
+  const hasSleep = allowable.some((item) => item.category === 'sleep');
+  if (!hasSleep && isWeakSleepFromOptions(options)) {
+    allowable.push({ factor: 'sleep', category: 'sleep' });
+  }
+
+  // One card per habit category first (move / sleep / bmi), in first-seen order.
+  const uniqueCategories = [];
+  const seenCategories = new Set();
+  const factorForCategory = {};
+  for (let i = 0; i < allowable.length; i += 1) {
+    const item = allowable[i];
+    if (seenCategories.has(item.category)) continue;
+    seenCategories.add(item.category);
+    uniqueCategories.push(item.category);
+    factorForCategory[item.category] = item.factor;
   }
 
   const usedIds = new Set();
@@ -199,15 +252,16 @@ function getHabitToolsForImprovements(improvements, options) {
     return false;
   }
 
-  // One card per top allowable habit factor so sleep is not crowded out by move.
-  for (let i = 0; i < allowable.length; i += 1) {
-    tryAddFromCategory(allowable[i].category, allowable[i].factor);
+  for (let i = 0; i < uniqueCategories.length; i += 1) {
+    const category = uniqueCategories[i];
+    tryAddFromCategory(category, factorForCategory[category]);
   }
 
   // Fill remaining slots from those same gaps only.
-  for (let i = 0; i < allowable.length; i += 1) {
+  for (let i = 0; i < uniqueCategories.length; i += 1) {
+    const category = uniqueCategories[i];
     while (picked.length < maxCards) {
-      if (!tryAddFromCategory(allowable[i].category, allowable[i].factor)) break;
+      if (!tryAddFromCategory(category, factorForCategory[category])) break;
     }
   }
 
