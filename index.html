@@ -5247,16 +5247,26 @@
 
             const imageWrap = document.createElement('div');
             imageWrap.className = 'product-image';
-            if (product.imageUrl) {
-                const img = document.createElement('img');
-                img.src = product.imageUrl;
-                img.alt = product.name;
-                imageWrap.appendChild(img);
-            } else {
+
+            function showProductNameFallback() {
+                imageWrap.replaceChildren();
                 const fallback = document.createElement('div');
                 fallback.className = 'product-image-fallback';
-                fallback.textContent = 'Amazon image pending SKU';
+                fallback.textContent = product.name || 'Habit tool';
                 imageWrap.appendChild(fallback);
+            }
+
+            if (product.imageUrl) {
+                const img = document.createElement('img');
+                img.alt = product.name || '';
+                img.onerror = function () {
+                    img.onerror = null;
+                    showProductNameFallback();
+                };
+                img.src = product.imageUrl;
+                imageWrap.appendChild(img);
+            } else {
+                showProductNameFallback();
             }
             content.appendChild(imageWrap);
 
