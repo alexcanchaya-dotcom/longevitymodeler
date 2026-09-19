@@ -396,6 +396,26 @@
 
     .action-button:active { transform: translateY(0); }
 
+    .action-button:disabled,
+    .action-button:disabled:hover {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .first-screen-hint {
+      margin: 8px 0 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .first-screen-hint[hidden] {
+      display: none;
+    }
+
     #reset {
       background: linear-gradient(135deg, #8a9ccf, #6d7fb8);
       box-shadow: 0 12px 24px rgba(109, 127, 184, 0.35);
@@ -624,12 +644,99 @@
       font-size: 13px;
     }
 
+    .first-screen {
+      margin-bottom: 4px;
+    }
+
+    .first-screen .inputs-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .first-screen .radio-group {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (min-width: 960px) {
+      .first-screen .inputs-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    .first-screen-note,
+    .refine-note {
+      margin: 0 0 14px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .refine-details {
+      margin-top: 16px;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 4px 16px 16px;
+      background: var(--card-bg);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    .refine-summary {
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      padding: 14px 4px;
+      color: #fff;
+      list-style: none;
+    }
+
+    .refine-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .refine-summary::after {
+      content: ' ▾';
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .refine-details[open] .refine-summary::after {
+      content: ' ▴';
+    }
+
+    .refine-details .section-grid {
+      margin-top: 8px;
+    }
+
+    .refine-inline-note {
+      margin: 4px 0 10px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .refine-text-button {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #d7e2ff;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+    }
+
+    .refine-text-button:hover {
+      color: #fff;
+    }
+
     @media (max-width: 640px) {
       :root { --site-footer-offset: 220px; }
       body { padding: 18px 10px var(--site-footer-offset); }
       .container { padding: 14px 12px; }
       .section-grid { grid-template-columns: 1fr; }
       .inputs-grid { grid-template-columns: 1fr; }
+      .first-screen .inputs-grid { grid-template-columns: 1fr; }
       .radio-group { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
       .language-select { position: static; justify-content: flex-end; margin-bottom: 10px; }
     }
@@ -866,7 +973,7 @@
     </div>
     <header>
       <h1 id="pageTitle">Longevity Insights Calculator</h1>
-      <p class="lead" id="pageSubtitle">Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.</p>
+      <p class="lead" id="pageSubtitle">A first lifespan estimate from five answers. Refine if you want a fuller picture.</p>
       <p class="top-note" id="topNote">For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.</p>
     </header>
 
@@ -888,21 +995,114 @@
             </div>
         </div>
 
-    <div class="section-grid">
+    <section class="section first-screen" id="firstScreen">
+      <h2 id="sectionFirstScreen">Your first estimate</h2>
+      <p class="first-screen-note" id="firstScreenNote">Five answers. No email. You get a free number first; more detail is optional after.</p>
+      <div class="inputs-grid">
+        <div>
+          <label for="age" id="labelAge">Age (18-100)</label>
+          <input type="number" id="age" min="18" max="100" inputmode="numeric">
+        </div>
+        <div>
+          <label id="labelGender">Sex</label>
+          <div class="radio-group">
+            <label><input type="radio" name="gender" value="male"> <span id="genderMale">Male</span></label>
+            <label><input type="radio" name="gender" value="female"> <span id="genderFemale">Female</span></label>
+          </div>
+        </div>
+        <div>
+          <label for="smoking" id="labelSmoking">Smoking status</label>
+          <select id="smoking">
+            <option value="" selected disabled>Choose…</option>
+            <option value="never">Never</option>
+            <option value="former5">Former (5+ years)</option>
+            <option value="formerRecent">Former (&lt;5 years)</option>
+            <option value="current">Current</option>
+          </select>
+        </div>
+        <div>
+          <label for="sleepHours" id="labelSleepHours">Sleep hours (4-12)</label>
+          <input type="number" id="sleepHours" min="4" max="12" step="0.5" inputmode="decimal">
+        </div>
+        <div>
+          <label for="activityLevel" id="labelActivity">Exercise / activity</label>
+          <select id="activityLevel">
+            <option value="" selected disabled>Choose…</option>
+            <option value="low">Little or none</option>
+            <option value="some">Some (1–2 days / week)</option>
+            <option value="regular">Regular (3–4 days / week)</option>
+            <option value="high">Frequent (5+ days / week)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div class="button-row">
+      <button id="calculate" class="action-button" type="button" disabled>See my estimate</button>
+      <button id="reset" class="action-button" type="button">Reset Form</button>
+    </div>
+    <p class="first-screen-hint" id="firstScreenHint">Answer age, sex, smoking, sleep, and exercise to see your estimate.</p>
+
+    <div class="results-wrapper" id="results">
+      <div class="result-card">
+        <div class="lifespan-row">
+          <div>
+            <div class="result-subtitle" id="resultEstimateLabel">Estimated lifespan</div>
+            <div class="lifespan-value" id="lifespanValue">-- years</div>
+          </div>
+          <div class="remaining-years" id="remainingYears"></div>
+        </div>
+        <div class="result-subtitle" id="encouragement">Your lifestyle choices can meaningfully shift this estimate.</div>
+        <p class="refine-inline-note">
+          <button type="button" class="refine-text-button" id="refineNumber">Refine my number</button>
+          <span id="refineInlineHint"> with the rest of the form — height, diet, sleep quality, and more.</span>
+        </p>
+
+        <div class="impact-grid" id="impactGrid"></div>
+
+        <div class="recommendations">
+          <h3 id="recommendationsTitle">Your top 3 levers this run</h3>
+          <p class="levers-note" id="leversNote">Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.</p>
+          <div id="recommendationChips" class="lever-list"></div>
+
+          <div class="habit-tools" id="habitTools" hidden>
+            <h3 class="habit-tools-heading" id="habitToolsTitle">Habit tools</h3>
+            <div class="habit-tools-cards" id="habitToolsCards"></div>
+            <div class="habit-tools-legal">
+              <p class="habit-tools-medical" id="habitToolsMedical">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations.</p>
+              <div class="ftc-disclosure" id="affiliateDisclosureBlock">
+                <p><small>
+                    <strong data-i18n="affiliateDisclosure.title">Affiliate Disclosure:</strong> <span data-i18n="affiliateDisclosure.body">As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.</span>
+                </small></p>
+              </div>
+            </div>
+          </div>
+
+                   <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);">
+           <h3 style="margin: 0 0 12px; font-size: 15px;">📚 Learn More About Longevity</h3>
+           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+             <a href="/how-it-works.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🧬 How This Calculator Works</a>
+             <a href="/exercise-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🏃 Exercise & Longevity Science</a>
+             <a href="/nutrition-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🥗 Nutrition & Aging Research</a>
+             <a href="/sleep-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">😴 Sleep Science for Longevity</a>
+             <a href="/results-guide.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">📊 Understanding Your Results</a>
+           </div>
+         </div>
+        </div>
+
+        <div class="disclaimer">
+          <span>⚠️</span>
+          <span id="inlineDisclaimer">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
+        </div>
+      </div>
+
+      <details class="refine-details" id="refineDetails">
+        <summary class="refine-summary" id="refineSummary">Refine my number</summary>
+        <p class="refine-note" id="refineNote">Optional. Extra answers can move this estimate. Unasked fields stay at the form defaults until you change them.</p>
+        <div class="section-grid">
       <section class="section">
         <h2 id="sectionDemographics">🧑 Basic Demographics</h2>
         <div class="inputs-grid">
-          <div>
-            <label for="age" id="labelAge">Age (18-100)</label>
-            <input type="number" id="age" min="18" max="100" value="35">
-          </div>
-          <div>
-            <label id="labelGender">Gender</label>
-            <div class="radio-group">
-              <label><input type="radio" name="gender" value="male" checked> <span id="genderMale">Male</span></label>
-              <label><input type="radio" name="gender" value="female"> <span id="genderFemale">Female</span></label>
-            </div>
-          </div>
           <div>
             <label for="height" id="labelHeight">Height (cm)</label>
             <input type="number" id="height" min="120" max="230" value="175">
@@ -1012,10 +1212,6 @@
         <h2 id="sectionSleep">😴 Sleep &amp; Recovery</h2>
         <div class="inputs-grid">
           <div>
-            <label for="sleepHours" id="labelSleepHours">Sleep hours (4-12)</label>
-            <input type="number" id="sleepHours" min="4" max="12" value="7.5" step="0.5">
-          </div>
-          <div>
             <label for="sleepQuality" id="labelSleepQuality">Sleep quality</label>
             <select id="sleepQuality">
               <option value="poor">Poor</option>
@@ -1039,15 +1235,6 @@
       <section class="section">
         <h2 id="sectionLifestyle">🌿 Lifestyle &amp; Habits</h2>
         <div class="inputs-grid">
-          <div>
-            <label for="smoking" id="labelSmoking">Smoking status</label>
-            <select id="smoking">
-              <option value="never" selected>Never</option>
-              <option value="former5">Former (5+ years)</option>
-              <option value="formerRecent">Former (&lt;5 years)</option>
-              <option value="current">Current</option>
-            </select>
-          </div>
           <div>
             <label for="alcohol" id="labelAlcohol">Alcohol consumption</label>
             <select id="alcohol">
@@ -1237,60 +1424,7 @@
         </div>
       </section>
     </div>
-
-    <div class="button-row">
-      <button id="calculate" class="action-button">Calculate Longevity Insights</button>
-      <button id="reset" class="action-button">Reset Form</button>
-    </div>
-
-    <div class="results-wrapper" id="results">
-      <div class="result-card">
-        <div class="lifespan-row">
-          <div>
-            <div class="result-subtitle" id="resultEstimateLabel">Estimated lifespan</div>
-            <div class="lifespan-value" id="lifespanValue">-- years</div>
-          </div>
-          <div class="remaining-years" id="remainingYears"></div>
-        </div>
-        <div class="result-subtitle" id="encouragement">Your lifestyle choices can meaningfully shift this estimate.</div>
-
-        <div class="impact-grid" id="impactGrid"></div>
-
-        <div class="recommendations">
-          <h3 id="recommendationsTitle">Your top 3 levers this run</h3>
-          <p class="levers-note" id="leversNote">Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.</p>
-          <div id="recommendationChips" class="lever-list"></div>
-
-          <div class="habit-tools" id="habitTools" hidden>
-            <h3 class="habit-tools-heading" id="habitToolsTitle">Habit tools</h3>
-            <div class="habit-tools-cards" id="habitToolsCards"></div>
-            <div class="habit-tools-legal">
-              <p class="habit-tools-medical" id="habitToolsMedical">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations.</p>
-              <div class="ftc-disclosure" id="affiliateDisclosureBlock">
-                <p><small>
-                    <strong data-i18n="affiliateDisclosure.title">Affiliate Disclosure:</strong> <span data-i18n="affiliateDisclosure.body">As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no extra cost to you. I only recommend products I believe will genuinely help improve your longevity.</span>
-                </small></p>
-              </div>
-            </div>
-          </div>
-
-                   <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);">
-           <h3 style="margin: 0 0 12px; font-size: 15px;">📚 Learn More About Longevity</h3>
-           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
-             <a href="/how-it-works.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🧬 How This Calculator Works</a>
-             <a href="/exercise-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🏃 Exercise & Longevity Science</a>
-             <a href="/nutrition-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🥗 Nutrition & Aging Research</a>
-             <a href="/sleep-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">😴 Sleep Science for Longevity</a>
-             <a href="/results-guide.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">📊 Understanding Your Results</a>
-           </div>
-         </div>
-        </div>
-
-        <div class="disclaimer">
-          <span>⚠️</span>
-          <span id="inlineDisclaimer">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
-        </div>
-      </div>
+      </details>
     </div>
 
     <div class="disclaimer-section" id="disclaimer">
@@ -1537,6 +1671,59 @@
       mentalHealth: { none: 0, mild: -0.5, moderate: -1.5, severe: -3 }
     };
 
+    const ACTIVITY_PRESETS = {
+      low: { cardio: 'never', strength: 'never', steps: 'lt5k' },
+      some: { cardio: '1-2', strength: '1-2', steps: '5-8k' },
+      regular: { cardio: '3-4', strength: '3-4', steps: '8-10k' },
+      high: { cardio: '5plus', strength: '5plus', steps: '10kplus' }
+    };
+
+    function choosePlaceholderLabel(lang) {
+      const t = translations[lang] || translations.en;
+      return t.choosePlaceholder || translations.en.choosePlaceholder;
+    }
+
+    function prependChooseOption(select, lang) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.disabled = true;
+      opt.textContent = choosePlaceholderLabel(lang);
+      select.insertBefore(opt, select.firstChild);
+    }
+
+    function applyActivityPreset(level) {
+      const preset = ACTIVITY_PRESETS[level];
+      if (!preset) return;
+      Object.entries(preset).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      });
+    }
+
+    function populateActivityOptions(lang) {
+      const select = document.getElementById('activityLevel');
+      if (!select) return;
+      const t = translations[lang] || translations.en;
+      const labels = t.activityOptions || translations.en.activityOptions;
+      const previous = select.value;
+      select.innerHTML = '';
+      prependChooseOption(select, lang);
+      ['low', 'some', 'regular', 'high'].forEach((value) => {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = labels[value];
+        select.appendChild(opt);
+      });
+      select.value = ACTIVITY_PRESETS[previous] ? previous : '';
+    }
+
+    function openRefineForm() {
+      const details = document.getElementById('refineDetails');
+      if (!details) return;
+      details.open = true;
+      details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     const DEFAULT_INPUTS = {
       age: 35,
       gender: 'male',
@@ -1733,7 +1920,7 @@
         metaDescription: 'Educational lifespan estimate from lifestyle answers. Not medical advice.',
         languageLabel: 'Language',
         pageTitle: 'Longevity Insights Calculator',
-        pageSubtitle: 'Comprehensive, science-informed estimator highlighting modifiable factors that influence lifespan.',
+        pageSubtitle: 'A first lifespan estimate from five answers. Refine if you want a fuller picture.',
         topNote: 'For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.',
         trustBadges: {
           noSignup: 'No signup required',
@@ -1753,6 +1940,7 @@
           body: 'As an Amazon Associate, I earn from qualifying purchases. This means if you click on a link and make a purchase, I may receive a small commission at no additional cost to you. I only recommend products I believe will genuinely help improve your longevity.'
         },
         sections: {
+          firstScreen: 'Your first estimate',
           demographics: '🧑 Basic Demographics',
           activity: '🏃 Physical Activity',
           nutrition: '🥗 Nutrition & Diet',
@@ -1766,7 +1954,8 @@
         },
         labels: {
           age: 'Age (18-100)',
-          gender: 'Gender',
+          gender: 'Sex',
+          activityLevel: 'Exercise / activity',
           male: 'Male',
           female: 'Female',
           height: 'Height (cm)',
@@ -1834,7 +2023,18 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Borderline high (200-239 mg/dL)', high: 'High (240+ mg/dL)', medication: 'On medication' },
           mentalHealth: { none: 'None', mild: 'Mild anxiety/depression', moderate: 'Moderate', severe: 'Severe' }
         },
-        buttons: { calculate: 'Calculate Longevity Insights', reset: 'Reset Form' },
+        buttons: { calculate: 'See my estimate', reset: 'Reset Form', refine: 'Refine my number' },
+        choosePlaceholder: 'Choose…',
+        firstScreenNote: 'Five answers. No email. You get a free number first; more detail is optional after.',
+        firstScreenHint: 'Answer age, sex, smoking, sleep, and exercise to see your estimate.',
+        refineNote: 'Optional. Extra answers can move this estimate. Unasked fields stay at the form defaults until you change them.',
+        refineInlineHint: ' with the rest of the form — height, diet, sleep quality, and more.',
+        activityOptions: {
+          low: 'Little or none',
+          some: 'Some (1–2 days / week)',
+          regular: 'Regular (3–4 days / week)',
+          high: 'Frequent (5+ days / week)'
+        },
         results: {
           estimated: 'Estimated lifespan',
           yearsLabel: 'years',
@@ -4662,9 +4862,14 @@
           opt.textContent = t.options[id][option.value];
           select.appendChild(opt);
         });
+        if (id === 'smoking') {
+          prependChooseOption(select, lang);
+        }
         const defaultValue = DEFAULT_INPUTS.selects[id];
         if (previous && optionValues[id]?.[previous] !== undefined) {
           select.value = previous;
+        } else if (id === 'smoking') {
+          select.value = '';
         } else if (defaultValue !== undefined) {
           select.value = defaultValue;
         }
@@ -4714,7 +4919,8 @@
       const t = translations[lang];
       const labelMap = {
         labelAge: t.labels.age,
-        labelGender: t.labels.gender,
+        labelGender: t.labels.gender || t.labels.sex || translations.en.labels.gender,
+        labelActivity: t.labels.activityLevel || translations.en.labels.activityLevel,
         genderMale: t.labels.male,
         genderFemale: t.labels.female,
         labelHeight: t.labels.height,
@@ -4788,6 +4994,14 @@
       document.getElementById('languageLabel').textContent = t.languageLabel;
       document.documentElement.lang = lang;
 
+      setText('sectionFirstScreen', t.sections.firstScreen || translations.en.sections.firstScreen);
+      setText('firstScreenNote', t.firstScreenNote || translations.en.firstScreenNote);
+      setText('firstScreenHint', t.firstScreenHint || translations.en.firstScreenHint);
+      setText('refineSummary', t.buttons.refine || translations.en.buttons.refine);
+      setText('refineNumber', t.buttons.refine || translations.en.buttons.refine);
+      setText('refineNote', t.refineNote || translations.en.refineNote);
+      setText('refineInlineHint', t.refineInlineHint || translations.en.refineInlineHint);
+      populateActivityOptions(lang);
       setText('sectionDemographics', t.sections.demographics);
       setText('sectionActivity', t.sections.activity);
       setText('sectionNutrition', t.sections.nutrition);
@@ -4827,6 +5041,7 @@
       updateBinaryLabels(currentLanguage);
       updateStaticText(currentLanguage);
       updateDisclaimers(currentLanguage);
+      syncFirstScreenGate();
       rebuildImpactGridIfVisible();
     }
 
@@ -5136,27 +5351,62 @@
       hideHabitTools();
     }
 
+    function isFirstScreenComplete() {
+      const age = parseFloat(document.getElementById('age')?.value);
+      const sleepHours = parseFloat(document.getElementById('sleepHours')?.value);
+      const smoking = document.getElementById('smoking')?.value;
+      const activity = document.getElementById('activityLevel')?.value;
+      const gender = document.querySelector('input[name="gender"]:checked');
+      return Boolean(
+        isFinite(age) && age >= 18 && age <= 100 &&
+        gender &&
+        smoking && optionValues.smoking[smoking] !== undefined &&
+        isFinite(sleepHours) && sleepHours >= 4 && sleepHours <= 12 &&
+        ACTIVITY_PRESETS[activity]
+      );
+    }
+
+    function syncFirstScreenGate() {
+      const ready = isFirstScreenComplete();
+      const button = document.getElementById('calculate');
+      const hint = document.getElementById('firstScreenHint');
+      if (button) button.disabled = !ready;
+      if (hint) hint.hidden = ready;
+      return ready;
+    }
+
     function applyDefaults() {
-      document.getElementById('age').value = DEFAULT_INPUTS.age;
       document.getElementById('height').value = DEFAULT_INPUTS.height;
       document.getElementById('weight').value = DEFAULT_INPUTS.weight;
-      document.getElementById('sleepHours').value = DEFAULT_INPUTS.sleepHours;
 
       Object.entries(DEFAULT_INPUTS.selects).forEach(([key, value]) => {
+        if (key === 'smoking') return;
         const select = document.getElementById(key);
         if (select) select.value = value;
       });
 
-      const genderRadio = document.querySelector(`input[name="gender"][value="${DEFAULT_INPUTS.gender}"]`);
-      if (genderRadio) genderRadio.checked = true;
+      document.getElementById('age').value = '';
+      document.getElementById('sleepHours').value = '';
+      const smoking = document.getElementById('smoking');
+      if (smoking) smoking.value = '';
+      const activity = document.getElementById('activityLevel');
+      if (activity) activity.value = '';
+
+      document.querySelectorAll('input[name="gender"]').forEach((radio) => {
+        radio.checked = false;
+      });
 
       ['heart','cancer'].forEach(name => {
         const radio = document.querySelector(`input[name="${name}"][value="${DEFAULT_INPUTS[name]}"]`);
         if (radio) radio.checked = true;
       });
+
+      syncFirstScreenGate();
     }
 
     function resetForm() {
+      const details = document.getElementById('refineDetails');
+      if (details) details.open = false;
       clearResultsDisplay();
       applyDefaults();
     }
@@ -5181,6 +5431,8 @@
     }
 
     function calculateLifespan({ scrollToResults = false } = {}) {
+      if (!syncFirstScreenGate()) return;
+      applyActivityPreset(document.getElementById('activityLevel')?.value);
       const values = collectInputs();
       const impacts = buildCategoryImpacts(values);
       const totalAdjustment = sumAdjustment(impacts);
@@ -5196,6 +5448,7 @@
     }
 
     function recalcOnChange() {
+      if (!syncFirstScreenGate()) return;
       const resultWrapper = document.getElementById('results');
       if (resultWrapper.classList.contains('visible')) {
         calculateLifespan({ scrollToResults: false });
@@ -5208,6 +5461,8 @@
     });
 
     document.getElementById('calculate').addEventListener('click', () => {
+      if (!syncFirstScreenGate()) return;
+
       // Track calculator usage
       if (typeof gtag !== 'undefined') {
         gtag('event', 'calculate_click', {
@@ -5219,6 +5474,11 @@
       calculateLifespan({ scrollToResults: true });
     });
     document.getElementById('reset').addEventListener('click', resetForm);
+    document.getElementById('refineNumber')?.addEventListener('click', openRefineForm);
+
+    document.getElementById('activityLevel')?.addEventListener('change', (e) => {
+      applyActivityPreset(e.target.value);
+    }, true);
 
     document.getElementById('languagePicker').addEventListener('change', (e) => {
       const lang = e.target.value;
