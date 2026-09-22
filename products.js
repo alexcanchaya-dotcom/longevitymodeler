@@ -63,8 +63,8 @@ const affiliateProducts = {
   walking_shoes: {
     id: 'walking_shoes',
     categories: ['move', 'bmi'],
-    name: 'Brooks Men\u2019s Ghost Max Cushion Neutral Running \u0026 Walking Shoe',
-    description: 'Everyday walk gear for more exercise and activity. Size, color, and sex variants are chosen on Amazon — pick your size on the product page, or the matching women\u2019s Ghost Max listing if needed.',
+    name: 'Brooks Men’s Ghost Max Cushion Neutral Running & Walking Shoe',
+    description: 'Everyday walk gear for more exercise and activity. Size, color, and sex variants are chosen on Amazon — pick your size on the product page, or the matching women’s Ghost Max listing if needed.',
     amazonLink: 'https://www.amazon.com/dp/B0CGKPMLP7?tag=longevitymode-20',
     imageUrl: 'https://m.media-amazon.com/images/I/81ZZnORVP4L._AC_SL1500_.jpg',
     whyRecommend: 'Comfortable walk gear makes it easier to build an exercise and activity habit.',
@@ -177,6 +177,8 @@ function isWeakSleepFromOptions(options) {
     return true;
   }
 
+  // Unscaled diagnosis sleep total is hours + quality + consistency (max 2.6).
+  // A strong night is 2.6; anything clearly below that is a real gap.
   const scores = options.categoryScores || {};
   if (typeof scores.sleep === 'number' && scores.sleep < 2.4) {
     return true;
@@ -207,11 +209,15 @@ function getHabitToolsForImprovements(improvements, options) {
   const maxCards = (options && options.maxCards) || 3;
   const allowable = collectAllowableFactors(improvements);
 
+  // Sleep hours/quality/consistency gaps are smaller than cardio/strength/steps
+  // in the points model, so they often sit below the top levers. Still treat a
+  // real sleep gap as allowable so move cannot take all three cards.
   const hasSleep = allowable.some((item) => item.category === 'sleep');
   if (!hasSleep && isWeakSleepFromOptions(options)) {
     allowable.push({ factor: 'sleep', category: 'sleep' });
   }
 
+  // One card per habit category first (move / sleep / bmi), in first-seen order.
   const uniqueCategories = [];
   const seenCategories = new Set();
   const factorForCategory = {};
@@ -251,6 +257,7 @@ function getHabitToolsForImprovements(improvements, options) {
     tryAddFromCategory(category, factorForCategory[category]);
   }
 
+  // Fill remaining slots from those same gaps only.
   for (let i = 0; i < uniqueCategories.length; i += 1) {
     const category = uniqueCategories[i];
     while (picked.length < maxCards) {
@@ -261,6 +268,8 @@ function getHabitToolsForImprovements(improvements, options) {
   return picked;
 }
 
+// Older callers passed the #1 recommendation text or factor. Smoking still
+// returns null. Prefer getHabitToolsForImprovements for top 2–3 gaps.
 function getProductForRecommendation(recommendationText) {
   const factor = normalizeFactorKey(recommendationText);
   if (!factor || isNeverProductFactor(factor)) return null;
@@ -281,7 +290,8 @@ if (typeof module !== 'undefined' && module.exports) {
   };
 }
 
-// Refine prominence (Ready pack): primary CTA after free estimate.
+
+// Refine prominence (Ready pack): primary CTA after free estimate. No precise/accurate/more exact copy.
 if (typeof document !== 'undefined') {
   (function () {
     function ready(fn) {
