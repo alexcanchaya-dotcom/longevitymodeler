@@ -1,1 +1,422 @@
-PLACEHOLDER_WILL_FAIL
+// Habit-tool catalog for Longevity Modeler (longevitymodeler.com).
+// Amazon Associates store ID: longevitymode-20
+//
+// Locked offer rules (Longevity Market + CoS):
+// - Free estimate stays free and first. No email wall.
+// - Products only for move / sleep gaps. Smoking is tip-only — never a SKU.
+// - Diet, stress, "see the doctor", and medical chips: tip only, no product.
+// - If a BMI / weight gap appears (refine screen or screen 1): walk gear and/or
+//   a simple scale only. No pills.
+// - No hardcoded prices or review counts.
+// - Do not invent Amazon product claims. Catalog SKUs use real Amazon.com
+//   product pages tagged with longevitymode-20. Fit Simplify bands keep the
+//   existing amzn.to short link.
+
+const AMAZON_STORE_ID = 'longevitymode-20';
+
+const NEVER_PRODUCT_FACTORS = [
+  'smoking',
+  'nicotine',
+  'diet',
+  'vegetables',
+  'processed',
+  'water',
+  'fish',
+  'stress',
+  'checkups',
+  'conditions',
+  'family',
+  'heart',
+  'cancer',
+  'diabetes',
+  'bp',
+  'cholesterol',
+  'mentalHealth',
+  'sauna',
+  'alcohol',
+  'social',
+  'meditation',
+  'nature',
+  'sun',
+  'education',
+  'marital',
+  'income'
+];
+
+const HABIT_TOOL_FACTORS = {
+  move: ['cardio', 'strength', 'steps', 'exercise', 'activity', 'walk'],
+  sleep: ['sleep', 'sleepHours', 'sleepHoursScore', 'sleepQuality', 'sleepConsistency'],
+  bmi: ['bmi', 'weight', 'bodyMass', 'bodyweight']
+};
+
+const affiliateProducts = {
+  bands: {
+    id: 'bands',
+    categories: ['move'],
+    name: 'Fit Simplify Resistance Loop Exercise Bands',
+    description: 'Portable bands for home strength and daily exercise / activity.',
+    amazonLink: 'https://amzn.to/3LW2jF4',
+    imageUrl: 'https://m.media-amazon.com/images/I/71S4-NjoTDL._AC_SL1500_.jpg',
+    whyRecommend: 'A simple way to add resistance training when exercise or activity is one of your top habit gaps.',
+    isPlaceholder: false
+  },
+  walking_shoes: {
+    id: 'walking_shoes',
+    categories: ['move', 'bmi'],
+    name: 'Brooks Men’s Ghost Max Cushion Neutral Running & Walking Shoe',
+    description: 'Everyday walk gear for more exercise and activity. Size, color, and sex variants are chosen on Amazon — pick your size on the product page, or the matching women’s Ghost Max listing if needed.',
+    amazonLink: 'https://www.amazon.com/dp/B0CGKPMLP7?tag=longevitymode-20',
+    imageUrl: 'https://m.media-amazon.com/images/I/81ZZnORVP4L._AC_SL1500_.jpg',
+    whyRecommend: 'Comfortable walk gear makes it easier to build an exercise and activity habit.',
+    isPlaceholder: false
+  },
+  pedometer: {
+    id: 'pedometer',
+    categories: ['move'],
+    name: 'Fitbit Inspire 3 activity tracker',
+    description: 'A simple activity check for daily movement — not a longevity gadget.',
+    amazonLink: 'https://www.amazon.com/dp/B0B5F9SZW7?tag=longevitymode-20',
+    imageUrl: 'https://m.media-amazon.com/images/I/51bmPvRJ18L._AC_SL1500_.jpg',
+    whyRecommend: 'A simple activity check can help you notice whether you are moving enough.',
+    isPlaceholder: false
+  },
+  sleep_mask: {
+    id: 'sleep_mask',
+    categories: ['sleep'],
+    name: 'Clementine Silk Organic Sleep Mask (Black)',
+    description: 'Blocks light for darker nights. Not a supplement or sleep-clinic kit.',
+    amazonLink: 'https://www.amazon.com/dp/B09GRR4D9G?tag=longevitymode-20',
+    imageUrl: 'assets/products/sleep_mask.jpg',
+    whyRecommend: 'A non-pill sleep tool when sleep is one of your top habit gaps.',
+    isPlaceholder: false
+  },
+  blackout_curtain: {
+    id: 'blackout_curtain',
+    categories: ['sleep'],
+    name: 'Amazon Basics Room Darkening Blackout Curtains (52 x 84, Black, set of 2)',
+    description: 'Darkens the room for more consistent sleep. Not a pill or melatonin stack.',
+    amazonLink: 'https://www.amazon.com/dp/B0153TOMRY?tag=longevitymode-20',
+    imageUrl: 'https://m.media-amazon.com/images/I/81UIJXGwfLL._AC_SL1500_.jpg',
+    whyRecommend: 'Room darkness is a simple sleep-environment change — no supplements.',
+    isPlaceholder: false
+  },
+  scale: {
+    id: 'scale',
+    categories: ['bmi'],
+    name: 'Etekcity Digital Bathroom Scale',
+    description: 'A basic weight check — no smart-longevity kit and no pills.',
+    amazonLink: 'https://www.amazon.com/dp/B00F3J9G1W?tag=longevitymode-20',
+    imageUrl: 'https://m.media-amazon.com/images/I/61XwieJFu4L._AC_SL1500_.jpg',
+    whyRecommend: 'If a BMI or weight gap is on screen, walk gear and/or a simple scale are the only tools we show. No pills.',
+    isPlaceholder: false
+  }
+};
+
+const CATEGORY_PRODUCT_ORDER = {
+  move: ['bands', 'walking_shoes', 'pedometer'],
+  sleep: ['sleep_mask', 'blackout_curtain'],
+  bmi: ['walking_shoes', 'scale']
+};
+
+function normalizeFactorKey(factor) {
+  return String(factor || '').trim();
+}
+
+function isNeverProductFactor(factor) {
+  const lower = normalizeFactorKey(factor).toLowerCase();
+  if (!lower) return true;
+  if (lower === 'smoking' || lower.startsWith('smok') || lower.includes('nicotin')) {
+    return true;
+  }
+  return NEVER_PRODUCT_FACTORS.some((name) => name.toLowerCase() === lower);
+}
+
+function categoryForFactor(factor) {
+  if (isNeverProductFactor(factor)) return null;
+  const lower = normalizeFactorKey(factor).toLowerCase();
+
+  if (HABIT_TOOL_FACTORS.bmi.some((key) => key.toLowerCase() === lower)) {
+    return 'bmi';
+  }
+  if (lower.startsWith('sleep') || HABIT_TOOL_FACTORS.sleep.some((key) => key.toLowerCase() === lower)) {
+    return 'sleep';
+  }
+  if (HABIT_TOOL_FACTORS.move.some((key) => key.toLowerCase() === lower)) {
+    return 'move';
+  }
+  return null;
+}
+
+function factorDisplayLabel(factor) {
+  const category = categoryForFactor(factor);
+  const key = normalizeFactorKey(factor).toLowerCase();
+  if (category === 'move' || key === 'steps') {
+    return 'exercise / activity';
+  }
+  if (category === 'sleep') return 'sleep';
+  if (category === 'bmi') return 'weight / BMI';
+  return key;
+}
+
+function isWeakSleepFromOptions(options) {
+  if (!options) return false;
+  if (options.sleepIsWeak === true) return true;
+
+  const values = options.values || {};
+  const hours = values.sleepHours;
+  if (typeof hours === 'number' && isFinite(hours) && (hours < 7 || hours > 9)) {
+    return true;
+  }
+  if (typeof values.sleepHoursScore === 'number' && values.sleepHoursScore < 1) {
+    return true;
+  }
+  if (typeof values.sleepQuality === 'number' && values.sleepQuality < 0.8) {
+    return true;
+  }
+  if (typeof values.sleepConsistency === 'number' && values.sleepConsistency < 0.8) {
+    return true;
+  }
+
+  // Unscaled diagnosis sleep total is hours + quality + consistency (max 2.6).
+  // A strong night is 2.6; anything clearly below that is a real gap.
+  const scores = options.categoryScores || {};
+  if (typeof scores.sleep === 'number' && scores.sleep < 2.4) {
+    return true;
+  }
+  return false;
+}
+
+function collectAllowableFactors(improvements) {
+  const list = Array.isArray(improvements) ? improvements : [];
+  const allowable = [];
+  const seenFactors = new Set();
+
+  for (let i = 0; i < list.length; i += 1) {
+    const item = list[i];
+    const factor = typeof item === 'string' ? item : item && item.factor;
+    const category = categoryForFactor(factor);
+    if (!category) continue;
+    const key = normalizeFactorKey(factor).toLowerCase();
+    if (seenFactors.has(key)) continue;
+    seenFactors.add(key);
+    allowable.push({ factor, category });
+  }
+
+  return allowable;
+}
+
+function getHabitToolsForImprovements(improvements, options) {
+  const maxCards = (options && options.maxCards) || 3;
+  const allowable = collectAllowableFactors(improvements);
+
+  // Sleep hours/quality/consistency gaps are smaller than cardio/strength/steps
+  // in the points model, so they often sit below the top levers. Still treat a
+  // real sleep gap as allowable so move cannot take all three cards.
+  const hasSleep = allowable.some((item) => item.category === 'sleep');
+  if (!hasSleep && isWeakSleepFromOptions(options)) {
+    allowable.push({ factor: 'sleep', category: 'sleep' });
+  }
+
+  // One card per habit category first (move / sleep / bmi), in first-seen order.
+  const uniqueCategories = [];
+  const seenCategories = new Set();
+  const factorForCategory = {};
+  for (let i = 0; i < allowable.length; i += 1) {
+    const item = allowable[i];
+    if (seenCategories.has(item.category)) continue;
+    seenCategories.add(item.category);
+    uniqueCategories.push(item.category);
+    factorForCategory[item.category] = item.factor;
+  }
+
+  const usedIds = new Set();
+  const picked = [];
+
+  function tryAddFromCategory(category, factor) {
+    if (picked.length >= maxCards) return false;
+    const order = CATEGORY_PRODUCT_ORDER[category] || [];
+    for (let j = 0; j < order.length; j += 1) {
+      const id = order[j];
+      if (usedIds.has(id)) continue;
+      const product = affiliateProducts[id];
+      if (!product) continue;
+      usedIds.add(id);
+      picked.push({
+        ...product,
+        matchedFactor: factor,
+        matchedCategory: category,
+        matchedLabel: factorDisplayLabel(factor)
+      });
+      return true;
+    }
+    return false;
+  }
+
+  for (let i = 0; i < uniqueCategories.length; i += 1) {
+    const category = uniqueCategories[i];
+    tryAddFromCategory(category, factorForCategory[category]);
+  }
+
+  // Fill remaining slots from those same gaps only.
+  for (let i = 0; i < uniqueCategories.length; i += 1) {
+    const category = uniqueCategories[i];
+    while (picked.length < maxCards) {
+      if (!tryAddFromCategory(category, factorForCategory[category])) break;
+    }
+  }
+
+  return picked;
+}
+
+// Older callers passed the #1 recommendation text or factor. Smoking still
+// returns null. Prefer getHabitToolsForImprovements for top 2–3 gaps.
+function getProductForRecommendation(recommendationText) {
+  const factor = normalizeFactorKey(recommendationText);
+  if (!factor || isNeverProductFactor(factor)) return null;
+  const tools = getHabitToolsForImprovements([{ factor }]);
+  return tools[0] || null;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    AMAZON_STORE_ID,
+    affiliateProducts,
+    NEVER_PRODUCT_FACTORS,
+    categoryForFactor,
+    isNeverProductFactor,
+    factorDisplayLabel,
+    getHabitToolsForImprovements,
+    getProductForRecommendation
+  };
+}
+
+
+// Soothing Stories sleep cross-link (Ready AUTH ship 22 Sep 2026).
+// Own PR — not Refine #39. Educational; never claims stories fix sleep or add years.
+if (typeof document !== 'undefined') {
+  (function () {
+    var PRIMARY_URL = 'https://youtu.be/Up8AEZjP0wE'; // Marco Polo sleep
+    var SECONDARY_URL = 'https://youtu.be/NPgE4MONZ0M'; // William
+
+    function ready(fn) {
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+      else fn();
+    }
+
+    function ensureStyles() {
+      if (document.getElementById('soothingStoriesStyles')) return;
+      var style = document.createElement('style');
+      style.id = 'soothingStoriesStyles';
+      style.textContent = [
+        '.soothing-stories{margin:14px 0 10px;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);}',
+        '.soothing-stories[hidden]{display:none!important;}',
+        '.soothing-stories-title{margin:0 0 6px;font-size:17px;font-weight:650;letter-spacing:0.15px;color:#fff;line-height:1.35;}',
+        '.soothing-stories-sub{margin:0 0 10px;font-size:13px;line-height:1.4;color:var(--text-secondary,#a8b0c4);}',
+        '.soothing-stories-links{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0;}',
+        '.soothing-stories-primary{display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:10px 14px;font:inherit;font-size:14px;font-weight:700;color:#1a2340;background:linear-gradient(135deg,#f4f7ff,#d7e2ff);text-decoration:none;}',
+        '.soothing-stories-primary:hover{filter:brightness(1.04);}',
+        '.soothing-stories-secondary{color:#d7e2ff;font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:3px;}',
+        '.soothing-stories-secondary:hover{color:#fff;}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+
+    function ensureCard() {
+      var existing = document.getElementById('soothingStories');
+      if (existing) return existing;
+
+      var habit = document.getElementById('habitTools');
+      var recs = document.querySelector('.recommendations');
+      var card = document.createElement('aside');
+      card.id = 'soothingStories';
+      card.className = 'soothing-stories';
+      card.hidden = true;
+      card.setAttribute('aria-label', 'Soothing Stories');
+      card.innerHTML =
+        "<h3 class=\"soothing-stories-title\">Can't sleep? Try a soothing story.</h3>" +
+        '<p class="soothing-stories-sub">From Soothing Stories on YouTube — calm listening, not medical advice.</p>' +
+        '<div class="soothing-stories-links">' +
+        '<a class="soothing-stories-primary" href="' + PRIMARY_URL + '" target="_blank" rel="noopener noreferrer">Marco Polo sleep</a>' +
+        '<a class="soothing-stories-secondary" href="' + SECONDARY_URL + '" target="_blank" rel="noopener noreferrer">William</a>' +
+        '</div>';
+
+      // Order: tip levers → Stories → Amazon habit tools. Never replace Amazon cards.
+      if (habit && habit.parentNode) {
+        habit.parentNode.insertBefore(card, habit);
+      } else if (recs && recs.parentNode) {
+        recs.parentNode.insertBefore(card, recs.nextSibling);
+      } else {
+        document.body.appendChild(card);
+      }
+      return card;
+    }
+
+    function hideStories() {
+      var card = document.getElementById('soothingStories');
+      if (card) card.hidden = true;
+    }
+
+    // Locked gate (Product Ready): sleepHours < 7, or Refine sleepQuality === poor.
+    // 7–9 and >9 hide. Unanswered sleep never shows.
+    function shouldShowStories(values) {
+      var hoursRaw = values && values.sleepHours;
+      var hoursEl = document.getElementById('sleepHours');
+      var hoursAnswered = hoursEl && String(hoursEl.value || '').trim() !== '' && isFinite(parseFloat(hoursEl.value));
+      if (!hoursAnswered) return false;
+
+      var hours = typeof hoursRaw === 'number' && isFinite(hoursRaw)
+        ? hoursRaw
+        : parseFloat(hoursEl.value);
+
+      if (isFinite(hours) && hours < 7) return true;
+
+      var qualityEl = document.getElementById('sleepQuality');
+      if (qualityEl && qualityEl.value === 'poor') return true;
+
+      return false;
+    }
+
+    function showStoriesIfNeeded(values) {
+      ensureStyles();
+      var card = ensureCard();
+      card.hidden = !shouldShowStories(values);
+    }
+
+    function wrapHabitTools() {
+      if (typeof displayHabitTools !== 'function') return false;
+      if (displayHabitTools.__soothingStoriesWrapped) return true;
+
+      var original = displayHabitTools;
+      function wrapped(improvements, values) {
+        original(improvements, values);
+        showStoriesIfNeeded(values);
+      }
+      wrapped.__soothingStoriesWrapped = true;
+      displayHabitTools = wrapped;
+      try { window.displayHabitTools = wrapped; } catch (e) {}
+
+      var origHide = typeof hideHabitTools === 'function' ? hideHabitTools : null;
+      if (origHide && !origHide.__soothingStoriesWrapped) {
+        function hideWrapped() {
+          origHide();
+          hideStories();
+        }
+        hideWrapped.__soothingStoriesWrapped = true;
+        hideHabitTools = hideWrapped;
+        try { window.hideHabitTools = hideWrapped; } catch (e) {}
+      }
+      return true;
+    }
+
+    ready(function () {
+      ensureStyles();
+      ensureCard();
+      var tries = 0;
+      (function install() {
+        if (wrapHabitTools()) return;
+        tries += 1;
+        if (tries < 40) setTimeout(install, 50);
+      })();
+    });
+  })();
+}
