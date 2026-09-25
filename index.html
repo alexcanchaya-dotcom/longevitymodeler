@@ -5114,7 +5114,7 @@
       const sleepHours = getNumericValue('sleepHours');
       return {
         age: getNumericValue('age'),
-        gender: document.querySelector('input[name="gender"]:checked')?.value === 'female' ? -2 : 0,
+        gender: document.querySelector('input[name="gender"]:checked')?.value === 'female' ? 2 : 0,
         height: getNumericValue('height'),
         weight: getNumericValue('weight'),
         cardio: getSelectScore('cardio'),
