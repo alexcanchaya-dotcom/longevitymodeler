@@ -946,6 +946,70 @@
             margin: 0 auto;
         }
     }
+    /* Road to 100 (YouTube) — see road100.js. Hidden unless a video has a real ID. */
+    .road100-result-line {
+      margin: 8px 0 4px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .road100-section {
+      margin-top: 28px;
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .road100-cta { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
+    .road100-cta a { color: var(--text-primary); text-decoration: underline; text-underline-offset: 3px; }
+    .road100-videos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .road100-video { margin: 0; }
+    .road100-video figcaption { margin-top: 8px; font-size: 14px; color: var(--text-secondary); }
+    .road100-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b1020;
+    }
+    .road100-frame iframe,
+    .road100-play,
+    .road100-play img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .road100-play { padding: 0; margin: 0; cursor: pointer; background: transparent; }
+    .road100-play img { object-fit: cover; }
+    .road100-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 68px;
+      height: 48px;
+      transform: translate(-50%, -50%);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.72);
+    }
+    .road100-play-icon::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-35%, -50%);
+      border-style: solid;
+      border-width: 10px 0 10px 18px;
+      border-color: transparent transparent transparent #fff;
+    }
+    .road100-play:hover .road100-play-icon,
+    .road100-play:focus-visible .road100-play-icon { background: #e62117; }
   </style>
 </head>
 <body>
@@ -1052,6 +1116,7 @@
           </div>
           <div class="remaining-years" id="remainingYears"></div>
         </div>
+        <p class="road100-result-line" id="road100ResultLine" hidden></p>
         <div class="result-subtitle" id="encouragement">Your lifestyle choices can meaningfully shift this estimate.</div>
         <p class="refine-inline-note">
           <button type="button" class="refine-text-button" id="refineNumber">Refine my number</button>
@@ -1426,6 +1491,19 @@
     </div>
       </details>
     </div>
+
+    <!-- Road to 100 videos: rendered by road100.js only for entries with a real YouTube ID. -->
+    <section class="road100-section" id="road100Section" hidden>
+      <p class="road100-cta"><a href="#firstScreen" id="road100Cta">Get your free estimate. 5 questions, no sign-up.</a></p>
+      <div class="road100-videos" id="road100Videos"></div>
+      <div class="disclaimer">
+        <span>⚠️</span>
+        <span id="road100Disclaimer">This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.</span>
+      </div>
+    </section>
+    <!-- Road to 100 video config (edit road100.js) + click-to-load embeds. Loaded here, before
+         the content below, so showing the section never shifts already-painted content. -->
+    <script src="road100.js"></script>
 
     <div class="disclaimer-section" id="disclaimer">
       <h2 id="disclaimerHeader">⚠️ Important Disclaimers</h2>
@@ -2085,6 +2163,9 @@
           regular: 'Regular (3–4 days / week)',
           high: 'Frequent (5+ days / week)'
         },
+        road100Cta: 'Get your free estimate. 5 questions, no sign-up.',
+        road100ResultLine: 'Watching Road to 100? This is your starting number. Pick one habit below to move it.',
+        road100Play: 'Play video',
         results: {
           estimated: 'Estimated lifespan',
           yearsLabel: 'years',
@@ -2285,6 +2366,9 @@
         },
         buttons: { calculate: 'Calcular Perspectivas de Longevidad', reset: 'Restablecer' },
         refineNote: 'Opcional. Las respuestas adicionales pueden cambiar esta estimación. Las preguntas que dejes sin cambiar cuentan como neutras (sin efecto).',
+        road100Cta: 'Obtén tu estimación gratis. 5 preguntas, sin registro.',
+        road100ResultLine: '¿Ves Road to 100? Este es tu número de partida. Elige un hábito de abajo para moverlo.',
+        road100Play: 'Reproducir vídeo',
         results: {
           estimated: 'Esperanza de vida estimada',
           yearsLabel: 'años',
@@ -2468,6 +2552,9 @@
         },
         buttons: { calculate: 'Oblicz Prognozy Długowieczności', reset: 'Resetuj Formularz' },
         refineNote: 'Opcjonalnie. Dodatkowe odpowiedzi mogą zmienić ten szacunek. Pytania, których nie zmienisz, liczą się jako neutralne (bez wpływu).',
+        road100Cta: 'Sprawdź swój bezpłatny szacunek. 5 pytań, bez rejestracji.',
+        road100ResultLine: 'Oglądasz Road to 100? To twoja liczba startowa. Wybierz jeden nawyk poniżej, żeby ją zmienić.',
+        road100Play: 'Odtwórz film',
         results: {
           estimated: 'Szacowana długość życia',
           yearsLabel: 'lat',
@@ -2663,6 +2750,9 @@
         },
         buttons: { calculate: 'Langlebigkeitseinblicke Berechnen', reset: 'Formular Zurücksetzen' },
         refineNote: 'Optional. Zusätzliche Antworten können diese Schätzung verändern. Fragen, die du unverändert lässt, zählen als neutral (ohne Wirkung).',
+        road100Cta: 'Hol dir deine kostenlose Schätzung. 5 Fragen, ohne Anmeldung.',
+        road100ResultLine: 'Du schaust Road to 100? Das ist deine Ausgangszahl. Wähle unten eine Gewohnheit, um sie zu verändern.',
+        road100Play: 'Video abspielen',
         results: {
           estimated: 'Geschätzte Lebensspanne',
           yearsLabel: 'Jahre',
@@ -2858,6 +2948,9 @@
         },
         buttons: { calculate: 'Calculer les Perspectives de Longévité', reset: 'Réinitialiser le Formulaire' },
         refineNote: 'Facultatif. Des réponses supplémentaires peuvent modifier cette estimation. Les questions que vous laissez inchangées comptent comme neutres (sans effet).',
+        road100Cta: 'Obtenez votre estimation gratuite. 5 questions, sans inscription.',
+        road100ResultLine: 'Vous regardez Road to 100 ? Voici votre chiffre de départ. Choisissez une habitude ci-dessous pour le faire bouger.',
+        road100Play: 'Lire la vidéo',
         results: {
           estimated: 'Durée de vie estimée',
           yearsLabel: 'ans',
@@ -3036,6 +3129,9 @@
         },
         buttons: { calculate: '计算长寿洞察', reset: '重置表单' },
         refineNote: '可选。补充回答可能会改变这一估算。未更改的问题按中性计算（没有影响）。',
+        road100Cta: '免费获取您的估算。5 个问题，无需注册。',
+        road100ResultLine: '正在看 Road to 100？这是您的起始数字。从下面选一个习惯来改变它。',
+        road100Play: '播放视频',
         results: {
           estimated: '预估寿命',
           yearsLabel: '年',
@@ -3214,6 +3310,9 @@
         },
         buttons: { calculate: 'Calcola gli insight di longevità', reset: 'Reimposta modulo' },
         refineNote: 'Facoltativo. Le risposte aggiuntive possono modificare questa stima. Le domande che lasci invariate contano come neutre (nessun effetto).',
+        road100Cta: 'Ottieni la tua stima gratuita. 5 domande, senza registrazione.',
+        road100ResultLine: 'Guardi Road to 100? Questo è il tuo numero di partenza. Scegli un’abitudine qui sotto per cambiarlo.',
+        road100Play: 'Riproduci video',
         results: {
           estimated: 'Durata di vita stimata',
           yearsLabel: 'anni',
@@ -3409,6 +3508,9 @@
         },
         buttons: { calculate: 'Calcular insights de longevidade', reset: 'Redefinir formulário' },
         refineNote: 'Opcional. Respostas extras podem alterar esta estimativa. As perguntas que você deixar sem alteração contam como neutras (sem efeito).',
+        road100Cta: 'Receba sua estimativa grátis. 5 perguntas, sem cadastro.',
+        road100ResultLine: 'Assistindo ao Road to 100? Este é o seu número de partida. Escolha um hábito abaixo para mudá-lo.',
+        road100Play: 'Reproduzir vídeo',
         results: {
           estimated: 'Expectativa de vida estimada',
           yearsLabel: 'anos',
@@ -3587,6 +3689,9 @@
         },
         buttons: { calculate: '長寿インサイトを計算', reset: 'フォームをリセット' },
         refineNote: '任意です。追加で回答すると、この推定値が変わることがあります。変更しなかった質問は中立（影響なし）として扱われます。',
+        road100Cta: '無料で推定値をチェック。質問は5つ、登録不要。',
+        road100ResultLine: 'Road to 100 をご覧ですか？これがあなたのスタートの数字です。下の習慣から1つ選んで、この数字を動かしましょう。',
+        road100Play: '動画を再生',
         results: {
           estimated: '推定寿命',
           yearsLabel: '年',
@@ -3765,6 +3870,9 @@
         },
         buttons: { calculate: '장수 인사이트 계산', reset: '양식 초기화' },
         refineNote: '선택 사항입니다. 추가 답변에 따라 이 추정치가 달라질 수 있습니다. 변경하지 않은 질문은 중립(영향 없음)으로 계산됩니다.',
+        road100Cta: '무료 추정치를 받아 보세요. 질문 5개, 가입 필요 없음.',
+        road100ResultLine: 'Road to 100을 보고 계신가요? 이것이 당신의 출발 숫자입니다. 아래에서 습관 하나를 골라 이 숫자를 움직여 보세요.',
+        road100Play: '동영상 재생',
         results: {
           estimated: '예상 수명',
           yearsLabel: '년',
@@ -3943,6 +4051,9 @@
         },
         buttons: { calculate: 'Рассчитать показатели долголетия', reset: 'Сбросить форму' },
         refineNote: 'Необязательно. Дополнительные ответы могут изменить эту оценку. Вопросы, которые вы не меняли, считаются нейтральными (без влияния).',
+        road100Cta: 'Получите бесплатную оценку. 5 вопросов, без регистрации.',
+        road100ResultLine: 'Смотрите Road to 100? Это ваше стартовое число. Выберите одну привычку ниже, чтобы его изменить.',
+        road100Play: 'Воспроизвести видео',
         results: {
           estimated: 'Прогнозируемая продолжительность жизни',
           yearsLabel: 'лет',
@@ -4121,6 +4232,9 @@
         },
         buttons: { calculate: 'احسب رؤى طول العمر', reset: 'إعادة تعيين النموذج' },
         refineNote: 'اختياري. قد تُغيّر الإجابات الإضافية هذا التقدير. الأسئلة التي تتركها دون تغيير تُحتسب محايدة (بلا تأثير).',
+        road100Cta: 'احصل على تقديرك المجاني. 5 أسئلة، دون تسجيل.',
+        road100ResultLine: 'تشاهد Road to 100؟ هذا هو رقمك الابتدائي. اختر عادة واحدة أدناه لتحريكه.',
+        road100Play: 'تشغيل الفيديو',
         results: {
           estimated: 'العمر المتوقع المقدر',
           yearsLabel: 'سنة',
@@ -4299,6 +4413,9 @@
         },
         buttons: { calculate: 'दीर्घायु इनसाइट्स की गणना करें', reset: 'फॉर्म रीसेट करें' },
         refineNote: 'वैकल्पिक। अतिरिक्त उत्तर इस अनुमान को बदल सकते हैं। जिन प्रश्नों को आप नहीं बदलते, उन्हें तटस्थ (कोई प्रभाव नहीं) माना जाता है।',
+        road100Cta: 'अपना मुफ़्त अनुमान पाएँ। 5 सवाल, बिना साइन-अप।',
+        road100ResultLine: 'Road to 100 देख रहे हैं? यह आपका शुरुआती नंबर है। इसे बदलने के लिए नीचे से एक आदत चुनें।',
+        road100Play: 'वीडियो चलाएँ',
         results: {
           estimated: 'अनुमानित जीवन प्रत्याशा',
           yearsLabel: 'वर्ष',
@@ -4477,6 +4594,9 @@
         },
         buttons: { calculate: 'Uzun ömür içgörülerini hesapla', reset: 'Formu sıfırla' },
         refineNote: 'İsteğe bağlı. Ek yanıtlar bu tahmini değiştirebilir. Değiştirmediğiniz sorular nötr (etkisiz) sayılır.',
+        road100Cta: 'Ücretsiz tahmininizi alın. 5 soru, kayıt gerekmez.',
+        road100ResultLine: 'Road to 100’ü mü izliyorsunuz? Bu sizin başlangıç sayınız. Onu değiştirmek için aşağıdan bir alışkanlık seçin.',
+        road100Play: 'Videoyu oynat',
         results: {
           estimated: 'Tahmini yaşam süresi',
           yearsLabel: 'yıl',
@@ -4655,6 +4775,9 @@
         },
         buttons: { calculate: 'Bereken langleven-inzichten', reset: 'Formulier resetten' },
         refineNote: 'Optioneel. Extra antwoorden kunnen deze schatting veranderen. Vragen die je niet wijzigt, tellen als neutraal (geen effect).',
+        road100Cta: 'Krijg je gratis schatting. 5 vragen, zonder aanmelden.',
+        road100ResultLine: 'Kijk je Road to 100? Dit is je startgetal. Kies hieronder één gewoonte om het te veranderen.',
+        road100Play: 'Video afspelen',
         results: {
           estimated: 'Geschatte levensduur',
           yearsLabel: 'jaar',
@@ -4833,6 +4956,9 @@
         },
         buttons: { calculate: 'Beräkna livslängdsinsikter', reset: 'Återställ formulär' },
         refineNote: 'Valfritt. Fler svar kan ändra den här uppskattningen. Frågor som du lämnar oförändrade räknas som neutrala (ingen effekt).',
+        road100Cta: 'Få din kostnadsfria uppskattning. 5 frågor, ingen registrering.',
+        road100ResultLine: 'Tittar du på Road to 100? Det här är ditt startvärde. Välj en vana nedan för att flytta det.',
+        road100Play: 'Spela upp video',
         results: {
           estimated: 'Beräknad livslängd',
           yearsLabel: 'år',
@@ -5121,9 +5247,30 @@
       updateBinaryLabels(currentLanguage);
       updateStaticText(currentLanguage);
       updateDisclaimers(currentLanguage);
+      renderRoad100(currentLanguage);
       syncFirstScreenGate();
       rebuildImpactGridIfVisible();
     }
+
+    function renderRoad100(lang) {
+      if (!window.Road100) return;
+      const t = translations[lang] || translations.en;
+      const en = translations.en;
+      window.Road100.render({
+        cta: t.road100Cta || en.road100Cta,
+        resultLine: t.road100ResultLine || en.road100ResultLine,
+        play: t.road100Play || en.road100Play,
+        disclaimer: t.inlineDisclaimer || en.inlineDisclaimer
+      }, lang === 'ar' ? 'rtl' : 'ltr');
+    }
+
+    document.getElementById('road100Cta')?.addEventListener('click', (e) => {
+      const target = document.getElementById('firstScreen');
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('age')?.focus({ preventScroll: true });
+    });
 
     function detectLanguage() {
       const params = new URLSearchParams(window.location.search);
