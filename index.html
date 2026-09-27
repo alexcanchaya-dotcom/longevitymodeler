@@ -1062,7 +1062,7 @@
 
         <div class="recommendations">
           <h3 id="recommendationsTitle">Your top 3 levers this run</h3>
-          <p class="levers-note" id="leversNote">Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.</p>
+          <p class="levers-note" id="leversNote">Ranked by how many years each change could add in this model (base: Irish life table for your age and sex). Educational only — not medical advice.</p>
           <div id="recommendationChips" class="lever-list"></div>
 
           <div class="habit-tools" id="habitTools" hidden>
@@ -1098,7 +1098,7 @@
 
       <details class="refine-details" id="refineDetails">
         <summary class="refine-summary" id="refineSummary">Refine my number</summary>
-        <p class="refine-note" id="refineNote">Optional. Extra answers can move this estimate. Unasked fields stay at the form defaults until you change them.</p>
+        <p class="refine-note" id="refineNote">Optional. Extra answers can move this estimate. Questions you leave unchanged count as neutral (no effect).</p>
         <div class="section-grid">
       <section class="section">
         <h2 id="sectionDemographics">🧑 Basic Demographics</h2>
@@ -1643,7 +1643,11 @@
     const optionValues = {
       cardio: { never: 0, '1-2': 1, '3-4': 2, '5plus': 3 },
       strength: { never: 0, '1-2': 1, '3-4': 2, '5plus': 3 },
-      steps: { lt5k: 0, '5-8k': 1, '8-10k': 2, '10kplus': 3 },
+      // Years, applied directly (not bonus-scaled). Paluch et al. 2022, Lancet Public Health
+      // (15 cohorts, n=47,471): vs ~3,500 steps/day, HR 0.60 / 0.55 / 0.47 at ~5,800 / 7,800 / 10,900.
+      // Converted with years ≈ ln(HR)/0.10 (Gompertz slope of CSO ILT 17) and taken at ~40%
+      // because cardio/strength already credit exercise and step cohorts are observational.
+      steps: { lt5k: -2, '5-8k': 0, '8-10k': 0.4, '10kplus': 1 },
       sauna: { never: 0, '1x': 1, '2-3': 2, '4plus': 3 },
       diet: { standard: 0, balanced: 1, mediterranean: 1.2, plant: 1, keto: 0.5 },
       vegetables: { lt2: 0, '2-3': 0.3, '4-5': 0.6, '6plus': 0.8 },
@@ -1652,7 +1656,9 @@
       fish: { never: 0, '1x': 0.25, '2-3': 0.4, '4plus': 0.5 },
       sleepQuality: { poor: 0, fair: 0.4, good: 0.8, excellent: 0.8 },
       sleepConsistency: { veryIrregular: 0, somewhatIrregular: 0.4, mostly: 0.8, veryConsistent: 0.8 },
-      smoking: { current: -8, former5: -2.5, formerRecent: -4.5, never: 0 },
+      // Years, applied directly (not bonus-scaled). Current smokers lose ~10 years vs never
+      // smokers (Doll et al. 2004 BMJ; Jha et al. 2013 NEJM). Former-smoker values unchanged.
+      smoking: { current: -10, former5: -2.5, formerRecent: -4.5, never: 0 },
       alcohol: { none: 0.8, light: 0.8, moderate: -0.4, heavy: -1.8 },
       stress: { veryHigh: -3, high: -2, moderate: 0, low: 0.8, veryLow: 1.5 },
       social: { isolated: -1, few: 0, moderate: 1, very: 2 },
@@ -1694,6 +1700,7 @@
     function applyActivityPreset(level) {
       const preset = ACTIVITY_PRESETS[level];
       if (!preset) return;
+      appliedActivityPreset = level;
       Object.entries(preset).forEach(([id, value]) => {
         const el = document.getElementById(id);
         if (el) el.value = value;
@@ -1766,6 +1773,49 @@
 
     const BONUS_SCALING = 0.45;
 
+    // CSO Irish Life Tables No. 17 (2015-2017), period life expectancy e(x) at exact age x,
+    // ages 18..105 (Table 1 males, Table 2 females). e(0) = 79.65 male, 83.44 female.
+    const LIFE_TABLE_MIN_AGE = 18;
+    const LIFE_TABLE_EX = {
+      male: [62.05, 61.07, 60.1, 59.13, 58.16, 57.19, 56.22, 55.25, 54.28, 53.31, 52.35, 51.38, 50.41, 49.45, 48.48, 47.52, 46.55, 45.59, 44.63, 43.67, 42.72, 41.76, 40.81, 39.85, 38.9, 37.96, 37.01, 36.07, 35.13, 34.19, 33.26, 32.33, 31.41, 30.49, 29.57, 28.66, 27.75, 26.85, 25.96, 25.07, 24.19, 23.32, 22.46, 21.6, 20.75, 19.92, 19.09, 18.28, 17.48, 16.69, 15.91, 15.15, 14.4, 13.67, 12.96, 12.26, 11.58, 10.92, 10.28, 9.66, 9.07, 8.49, 7.94, 7.41, 6.91, 6.43, 5.97, 5.55, 5.15, 4.77, 4.43, 4.13, 3.86, 3.63, 3.45, 3.32, 3.23, 3.15, 3.08, 3.0, 2.9, 2.77, 2.59, 2.36, 2.07, 1.7, 1.22, 0.5],
+      female: [65.78, 64.8, 63.81, 62.82, 61.83, 60.84, 59.85, 58.86, 57.87, 56.89, 55.9, 54.91, 53.93, 52.95, 51.96, 50.98, 50.0, 49.02, 48.04, 47.06, 46.08, 45.11, 44.13, 43.16, 42.19, 41.22, 40.25, 39.29, 38.33, 37.37, 36.41, 35.46, 34.52, 33.57, 32.64, 31.71, 30.78, 29.86, 28.94, 28.03, 27.13, 26.23, 25.33, 24.45, 23.57, 22.7, 21.83, 20.97, 20.12, 19.28, 18.45, 17.63, 16.81, 16.01, 15.22, 14.44, 13.67, 12.92, 12.18, 11.46, 10.77, 10.09, 9.43, 8.8, 8.19, 7.62, 7.07, 6.54, 6.05, 5.6, 5.17, 4.77, 4.4, 4.07, 3.76, 3.49, 3.24, 3.01, 2.81, 2.63, 2.47, 2.32, 2.17, 2.01, 1.81, 1.54, 1.15, 0.5]
+    };
+
+    // Factors scored directly in years (not bonus-scaled): smoking, steps, sleep hours.
+    const DIRECT_YEAR_FACTORS = new Set(['smoking', 'steps', 'sleepHoursScore']);
+
+    // Refine-form questions that only count once the user has actually answered them.
+    // Until then they score 0 (neutral) instead of the generous form defaults.
+    const touchedRefineFields = new Set();
+    let appliedActivityPreset = null;
+
+    function remainingLifeExpectancy(age, sex) {
+      const table = LIFE_TABLE_EX[sex === 'female' ? 'female' : 'male'];
+      const x = clamp(isFinite(age) ? age : 50, LIFE_TABLE_MIN_AGE, LIFE_TABLE_MIN_AGE + table.length - 1);
+      const i = Math.floor(x) - LIFE_TABLE_MIN_AGE;
+      const frac = x - Math.floor(x);
+      const next = table[Math.min(i + 1, table.length - 1)];
+      return table[i] + (next - table[i]) * frac;
+    }
+
+    // Lifestyle effect sizes are "years at age 50 or younger". Older users have fewer years
+    // left for a habit to add or remove, so effects shrink in proportion to remaining life.
+    function ageEffectScale(age, sex) {
+      return Math.min(1, remainingLifeExpectancy(age, sex) / remainingLifeExpectancy(50, sex));
+    }
+
+    // U-shaped sleep curve in years. Yin et al. 2017 J Am Heart Assoc dose-response meta-analysis:
+    // lowest risk around 7h; RR 1.06 per hour shorter, 1.13 per hour longer (Cappuccio et al. 2010
+    // Sleep gives the same U shape). Converted with years ≈ ln(RR)/0.10, flat 7-8h, capped at -2.5.
+    // Long sleep is taken at half that rate (-0.6/h): much of the long-sleep risk reflects
+    // existing illness (reverse causation), not the extra sleep itself.
+    function sleepHoursYears(hours) {
+      if (!isFinite(hours) || hours <= 0) return 0;
+      const shortPenalty = Math.max(0, 7 - hours) * 0.6;
+      const longPenalty = Math.max(0, hours - 8) * 0.6;
+      return -Math.min(2.5, shortPenalty + longPenalty);
+    }
+
     const CHANGEABLE_FACTORS = new Set([
       'cardio', 'strength', 'steps', 'sauna',
       'diet', 'vegetables', 'processed', 'water', 'fish',
@@ -1823,7 +1873,7 @@
         href: '/nutrition-longevity.html'
       },
       sleepHoursScore: {
-        tip: 'Keep a regular 7–9 hour sleep window when you can.',
+        tip: 'Keep a regular 7–8 hour sleep window when you can.',
         cite: 'Nurses’ Health Study',
         href: '/sleep-longevity.html'
       },
@@ -1907,7 +1957,7 @@
     const categoryWeights = {
       activity: { max: 2.7, keys: ['cardio', 'strength', 'steps', 'sauna'] },
       nutrition: { max: 2.25, keys: ['diet', 'vegetables', 'processed', 'water', 'fish'] },
-      sleep: { max: 1.35, keys: ['sleepHours', 'sleepQuality', 'sleepConsistency'] },
+      sleep: { max: 1.35, keys: ['sleepHoursScore', 'sleepQuality', 'sleepConsistency'] },
       lifestyle: { max: 2.7, keys: ['smoking', 'alcohol', 'stress', 'social'] },
       wellness: { max: 0.9, keys: ['meditation', 'nature', 'sun'] },
       management: { max: 1.35, keys: ['checkups', 'conditions', 'family'] },
@@ -2027,7 +2077,7 @@
         choosePlaceholder: 'Choose…',
         firstScreenNote: 'Five answers. No email. You get a free number first; more detail is optional after.',
         firstScreenHint: 'Answer age, sex, smoking, sleep, and exercise to see your estimate.',
-        refineNote: 'Optional. Extra answers can move this estimate. Unasked fields stay at the form defaults until you change them.',
+        refineNote: 'Optional. Extra answers can move this estimate. Questions you leave unchanged count as neutral (no effect).',
         refineInlineHint: ' with the rest of the form — height, diet, sleep quality, and more.',
         activityOptions: {
           low: 'Little or none',
@@ -2044,7 +2094,7 @@
           encouragementNegative: 'Your choices can add years—focus on the biggest opportunities to improve your estimate.',
           defaultEncouragement: 'Your lifestyle choices can meaningfully shift this estimate.',
           topOpportunities: 'Your top 3 levers this run',
-          leversNote: 'Ranked by how much each answer moved this points model (base 82). Educational only — not medical advice.',
+          leversNote: 'Ranked by how many years each change could add in this model (base: Irish life table for your age and sex). Educational only — not medical advice.',
           strongPerformance: 'This estimate looks strong across key areas—keep up those habits.'
         },
         inlineDisclaimer: 'This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations. See the full disclaimers below.',
@@ -2234,6 +2284,7 @@
           mentalHealth: { none: 'Ninguna', mild: 'Ansiedad/Depresión leve', moderate: 'Moderada', severe: 'Severa' }
         },
         buttons: { calculate: 'Calcular Perspectivas de Longevidad', reset: 'Restablecer' },
+        refineNote: 'Opcional. Las respuestas adicionales pueden cambiar esta estimación. Las preguntas que dejes sin cambiar cuentan como neutras (sin efecto).',
         results: {
           estimated: 'Esperanza de vida estimada',
           yearsLabel: 'años',
@@ -2243,6 +2294,7 @@
           encouragementNegative: 'Tus elecciones pueden sumar años: enfócate en las mejores oportunidades para mejorar tu estimación.',
           defaultEncouragement: 'Tus elecciones de estilo de vida pueden cambiar significativamente esta estimación.',
           topOpportunities: 'Principales oportunidades de mejora',
+          leversNote: 'Ordenadas según cuántos años podría sumar cada cambio en este modelo (base: tabla de vida irlandesa para tu edad y sexo). Solo con fines educativos — no es consejo médico.',
           strongPerformance: 'Estás rindiendo bien en las áreas clave: ¡mantén tus hábitos!'
         },
         inlineDisclaimer: 'Esta calculadora es solo informativa y educativa y no brinda consejos médicos. Consulta a profesionales de salud para recomendaciones personales. Revisa los avisos completos abajo.',
@@ -2415,6 +2467,7 @@
           mentalHealth: { none: 'Brak', mild: 'Łagodny niepokój/depresja', moderate: 'Umiarkowany', severe: 'Poważny' }
         },
         buttons: { calculate: 'Oblicz Prognozy Długowieczności', reset: 'Resetuj Formularz' },
+        refineNote: 'Opcjonalnie. Dodatkowe odpowiedzi mogą zmienić ten szacunek. Pytania, których nie zmienisz, liczą się jako neutralne (bez wpływu).',
         results: {
           estimated: 'Szacowana długość życia',
           yearsLabel: 'lat',
@@ -2424,6 +2477,7 @@
           encouragementNegative: 'Twoje wybory mogą dodać lat — skup się na największych możliwościach poprawy wyniku.',
           defaultEncouragement: 'Twoje wybory stylu życia mogą znacząco zmienić tę estymację.',
           topOpportunities: 'Najważniejsze obszary do poprawy',
+          leversNote: 'Uszeregowane według tego, ile lat każda zmiana mogłaby dodać w tym modelu (podstawa: irlandzkie tablice trwania życia dla twojego wieku i płci). Wyłącznie w celach edukacyjnych — to nie jest porada medyczna.',
           strongPerformance: 'Wypadasz dobrze w kluczowych obszarach — utrzymuj te nawyki!'
         },
         inlineDisclaimer: 'Ten kalkulator ma charakter wyłącznie informacyjny i edukacyjny i nie stanowi porady medycznej. Skonsultuj się z personelem medycznym po indywidualne zalecenia. Zobacz pełne zastrzeżenia poniżej.',
@@ -2608,6 +2662,7 @@
           mentalHealth: { none: 'Keine', mild: 'Leichte Angst/Depression', moderate: 'Mittel', severe: 'Schwer' }
         },
         buttons: { calculate: 'Langlebigkeitseinblicke Berechnen', reset: 'Formular Zurücksetzen' },
+        refineNote: 'Optional. Zusätzliche Antworten können diese Schätzung verändern. Fragen, die du unverändert lässt, zählen als neutral (ohne Wirkung).',
         results: {
           estimated: 'Geschätzte Lebensspanne',
           yearsLabel: 'Jahre',
@@ -2617,6 +2672,7 @@
           encouragementNegative: 'Deine Entscheidungen können Jahre hinzufügen – konzentriere dich auf die größten Chancen zur Verbesserung.',
           defaultEncouragement: 'Deine Lebensstilentscheidungen können diese Schätzung deutlich verändern.',
           topOpportunities: 'Top-Möglichkeiten zur Verbesserung',
+          leversNote: 'Sortiert danach, wie viele Jahre jede Änderung in diesem Modell hinzufügen könnte (Basis: irische Sterbetafel für dein Alter und Geschlecht). Nur zu Bildungszwecken — keine medizinische Beratung.',
           strongPerformance: 'Du lieferst starke Leistungen in den wichtigsten Bereichen – weiter so!'
         },
         inlineDisclaimer: 'Dieser Rechner dient nur Informations- und Bildungszwecken und bietet keine medizinische Beratung. Konsultiere Fachpersonal für individuelle Empfehlungen. Sieh dir unten die vollständigen Hinweise an.',
@@ -2801,6 +2857,7 @@
           mentalHealth: { none: 'Aucun', mild: 'Anxiété/Dépression légère', moderate: 'Modérée', severe: 'Sévère' }
         },
         buttons: { calculate: 'Calculer les Perspectives de Longévité', reset: 'Réinitialiser le Formulaire' },
+        refineNote: 'Facultatif. Des réponses supplémentaires peuvent modifier cette estimation. Les questions que vous laissez inchangées comptent comme neutres (sans effet).',
         results: {
           estimated: 'Durée de vie estimée',
           yearsLabel: 'ans',
@@ -2810,6 +2867,7 @@
           encouragementNegative: 'Vos choix peuvent ajouter des années — concentrez-vous sur les meilleures opportunités pour améliorer votre estimation.',
           defaultEncouragement: 'Vos choix de vie peuvent modifier sensiblement cette estimation.',
           topOpportunities: 'Principales opportunités d’amélioration',
+          leversNote: 'Classés selon le nombre d’années que chaque changement pourrait ajouter dans ce modèle (base : table de mortalité irlandaise pour votre âge et votre sexe). À titre éducatif uniquement — pas un avis médical.',
           strongPerformance: 'Vous performez bien sur les axes clés — continuez ainsi !'
         },
         inlineDisclaimer: 'Ce calculateur est uniquement informatif et éducatif et ne fournit pas de conseils médicaux. Consultez des professionnels de santé pour des recommandations personnalisées. Voir les avertissements complets ci-dessous.',
@@ -2977,6 +3035,7 @@
           mentalHealth: { none: '无', mild: '轻度焦虑/抑郁', moderate: '中度', severe: '重度' }
         },
         buttons: { calculate: '计算长寿洞察', reset: '重置表单' },
+        refineNote: '可选。补充回答可能会改变这一估算。未更改的问题按中性计算（没有影响）。',
         results: {
           estimated: '预估寿命',
           yearsLabel: '年',
@@ -2986,6 +3045,7 @@
           encouragementNegative: '你的选择可以增加寿命—专注于提升估算的关键机会。',
           defaultEncouragement: '你的生活方式选择会显著影响此估算。',
           topOpportunities: '主要改进机会',
+          leversNote: '按每项改变在此模型中可能增加的年数排序（基准：与您的年龄和性别对应的爱尔兰生命表）。仅供教育参考，不构成医疗建议。',
           strongPerformance: '你在关键领域表现良好—请继续保持！'
         },
         inlineDisclaimer: '此计算器仅供信息和教育用途，不提供医疗建议。请咨询专业医务人员获取个人建议。完整免责声明见下方。',
@@ -3153,6 +3213,7 @@
           mentalHealth: { none: 'Nessuna', mild: 'Lieve ansia/depressione', moderate: 'Moderata', severe: 'Grave' }
         },
         buttons: { calculate: 'Calcola gli insight di longevità', reset: 'Reimposta modulo' },
+        refineNote: 'Facoltativo. Le risposte aggiuntive possono modificare questa stima. Le domande che lasci invariate contano come neutre (nessun effetto).',
         results: {
           estimated: 'Durata di vita stimata',
           yearsLabel: 'anni',
@@ -3162,6 +3223,7 @@
           encouragementNegative: 'Le tue scelte possono aggiungere anni — concentrati sulle maggiori opportunità di miglioramento.',
           defaultEncouragement: 'Le tue scelte di vita possono modificare sensibilmente questa stima.',
           topOpportunities: 'Principali opportunità di miglioramento',
+          leversNote: 'Ordinate in base a quanti anni ogni cambiamento potrebbe aggiungere in questo modello (base: tavola di mortalità irlandese per la tua età e il tuo sesso). Solo a scopo educativo — non è un consiglio medico.',
           strongPerformance: 'Stai performando bene nelle aree chiave — continua così!'
         },
         inlineDisclaimer: 'Questo calcolatore è solo a scopo informativo ed educativo e non fornisce consigli medici. Consulta professionisti sanitari qualificati per raccomandazioni personali. Vedi le avvertenze complete qui sotto.',
@@ -3346,6 +3408,7 @@
           mentalHealth: { none: 'Nenhuma', mild: 'Ansiedade/Depressão leve', moderate: 'Moderada', severe: 'Grave' }
         },
         buttons: { calculate: 'Calcular insights de longevidade', reset: 'Redefinir formulário' },
+        refineNote: 'Opcional. Respostas extras podem alterar esta estimativa. As perguntas que você deixar sem alteração contam como neutras (sem efeito).',
         results: {
           estimated: 'Expectativa de vida estimada',
           yearsLabel: 'anos',
@@ -3355,6 +3418,7 @@
           encouragementNegative: 'Suas escolhas podem acrescentar anos — concentre-se nas maiores oportunidades de melhoria.',
           defaultEncouragement: 'Suas escolhas de estilo de vida podem alterar significativamente esta estimativa.',
           topOpportunities: 'Principais oportunidades de melhoria',
+          leversNote: 'Ordenadas por quantos anos cada mudança poderia acrescentar neste modelo (base: tábua de vida irlandesa para sua idade e sexo). Apenas para fins educativos — não é aconselhamento médico.',
           strongPerformance: 'Você está se saindo muito bem nas áreas-chave — continue assim!'
         },
         inlineDisclaimer: 'Esta calculadora é apenas para fins informativos e educativos e não fornece aconselhamento médico. Consulte profissionais de saúde qualificados para recomendações pessoais. Veja os avisos completos abaixo.',
@@ -3522,6 +3586,7 @@
           mentalHealth: { none: 'なし', mild: '軽度の不安/抑うつ', moderate: '中等度', severe: '重度' }
         },
         buttons: { calculate: '長寿インサイトを計算', reset: 'フォームをリセット' },
+        refineNote: '任意です。追加で回答すると、この推定値が変わることがあります。変更しなかった質問は中立（影響なし）として扱われます。',
         results: {
           estimated: '推定寿命',
           yearsLabel: '年',
@@ -3531,6 +3596,7 @@
           encouragementNegative: '選択次第で寿命を延ばせます — 改善の最大のチャンスに注目してください。',
           defaultEncouragement: '生活習慣はこの推計を大きく左右します。',
           topOpportunities: '改善の主な機会',
+          leversNote: 'このモデルで各変更が何年延ばせるかの順に並べています（基準：あなたの年齢と性別に対応するアイルランド生命表）。教育目的のみであり、医学的助言ではありません。',
           strongPerformance: '重要な領域で良好に取り組んでいます — その調子で続けましょう！'
         },
         inlineDisclaimer: 'この計算機は情報提供と教育のみを目的としており、医療アドバイスではありません。個別の推奨については資格ある医療専門家に相談してください。以下に全文の免責事項があります。',
@@ -3698,6 +3764,7 @@
           mentalHealth: { none: '없음', mild: '경미한 불안/우울', moderate: '중등도', severe: '심각' }
         },
         buttons: { calculate: '장수 인사이트 계산', reset: '양식 초기화' },
+        refineNote: '선택 사항입니다. 추가 답변에 따라 이 추정치가 달라질 수 있습니다. 변경하지 않은 질문은 중립(영향 없음)으로 계산됩니다.',
         results: {
           estimated: '예상 수명',
           yearsLabel: '년',
@@ -3707,6 +3774,7 @@
           encouragementNegative: '선택을 바꾸면 수명을 늘릴 수 있습니다 — 가장 큰 개선 기회에 집중하세요.',
           defaultEncouragement: '생활 습관이 이 추정을 크게 바꿀 수 있습니다.',
           topOpportunities: '주요 개선 기회',
+          leversNote: '이 모델에서 각 변화가 더해 줄 수 있는 햇수 순으로 정렬했습니다(기준: 나이와 성별에 따른 아일랜드 생명표). 교육용일 뿐이며 의학적 조언이 아닙니다.',
           strongPerformance: '핵심 영역에서 잘하고 있습니다 — 계속 유지하세요!'
         },
         inlineDisclaimer: '이 계산기는 정보 제공 및 교육 목적만을 위한 것이며 의료 조언을 제공하지 않습니다. 개인별 권장 사항은 자격 있는 의료 전문가와 상담하세요. 아래의 전체 면책 조항을 확인하세요.',
@@ -3874,6 +3942,7 @@
           mentalHealth: { none: 'Нет', mild: 'Легкая тревога/депрессия', moderate: 'Средняя', severe: 'Тяжелая' }
         },
         buttons: { calculate: 'Рассчитать показатели долголетия', reset: 'Сбросить форму' },
+        refineNote: 'Необязательно. Дополнительные ответы могут изменить эту оценку. Вопросы, которые вы не меняли, считаются нейтральными (без влияния).',
         results: {
           estimated: 'Прогнозируемая продолжительность жизни',
           yearsLabel: 'лет',
@@ -3883,6 +3952,7 @@
           encouragementNegative: 'Ваши выборы могут добавить годы — сосредоточьтесь на главных возможностях улучшения.',
           defaultEncouragement: 'Ваш образ жизни может заметно изменить эту оценку.',
           topOpportunities: 'Главные возможности для улучшения',
+          leversNote: 'Отсортировано по тому, сколько лет каждое изменение может добавить в этой модели (основа: ирландская таблица продолжительности жизни для вашего возраста и пола). Только в образовательных целях — не медицинская консультация.',
           strongPerformance: 'Вы отлично справляетесь в ключевых областях — продолжайте!'
         },
         inlineDisclaimer: 'Этот калькулятор предназначен только для информации и обучения и не является медицинской рекомендацией. Для персональных советов обращайтесь к квалифицированным специалистам. Полные предупреждения приведены ниже.',
@@ -4050,6 +4120,7 @@
           mentalHealth: { none: 'لا يوجد', mild: 'قلق/اكتئاب خفيف', moderate: 'متوسط', severe: 'شديد' }
         },
         buttons: { calculate: 'احسب رؤى طول العمر', reset: 'إعادة تعيين النموذج' },
+        refineNote: 'اختياري. قد تُغيّر الإجابات الإضافية هذا التقدير. الأسئلة التي تتركها دون تغيير تُحتسب محايدة (بلا تأثير).',
         results: {
           estimated: 'العمر المتوقع المقدر',
           yearsLabel: 'سنة',
@@ -4059,6 +4130,7 @@
           encouragementNegative: 'اختياراتك يمكن أن تضيف سنوات — ركز على أهم فرص التحسين.',
           defaultEncouragement: 'اختيارات نمط حياتك يمكن أن تغير هذه التقديرات بشكل ملحوظ.',
           topOpportunities: 'أهم فرص التحسين',
+          leversNote: 'مرتبة حسب عدد السنوات التي قد يضيفها كل تغيير في هذا النموذج (الأساس: جدول الحياة الأيرلندي لعمرك وجنسك). لأغراض تعليمية فقط — وليست نصيحة طبية.',
           strongPerformance: 'أداء قوي في المجالات الرئيسية — استمر!'
         },
         inlineDisclaimer: 'هذه الحاسبة للمعرفة والتعليم فقط ولا تقدم نصيحة طبية. استشر متخصصين مؤهلين للحصول على توصيات شخصية. انظر التحذيرات الكاملة أدناه.',
@@ -4226,6 +4298,7 @@
           mentalHealth: { none: 'नहीं', mild: 'हल्का चिंता/अवसाद', moderate: 'मध्यम', severe: 'गंभीर' }
         },
         buttons: { calculate: 'दीर्घायु इनसाइट्स की गणना करें', reset: 'फॉर्म रीसेट करें' },
+        refineNote: 'वैकल्पिक। अतिरिक्त उत्तर इस अनुमान को बदल सकते हैं। जिन प्रश्नों को आप नहीं बदलते, उन्हें तटस्थ (कोई प्रभाव नहीं) माना जाता है।',
         results: {
           estimated: 'अनुमानित जीवन प्रत्याशा',
           yearsLabel: 'वर्ष',
@@ -4235,6 +4308,7 @@
           encouragementNegative: 'आपकी पसंद वर्षों को जोड़ सकती है — सुधार की सबसे बड़ी संभावनाओं पर ध्यान दें।',
           defaultEncouragement: 'आपकी जीवनशैली के विकल्प इस अनुमान को अर्थपूर्ण रूप से बदल सकते हैं।',
           topOpportunities: 'सुधार की शीर्ष संभावनाएँ',
+          leversNote: 'इस मॉडल में हर बदलाव कितने साल जोड़ सकता है, उसी क्रम में रखा गया है (आधार: आपकी आयु और लिंग के लिए आयरिश जीवन तालिका)। केवल शैक्षिक उद्देश्य के लिए — यह चिकित्सा सलाह नहीं है।',
           strongPerformance: 'आप प्रमुख क्षेत्रों में अच्छा कर रहे हैं — ऐसे ही जारी रखें!'
         },
         inlineDisclaimer: 'यह कैलकुलेटर केवल जानकारी और शिक्षा के उद्देश्य से है और चिकित्सा सलाह प्रदान नहीं करता। व्यक्तिगत अनुशंसाओं के लिए योग्य स्वास्थ्य पेशेवरों से परामर्श करें। नीचे पूर्ण अस्वीकरण देखें।',
@@ -4402,6 +4476,7 @@
           mentalHealth: { none: 'Yok', mild: 'Hafif anksiyete/depresyon', moderate: 'Orta', severe: 'Şiddetli' }
         },
         buttons: { calculate: 'Uzun ömür içgörülerini hesapla', reset: 'Formu sıfırla' },
+        refineNote: 'İsteğe bağlı. Ek yanıtlar bu tahmini değiştirebilir. Değiştirmediğiniz sorular nötr (etkisiz) sayılır.',
         results: {
           estimated: 'Tahmini yaşam süresi',
           yearsLabel: 'yıl',
@@ -4411,6 +4486,7 @@
           encouragementNegative: 'Seçimleriniz yıllar kazandırabilir — en büyük iyileştirme fırsatlarına odaklanın.',
           defaultEncouragement: 'Yaşam tarzı seçimleriniz bu tahmini anlamlı şekilde değiştirebilir.',
           topOpportunities: 'Başlıca iyileştirme fırsatları',
+          leversNote: 'Bu modelde her değişikliğin kaç yıl ekleyebileceğine göre sıralanmıştır (temel: yaşınız ve cinsiyetiniz için İrlanda yaşam tablosu). Yalnızca eğitim amaçlıdır — tıbbi tavsiye değildir.',
           strongPerformance: 'Önemli alanlarda güçlü performans gösteriyorsunuz — devam edin!'
         },
         inlineDisclaimer: 'Bu hesaplayıcı yalnızca bilgi ve eğitim içindir, tıbbi tavsiye sağlamaz. Kişisel öneriler için nitelikli sağlık profesyonellerine danışın. Aşağıdaki tam uyarıları inceleyin.',
@@ -4578,6 +4654,7 @@
           mentalHealth: { none: 'Geen', mild: 'Lichte angst/depressie', moderate: 'Matig', severe: 'Ernstig' }
         },
         buttons: { calculate: 'Bereken langleven-inzichten', reset: 'Formulier resetten' },
+        refineNote: 'Optioneel. Extra antwoorden kunnen deze schatting veranderen. Vragen die je niet wijzigt, tellen als neutraal (geen effect).',
         results: {
           estimated: 'Geschatte levensduur',
           yearsLabel: 'jaar',
@@ -4587,6 +4664,7 @@
           encouragementNegative: 'Je keuzes kunnen jaren toevoegen — focus op de grootste verbeterkansen.',
           defaultEncouragement: 'Je levensstijlkeuzes kunnen deze schatting aanzienlijk verschuiven.',
           topOpportunities: 'Belangrijkste verbeterkansen',
+          leversNote: 'Gerangschikt naar hoeveel jaar elke verandering in dit model zou kunnen toevoegen (basis: Ierse overlevingstafel voor jouw leeftijd en geslacht). Alleen voor educatieve doeleinden — geen medisch advies.',
           strongPerformance: 'Sterke prestaties op kerngebieden — ga zo door!'
         },
         inlineDisclaimer: 'Deze calculator is alleen voor informatie en educatie en biedt geen medisch advies. Raadpleeg gekwalificeerde zorgprofessionals voor persoonlijke aanbevelingen. Zie hieronder de volledige disclaimers.',
@@ -4754,6 +4832,7 @@
           mentalHealth: { none: 'Inget', mild: 'Mild ångest/depression', moderate: 'Måttlig', severe: 'Allvarlig' }
         },
         buttons: { calculate: 'Beräkna livslängdsinsikter', reset: 'Återställ formulär' },
+        refineNote: 'Valfritt. Fler svar kan ändra den här uppskattningen. Frågor som du lämnar oförändrade räknas som neutrala (ingen effekt).',
         results: {
           estimated: 'Beräknad livslängd',
           yearsLabel: 'år',
@@ -4763,6 +4842,7 @@
           encouragementNegative: 'Dina val kan lägga till år — fokusera på de största förbättringsmöjligheterna.',
           defaultEncouragement: 'Dina livsstilsval kan påverka denna uppskattning avsevärt.',
           topOpportunities: 'Största förbättringsmöjligheter',
+          leversNote: 'Rangordnade efter hur många år varje förändring skulle kunna lägga till i den här modellen (bas: irländsk livslängdstabell för din ålder och ditt kön). Endast i utbildningssyfte — inte medicinsk rådgivning.',
           strongPerformance: 'Du presterar starkt inom nyckelområden — fortsätt så!'
         },
         inlineDisclaimer: 'Denna kalkylator är endast för information och utbildning och ger ingen medicinsk rådgivning. Rådfråga kvalificerade vårdgivare för personliga rekommendationer. Se fullständiga friskrivningar nedan.',
@@ -5114,7 +5194,8 @@
       const sleepHours = getNumericValue('sleepHours');
       return {
         age: getNumericValue('age'),
-        gender: document.querySelector('input[name="gender"]:checked')?.value === 'female' ? 2 : 0,
+        // Sex selects the CSO life table (female e(50) is 3.1 years above male); no flat +/-2.
+        sex: document.querySelector('input[name="gender"]:checked')?.value === 'female' ? 'female' : 'male',
         height: getNumericValue('height'),
         weight: getNumericValue('weight'),
         cardio: getSelectScore('cardio'),
@@ -5128,6 +5209,7 @@
         fish: getSelectScore('fish'),
         sleepHours,
         sleepHoursScore: calculateHoursScore(sleepHours),
+        sleepHoursYears: sleepHoursYears(sleepHours),
         sleepQuality: getSelectScore('sleepQuality'),
         sleepConsistency: getSelectScore('sleepConsistency'),
         smoking: getSelectScore('smoking'),
@@ -5224,7 +5306,7 @@
       const improvements = [];
 
       const targetRanges = {
-        cardio: 3, strength: 3, steps: 3, sauna: 3,
+        cardio: 3, strength: 3, steps: optionValues.steps['10kplus'], sauna: 3,
         diet: 1.2, vegetables: 0.8, processed: 0.5, water: 0.35, fish: 0.5,
         sleepHoursScore: 1, sleepQuality: 0.8, sleepConsistency: 0.8,
         smoking: 0, alcohol: 0.8, stress: 1.5, social: 2,
@@ -5238,12 +5320,26 @@
 
       Object.entries(targetRanges).forEach(([factor, target]) => {
         const current = currentScores[factor] ?? 0;
-        const gap = target - current;
-        const potentialGain = Math.max(0, gap);
+        let potentialGain;
+        let scaledGain;
+        if (DIRECT_YEAR_FACTORS.has(factor)) {
+          // Already in years: no 3-point cap and no bonus scaling, so quitting smoking
+          // (about +7.5 years) outranks a sauna or meditation tweak.
+          if (factor === 'smoking') {
+            potentialGain = current === optionValues.smoking.current
+              ? optionValues.smoking.former5 - current : 0;
+          } else if (factor === 'sleepHoursScore') {
+            potentialGain = -(values.sleepHoursYears || 0);
+          } else {
+            potentialGain = Math.max(0, target - current);
+          }
+          scaledGain = potentialGain;
+        } else {
+          potentialGain = Math.max(0, target - current);
+          scaledGain = Math.min(potentialGain, 3) * BONUS_SCALING;
+        }
 
         if (potentialGain > 0.15 && CHANGEABLE_FACTORS.has(factor)) {
-          const limitedGain = Math.min(potentialGain, 3);
-          const scaledGain = limitedGain * BONUS_SCALING;
           improvements.push({
             factor,
             potentialGain: scaledGain,
@@ -5385,6 +5481,8 @@
         if (select) select.value = value;
       });
 
+      touchedRefineFields.clear();
+      appliedActivityPreset = null;
       document.getElementById('age').value = '';
       document.getElementById('sleepHours').value = '';
       const smoking = document.getElementById('smoking');
@@ -5411,16 +5509,39 @@
       applyDefaults();
     }
 
+    // Refine-form fields scored as neutral (0) until the user changes them. cardio, strength and
+    // steps come from the first-screen activity answer; smoking and sleep hours are first-screen.
+    const NEUTRAL_UNTIL_ANSWERED = Object.keys(DEFAULT_INPUTS.selects)
+      .filter((key) => !['smoking', 'cardio', 'strength', 'steps'].includes(key));
+
+    function neutralizeUnanswered(values) {
+      const scored = { ...values };
+      NEUTRAL_UNTIL_ANSWERED.forEach((key) => {
+        if (!touchedRefineFields.has(key)) scored[key] = 0;
+      });
+      scored.bmiAnswered = touchedRefineFields.has('height') || touchedRefineFields.has('weight');
+      return scored;
+    }
+
+    // Age-conditioned base: current age + CSO remaining life expectancy for that age and sex.
     function buildBaseLifespan(values) {
-      const bmi = values.weight / Math.pow(values.height / 100, 2);
-      const bmiAdjustment = bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
-      const base = 82 + values.gender + bmiAdjustment;
-      return clampLifespan(base);
+      let bmiAdjustment = 0;
+      if (values.bmiAnswered !== false && values.height > 0 && values.weight > 0) {
+        const bmi = values.weight / Math.pow(values.height / 100, 2);
+        bmiAdjustment = bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
+      }
+      return values.age + remainingLifeExpectancy(values.age, values.sex) + bmiAdjustment;
     }
 
     function buildCategoryImpacts(values) {
-      const impacts = buildDiagnosis(values);
-      return applyBonusScaling(impacts);
+      // Smoking, steps and sleep hours are already in years: keep them out of the bonus scaling.
+      const impacts = applyBonusScaling(buildDiagnosis({ ...values, smoking: 0, steps: 0, sleepHoursScore: 0 }));
+      impacts.lifestyle += values.smoking;
+      impacts.activity += values.steps;
+      impacts.sleep += values.sleepHoursYears || 0;
+      const scale = ageEffectScale(values.age, values.sex);
+      Object.keys(impacts).forEach((key) => { impacts[key] *= scale; });
+      return impacts;
     }
 
     function rebuildImpactGridIfVisible() {
@@ -5432,13 +5553,19 @@
 
     function calculateLifespan({ scrollToResults = false } = {}) {
       if (!syncFirstScreenGate()) return;
-      applyActivityPreset(document.getElementById('activityLevel')?.value);
+      // Only apply the activity preset when the activity answer changed, so refine-form
+      // answers (e.g. daily steps) are not overwritten on every recalculation.
+      const activityLevel = document.getElementById('activityLevel')?.value;
+      if (activityLevel !== appliedActivityPreset) applyActivityPreset(activityLevel);
       const values = collectInputs();
-      const impacts = buildCategoryImpacts(values);
+      const scored = neutralizeUnanswered(values);
+      const impacts = buildCategoryImpacts(scored);
       const totalAdjustment = sumAdjustment(impacts);
 
-      const base = buildBaseLifespan(values);
-      const lifespan = clampLifespan(base + totalAdjustment);
+      const base = buildBaseLifespan(scored);
+      // Never predict less than a quarter of the table's remaining years for this age.
+      const floor = values.age + 0.25 * remainingLifeExpectancy(values.age, values.sex);
+      const lifespan = clampLifespan(Math.max(floor, base + totalAdjustment));
       const remaining = calculateRemainingYears(lifespan, values.age);
 
       renderResults(lifespan, remaining, impacts, { scrollToResults });
@@ -5454,6 +5581,15 @@
         calculateLifespan({ scrollToResults: false });
       }
     }
+
+    document.getElementById('refineDetails')?.addEventListener('change', (e) => {
+      const key = e.target.id || e.target.name;
+      if (key) touchedRefineFields.add(key);
+    }, true);
+    document.getElementById('refineDetails')?.addEventListener('input', (e) => {
+      const key = e.target.id || e.target.name;
+      if (key) touchedRefineFields.add(key);
+    }, true);
 
     document.querySelectorAll('input, select').forEach(el => {
       el.addEventListener('change', recalcOnChange);
