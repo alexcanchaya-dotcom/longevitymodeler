@@ -745,8 +745,10 @@
     }
 
     @media (max-width: 640px) {
-      :root { --site-footer-h: 72px; }
-      body { padding: 18px 10px var(--site-footer-offset); }
+      /* Phones: the footer is part of the page flow (see .site-footer below), so the body
+         needs no extra bottom room for it and stacks the footer under the container. */
+      body { padding: 18px 10px 0; flex-direction: column; justify-content: flex-start; }
+      html { scroll-padding-bottom: 0; }
       .container { padding: 14px 12px; }
       .section-grid { grid-template-columns: 1fr; }
       .inputs-grid { grid-template-columns: 1fr; }
@@ -936,14 +938,17 @@
         padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Phones: a compact footer so it takes less of a short screen (it was 107px tall,
-       a sixth of a 360x640 screen, and sat over the result and habit-tool cards). */
+    /* Phones: the footer sits at the end of the page instead of being fixed to the bottom
+       of the screen, so it never covers the result, levers or habit-tool cards. */
     @media (max-width: 640px) {
         .site-footer {
-            padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
+            position: static;
+            margin: 16px -10px 0;
+            padding: 6px 10px;
             line-height: 1.35;
             background: #fff;
         }
+        .product-cta { scroll-margin-bottom: 0; }
         .site-footer > a {
             margin: 0 6px !important;
             font-size: 12.5px !important;
