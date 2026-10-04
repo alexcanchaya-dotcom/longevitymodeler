@@ -39,10 +39,11 @@ const names = [
   'LIFE_TABLE_MIN_AGE', 'LIFE_TABLE_EX', 'BONUS_SCALING', 'optionValues', 'ACTIVITY_PRESETS',
   'clamp', 'remainingLifeExpectancy', 'rawAgeEffectScale', 'ageEffectScale', 'sleepHoursYears',
   'calculateHoursScore', 'applyBonusScaling', 'sumAdjustment', 'buildDiagnosis', 'clampLifespan',
-  'buildBaseLifespan', 'buildCategoryImpacts', 'computeLifespan'
+  'bmiAdjustmentYears', 'buildBaseLifespan', 'LI_2018_E50_ALL_LOW_RISK', 'positiveAdjustmentCap',
+  'capPositiveAdjustment', 'buildCategoryImpacts', 'computeLifespan'
 ];
 const src = names.map(grab).join('\n') +
-  '\nreturn { optionValues, ACTIVITY_PRESETS, sleepHoursYears, calculateHoursScore, computeLifespan };';
+  '\nreturn { optionValues, ACTIVITY_PRESETS, sleepHoursYears, calculateHoursScore, computeLifespan, positiveAdjustmentCap, capPositiveAdjustment };';
 const S = new Function(src)();
 const ov = S.optionValues;
 
@@ -112,10 +113,42 @@ test('family, education, marital status and income are added as years, not bonus
   });
 });
 
-test('every answer healthy at 50 sits at least 2 years below the old 99.77 (F) / 96.66 (M)', () => {
+// Li et al. 2018, Circulation 138:345-355: life expectancy at 50 with all five low-risk factors
+// 43.1 years (women) and 37.6 years (men) -> expected age at death 93.1 / 87.6.
+test('every answer healthy at 50 lands within 0.5 years of Li et al. 2018 (93.1 F / 87.6 M)', () => {
   const f = lifespan({ smoking: 'never', activity: 'high', sleep: 7.5, refine: 'healthy', sex: 'female', age: 50 });
   const m = lifespan({ smoking: 'never', activity: 'high', sleep: 7.5, refine: 'healthy', sex: 'male', age: 50 });
-  assert(f <= 97.8 && m <= 94.7, `all-healthy at 50: F ${f}, M ${m}`);
+  assert(Math.abs(f - 93.1) <= 0.5, `all-healthy F at 50: ${f}`);
+  assert(Math.abs(m - 87.6) <= 0.5, `all-healthy M at 50: ${m}`);
+});
+
+test('cap = Li 2018 projection at 50 minus the CSO baseline at 50 (8.58 F / 6.19 M)', () => {
+  assert(Math.abs(S.positiveAdjustmentCap('female') - 8.58) < 1e-9, `F cap ${S.positiveAdjustmentCap('female')}`);
+  assert(Math.abs(S.positiveAdjustmentCap('male') - 6.19) < 1e-9, `M cap ${S.positiveAdjustmentCap('male')}`);
+});
+
+test('the cap never changes a negative (or below-cap) total', () => {
+  const neg = { activity: 1.2, nutrition: 0.5, sleep: -1, lifestyle: -10, wellness: 0.2, management: -0.9, socioeconomic: -0.6, medical: -3 };
+  const out = S.capPositiveAdjustment(neg, 6.19, 1);
+  Object.keys(neg).forEach((k) => assert(out[k] === neg[k], `${k} changed`));
+  // Whole grid: results with the cap match results without it whenever the uncapped total is <= 0.
+  const uncappedSrc = src.replace('if (!(total > cap)) return impacts;', 'return impacts;');
+  const U = new Function(uncappedSrc)();
+  const healthy50 = scoredInputs({ age: 50, sex: 'female', smoking: 'never', activity: 'high', sleep: 7.5, refine: 'healthy' });
+  assert(U.computeLifespan(healthy50).lifespan > 95, 'uncapped copy should exceed the cap (sanity check)');
+  let checked = 0;
+  ['current', 'formerRecent', 'former5', 'never'].forEach((smoking) => ['low', 'some', 'regular', 'high'].forEach((activity) =>
+    [4, 5, 6, 7.5, 9, 12].forEach((sleep) => ['none', 'healthy', 'unhealthy'].forEach((refine) => ['female', 'male'].forEach((sex) => {
+      for (let age = 18; age <= 100; age += 1) {
+        const v = scoredInputs({ age, sex, smoking, activity, sleep, refine });
+        const raw = U.computeLifespan(v);
+        if (Object.values(raw.impacts).reduce((a, b) => a + b, 0) > 0) continue;
+        checked += 1;
+        const capped = S.computeLifespan(v).lifespan;
+        assert(Math.abs(capped - raw.lifespan) < 1e-12, `${smoking}/${activity}/${sleep}/${refine}/${sex}/${age}: ${capped} vs ${raw.lifespan}`);
+      }
+    })))));
+  assert(checked > 1000, `only ${checked} negative-total cases checked`);
 });
 
 console.log(`\n${passed} tests passed`);

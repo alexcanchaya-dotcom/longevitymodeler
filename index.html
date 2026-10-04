@@ -7007,14 +7007,46 @@
       return scored;
     }
 
+    function bmiAdjustmentYears(values) {
+      if (values.bmiAnswered === false || !(values.height > 0) || !(values.weight > 0)) return 0;
+      const bmi = values.weight / Math.pow(values.height / 100, 2);
+      return bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
+    }
+
     // Age-conditioned base: current age + CSO remaining life expectancy for that age and sex.
     function buildBaseLifespan(values) {
-      let bmiAdjustment = 0;
-      if (values.bmiAnswered !== false && values.height > 0 && values.weight > 0) {
-        const bmi = values.weight / Math.pow(values.height / 100, 2);
-        bmiAdjustment = bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
-      }
-      return values.age + remainingLifeExpectancy(values.age, values.sex) + bmiAdjustment;
+      return values.age + remainingLifeExpectancy(values.age, values.sex) + bmiAdjustmentYears(values);
+    }
+
+    // Cap on the total positive adjustment, from Li et al. 2018, Circulation 138:345-355 ("Impact of
+    // healthy lifestyle factors on life expectancies in the US population"; NHS + HPFS, 123,219 adults,
+    // US 2014 death rates): with all five low-risk factors (never smoking, BMI 18.5-24.9, >=30 min/day
+    // moderate-to-vigorous activity, moderate alcohol, top-40% diet quality) life expectancy at 50 is
+    // 43.1 years (women) and 37.6 years (men), i.e. an expected age at death of 93.1 and 87.6.
+    // The model's adjustments are measured against the CSO population baseline (not against Li's
+    // "zero low-risk factors" group), so the cap is Li's projection minus the CSO baseline at 50:
+    //   women: 93.1 - (50 + 34.52) = 8.58 years;   men: 87.6 - (50 + 31.41) = 6.19 years.
+    // It is in "years at age 50" units: it applies to habit points + BMI before the age taper, and the
+    // age taper (ageEffectScale: CSO remaining life expectancy, never lower a year later) then shrinks it
+    // with age exactly as it shrinks any other effect. Only positive totals can reach it.
+    const LI_2018_E50_ALL_LOW_RISK = { female: 43.1, male: 37.6 };
+    function positiveAdjustmentCap(sex) {
+      const key = sex === 'female' ? 'female' : 'male';
+      return LI_2018_E50_ALL_LOW_RISK[key] - remainingLifeExpectancy(50, key);
+    }
+
+    // Shrinks only the positive categories so that (category total + BMI) does not exceed the cap.
+    // Totals at or below the cap, including every negative total, are returned unchanged.
+    function capPositiveAdjustment(impacts, cap, otherYears = 0) {
+      const total = sumAdjustment(impacts) + otherYears;
+      if (!(total > cap)) return impacts;
+      const keys = Object.keys(impacts);
+      const positive = keys.reduce((acc, k) => acc + Math.max(0, impacts[k]), 0);
+      if (!(positive > 0)) return impacts;
+      const factor = Math.max(0, (positive - (total - cap)) / positive);
+      const capped = {};
+      keys.forEach((k) => { capped[k] = impacts[k] > 0 ? impacts[k] * factor : impacts[k]; });
+      return capped;
     }
 
     function buildCategoryImpacts(values) {
@@ -7028,9 +7060,12 @@
       impacts.sleep += values.sleepHoursYears || 0;
       impacts.management += values.family || 0;
       impacts.socioeconomic += (values.education || 0) + (values.marital || 0) + (values.income || 0);
-      const scale = ageEffectScale(values.age, values.sex, sumAdjustment(impacts));
-      Object.keys(impacts).forEach((key) => { impacts[key] *= scale; });
-      return impacts;
+      // Li et al. 2018 cap (see positiveAdjustmentCap), applied after the habit sum and before the age
+      // taper, floor and clamp. BMI counts towards it because Li's five factors include normal weight.
+      const capped = capPositiveAdjustment(impacts, positiveAdjustmentCap(values.sex), bmiAdjustmentYears(values));
+      const scale = ageEffectScale(values.age, values.sex, sumAdjustment(capped));
+      Object.keys(capped).forEach((key) => { capped[key] *= scale; });
+      return capped;
     }
 
     // Pure scoring step (no DOM): scored inputs -> lifespan and category impacts.
