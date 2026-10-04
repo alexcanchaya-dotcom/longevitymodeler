@@ -60,7 +60,7 @@
         <h2>Key Factors We Analyze</h2>
         
         <h3>1. Physical Activity & Exercise</h3>
-        <p><strong>Impact: +3 to +7 years</strong></p>
+        <p><strong>In this calculator (age 50):</strong> daily steps count from &minus;2 years (under 5,000) to +1 (10,000+); cardio, strength and sauna together count up to about +3.4.</p>
         <ul>
             <li><strong>Cardio Exercise:</strong> 150 minutes/week of moderate activity reduces mortality risk by 31% (Harvard study, 120,000+ participants)</li>
             <li><strong>Strength Training:</strong> 2-3 sessions/week reduces all-cause mortality by 23%</li>
@@ -68,16 +68,16 @@
         </ul>
         
         <h3>2. Nutrition & Diet Quality</h3>
-        <p><strong>Impact: +5 to +13 years</strong></p>
+        <p><strong>In this calculator (age 50):</strong> about &minus;1.4 to +1.5 years for all the food and drink answers together.</p>
         <ul>
-            <li><strong>Mediterranean Diet:</strong> Associated with 10+ year lifespan increase in multiple studies</li>
+            <li><strong>Mediterranean Diet:</strong> linked to lower cardiovascular and all-cause mortality in large studies (PREDIMED trial: about 30% fewer major cardiovascular events)</li>
             <li><strong>Vegetable Intake:</strong> Each additional daily serving reduces mortality by 5%</li>
-            <li><strong>Processed Foods:</strong> High consumption linked to 14-year reduction in healthy lifespan</li>
+            <li><strong>Processed Foods:</strong> high consumption linked to higher mortality; in this calculator eating them daily counts against you</li>
             <li><strong>Fish Consumption:</strong> 2-3 servings/week associated with 27% lower heart disease risk</li>
         </ul>
         
         <h3>3. Sleep Quality & Duration</h3>
-        <p><strong>Impact: +2 to +5 years</strong></p>
+        <p><strong>In this calculator (age 50):</strong> sleep hours count from 0 to &minus;2.5 years; sleep quality and a regular schedule together count up to about +0.7.</p>
         <ul>
             <li><strong>Optimal Range:</strong> studies find the lowest mortality at about 7&ndash;8 hours a night</li>
             <li><strong>Too Little Sleep:</strong> <6 hours increases mortality risk by 12%</li>
@@ -87,25 +87,32 @@
         </ul>
         
         <h3>4. Lifestyle & Social Factors</h3>
-        <p><strong>Impact: +4 to +8 years</strong></p>
+        <p><strong>In this calculator (age 50):</strong> current smoking &minus;10 years, quit under 5 years ago &minus;4.5, quit 5+ years ago &minus;2.5; alcohol, stress and social connection together count from about &minus;5.8 to +1.9.</p>
         <ul>
-            <li><strong>Smoking:</strong> Cessation adds 10 years vs. continued smoking</li>
-            <li><strong>Alcohol:</strong> Light-moderate consumption (1-7 drinks/week) vs. heavy drinking = +4-6 years</li>
+            <li><strong>Smoking:</strong> smokers lose about 10 years compared with people who never smoked (Doll 2004, Jha 2013); stopping wins most of that back</li>
+            <li><strong>Alcohol:</strong> heavy drinking is linked to clearly higher mortality; the calculator does not reward drinking over not drinking</li>
             <li><strong>Stress Management:</strong> Chronic stress increases mortality by 43%</li>
             <li><strong>Social Connections:</strong> Strong relationships reduce mortality by 50% (equivalent to quitting smoking)</li>
         </ul>
 
         <h3>5. Wellness Practices</h3>
-        <p><strong>Impact: +1 to +4 years</strong></p>
+        <p><strong>In this calculator (age 50):</strong> meditation, time in nature and moderate sun together count up to about +0.3 years; excessive sun counts &minus;0.5.</p>
         <ul>
-            <li><strong>Meditation:</strong> Regular practice associated with reduced biological aging</li>
-            <li><strong>Time in Nature:</strong> 2+ hours/week linked to better health outcomes</li>
-            <li><strong>Sun Exposure:</strong> Adequate vitamin D levels critical for longevity</li>
-            <li><strong>Sauna Use:</strong> 2-3 sessions/week reduces cardiovascular mortality by 27%</li>
+            <li><strong>Meditation, time in nature, sun:</strong> we found no meta-analysis or large cohort that gives an all-cause mortality estimate for these, so they carry only small, conservative points.</li>
+            <li><strong>Sauna Use:</strong> in one Finnish cohort of 2,315 men, 2&ndash;3 sessions a week went with 27% lower cardiovascular mortality, and 4&ndash;7 sessions with 40% lower all-cause mortality (Laukkanen 2015). Because that is a single study of men, the calculator counts sauna at half its earlier weight (at most about +0.7 years, shared with cardio and strength).</li>
+        </ul>
+
+        <h3>6. Background &amp; Health Care</h3>
+        <p><strong>In this calculator (age 50):</strong> each of these answers is counted directly in years.</p>
+        <ul>
+            <li><strong>Parents' age at death:</strong> &minus;0.9 (average under 70) to +1.2 (85+). In UK Biobank, each extra decade a parent lived past 70 went with about 17% lower mortality in their children (Atkins 2016, <em>JACC</em>). We count half of that, because much of it runs through blood pressure, cholesterol and heart disease, which are asked separately, and lifespan is only modestly inherited (Ruby 2018, <em>Genetics</em>).</li>
+            <li><strong>Education and income:</strong> education &minus;0.3 to +0.9, income &minus;0.6 to +0.6. They share one budget so they are not counted twice: low vs high socioeconomic position went with 26% higher mortality after allowing for smoking, alcohol, activity, blood pressure, diabetes and weight (Stringhini 2017, <em>Lancet</em>), and each extra year of schooling with about 2% lower mortality (Balaj 2024, <em>Lancet Public Health</em>).</li>
+            <li><strong>Marital status:</strong> married or partnered +0.7, single &minus;0.8, divorced &minus;0.4, widowed 0. A meta-analysis of 7.9 million people found higher mortality in unmarried people (Wang 2020); we keep these small because healthier people are more likely to marry and the social question overlaps.</li>
+            <li><strong>Health check-ups:</strong> no effect on the estimate. A Cochrane review of 11 trials (233,298 people) found general health checks did not reduce deaths (Krogsb&oslash;ll 2019). Seeing a clinician still matters for managing conditions you already have.</li>
         </ul>
 
         <h2>Statistical Model Overview</h2>
-        <p>The estimate starts from your <strong>current age plus the average remaining years for someone of your age and sex</strong> in the CSO Irish Life Tables No. 17 (2015&ndash;2017; life expectancy at birth 79.6 for males and 83.4 for females). It then adds or subtracts years for your answers, plus a small BMI adjustment if you enter height and weight. Smoking (current smokers about &minus;10 years; Doll 2004, Jha 2013), daily steps (Paluch 2022) and sleep hours (a U-shaped curve: no effect at 7&ndash;8 hours, about &minus;0.6 years per hour under 7 or over 8, capped at &minus;2.5; Yin 2017) are scored directly in years; other habits are smaller points. Because older people have fewer years left for a habit to change, these adjustments shrink with age after 50. It does not produce a statistical confidence range.</p>
+        <p>The estimate starts from your <strong>current age plus the average remaining years for someone of your age and sex</strong> in the CSO Irish Life Tables No. 17 (2015&ndash;2017; life expectancy at birth 79.6 for males and 83.4 for females). It then adds or subtracts years for your answers, plus a small BMI adjustment if you enter height and weight. Smoking (current smokers about &minus;10 years; Doll 2004, Jha 2013), daily steps (Paluch 2022) and sleep hours (a U-shaped curve: no effect at 7&ndash;8 hours, about &minus;0.6 years per hour under 7 or over 8, capped at &minus;2.5; Yin 2017) are scored directly in years, as are parents&rsquo; age at death, education, income and marital status (see section 6); other habits are smaller points, and health check-ups count for nothing. All the positive answers together, including a healthy BMI, are capped: at age 50 the estimate can sit at most 8.6 years (women) or 6.2 years (men) above the life-table average. That puts someone who answers everything healthily at about 93.1 (women) or 87.6 (men), the life expectancy Li et al. (2018, <em>Circulation</em>) projected at 50 for people with all five low-risk habits: never smoking, healthy weight, regular activity, moderate alcohol and a good diet. Because older people have fewer years left for a habit to change, these adjustments, and the cap, shrink with age after 50, and a year older never gives a lower estimate for the same answers. It does not produce a statistical confidence range.</p>
         <p>Those points are informed by published research, but this is a simple additive score—not a fitted regression and not a medical prediction.</p>
 
         <div class="highlight">
@@ -122,7 +129,7 @@
         </div>
 
         <h2>Why This Matters</h2>
-        <p>Understanding how lifestyle affects longevity empowers you to make informed decisions. Research consistently shows that <strong>lifestyle factors account for 70-80% of longevity variance</strong> in populations, while genetics contribute only 20-30%.</p>
+        <p>Understanding how lifestyle affects longevity empowers you to make informed decisions. Twin studies put the inherited share of lifespan at about 25% (Herskind 1996), and a 2018 study of large family trees found it is probably under 10% once couples&rsquo; shared lifestyles are allowed for (Ruby 2018). Most of what this calculator asks about is behaviour and circumstance.</p>
         
         <p><strong>The good news:</strong> Most factors in this calculator are modifiable. Small, consistent changes can have dramatic cumulative effects over decades.</p>
 
@@ -133,6 +140,14 @@
             <li>Blue Zones Research - Populations with Exceptional Longevity</li>
             <li>WHO Global Health Observatory Data (background reading; not used as the calculator baseline)</li>
             <li>American Heart Association - Physical Activity Guidelines</li>
+            <li>Li Y et al. Impact of healthy lifestyle factors on life expectancies in the US population. <em>Circulation</em> 2018;138:345&ndash;355 (the cap on positive answers)</li>
+            <li>Atkins JL et al. Longer-lived parents and cardiovascular outcomes. <em>J Am Coll Cardiol</em> 2016 (UK Biobank)</li>
+            <li>Stringhini S et al. Socioeconomic status and the 25&times;25 risk factors as determinants of premature mortality. <em>Lancet</em> 2017</li>
+            <li>Balaj M et al. Effects of education on adult mortality: a global systematic review and meta-analysis. <em>Lancet Public Health</em> 2024</li>
+            <li>Wang Y et al. Sex differences in the association between marital status and mortality: a meta-analysis. <em>Global Health Research and Policy</em> 2020</li>
+            <li>Krogsb&oslash;ll LT et al. General health checks in adults for reducing morbidity and mortality from disease. <em>Cochrane Database Syst Rev</em> 2019</li>
+            <li>Laukkanen T et al. Association between sauna bathing and fatal cardiovascular and all-cause mortality events. <em>JAMA Intern Med</em> 2015</li>
+            <li>Herskind AM et al. The heritability of human longevity (Danish twins). <em>Hum Genet</em> 1996; Ruby JG et al. Estimates of the heritability of human longevity are substantially inflated due to assortative mating. <em>Genetics</em> 2018</li>
         </ul>
 
         <div class="footer-links">

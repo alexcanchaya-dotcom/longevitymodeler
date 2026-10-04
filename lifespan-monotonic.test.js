@@ -40,7 +40,8 @@ const names = [
   'LIFE_TABLE_MIN_AGE', 'LIFE_TABLE_EX', 'BONUS_SCALING', 'optionValues', 'ACTIVITY_PRESETS',
   'clamp', 'remainingLifeExpectancy', 'rawAgeEffectScale', 'ageEffectScale', 'sleepHoursYears',
   'calculateHoursScore', 'applyBonusScaling', 'sumAdjustment', 'buildDiagnosis', 'clampLifespan',
-  'buildBaseLifespan', 'buildCategoryImpacts', 'computeLifespan'
+  'bmiAdjustmentYears', 'buildBaseLifespan', 'LI_2018_E50_ALL_LOW_RISK', 'positiveAdjustmentCap',
+  'capPositiveAdjustment', 'buildCategoryImpacts', 'computeLifespan'
 ];
 const src = names.map(grab).join('\n') +
   '\nreturn { optionValues, ACTIVITY_PRESETS, sleepHoursYears, calculateHoursScore, computeLifespan };';

@@ -1688,7 +1688,9 @@
       // Converted with years ≈ ln(HR)/0.10 (Gompertz slope of CSO ILT 17) and taken at ~40%
       // because cardio/strength already credit exercise and step cohorts are observational.
       steps: { lt5k: -2, '5-8k': 0, '8-10k': 0.4, '10kplus': 1 },
-      sauna: { never: 0, '1x': 1, '2-3': 2, '4plus': 3 },
+      // Sauna: one Finnish cohort of 2,315 men (Laukkanen et al. 2015, JAMA Intern Med; 4-7/week vs 1/week
+      // all-cause HR 0.60) and no meta-analysis, so it is taken at half its old points (max 1.5 -> 0.7 years).
+      sauna: { never: 0, '1x': 0.5, '2-3': 1, '4plus': 1.5 },
       diet: { standard: 0, balanced: 1, mediterranean: 1.2, plant: 1, keto: 0.5 },
       vegetables: { lt2: 0, '2-3': 0.3, '4-5': 0.6, '6plus': 0.8 },
       processed: { daily: -1, several: -0.5, rarely: 0.35, never: 0.5 },
@@ -1702,15 +1704,34 @@
       alcohol: { none: 0.8, light: 0.8, moderate: -0.4, heavy: -1.8 },
       stress: { veryHigh: -3, high: -2, moderate: 0, low: 0.8, veryLow: 1.5 },
       social: { isolated: -1, few: 0, moderate: 1, very: 2 },
-      meditation: { never: 0, occasionally: 0.2, weekly: 0.35, daily: 0.6 },
-      nature: { rarely: 0, monthly: 0.2, weekly: 0.35, daily: 0.35 },
-      sun: { minimal: 0, moderateScreen: 0.35, moderateNoScreen: 0.35, excessive: -0.5 },
-      checkups: { never: 0, twoYears: 0.2, annual: 0.5, sixMonths: 0.7 },
+      // Meditation, time in nature and moderate sun: no meta-analysis or large cohort with an all-cause
+      // mortality estimate we could use, so the positive points are halved (conservative).
+      meditation: { never: 0, occasionally: 0.1, weekly: 0.2, daily: 0.3 },
+      nature: { rarely: 0, monthly: 0.1, weekly: 0.2, daily: 0.2 },
+      sun: { minimal: 0, moderateScreen: 0.2, moderateNoScreen: 0.2, excessive: -0.5 },
+      // General health checks: no effect on all-cause mortality (Krogsbøll et al. 2019, Cochrane CD009009:
+      // 11 trials, 233,298 people, RR 1.00, 95% CI 0.97-1.03, high certainty).
+      checkups: { never: 0, twoYears: 0, annual: 0, sixMonths: 0 },
       conditions: { none: 0, one: -1, twoThree: -1.5, fourPlus: -2 },
-      family: { poor: -5, fair: -1, good: 1, excellent: 4 },
-      education: { lessHS: -2, highSchool: 0, someCollege: 0.8, bachelor: 1.5, graduate: 2.2 },
-      marital: { single: -0.8, married: 1.5, divorced: -0.4, widowed: 0 },
-      income: { poverty: -3, lowerMiddle: -1, middle: 0, upperMiddle: 0.8, high: 1.5 },
+      // family, education, marital and income are in YEARS, applied directly (not bonus-scaled), with
+      // years ~= ln(HR)/0.10 (Gompertz slope of CSO ILT 17), as for smoking and steps.
+      // Parents' average age at death: Atkins et al. 2016, JACC (UK Biobank, n=186,151): all-cause HR 0.84
+      // (mother) / 0.83 (father) per decade of survival beyond 70, adjusted for education, income, smoking,
+      // alcohol, activity and BMI -> ~1.9 years per decade, centred on ~75 (UK Biobank parents' mean).
+      // Taken at half: much of the benefit runs through blood pressure, cholesterol and heart disease, which
+      // are scored separately, and pedigree heritability of lifespan is under 10% (Ruby et al. 2018, Genetics).
+      family: { poor: -0.9, fair: 0, good: 0.7, excellent: 1.2 },
+      // Education and income share one socioeconomic budget so they are not counted twice: low vs high SES
+      // all-cause HR 1.26 after adjusting for the 25x25 risk factors (Stringhini et al. 2017, Lancet; 48 cohorts,
+      // 1.7 million) -> ~2.3 years, split evenly. Education is linear in years of schooling (Balaj et al. 2024,
+      // Lancet Public Health: 1.9% lower mortality per year), ~10/12/14/16/18 years.
+      education: { lessHS: -0.3, highSchool: 0, someCollege: 0.3, bachelor: 0.6, graduate: 0.9 },
+      // Wang et al. 2020, Global Health Research and Policy (21 cohorts, 7.9 million): vs married, never married
+      // RR 1.67 men / 1.46 women, divorced 1.59 / 1.27, widowed 1.30 / 1.14. Those would be 1.3-5 years; kept at
+      // the old effective values (married +0.7) because of health selection into marriage and overlap with
+      // the social-connection question.
+      marital: { single: -0.8, married: 0.7, divorced: -0.4, widowed: 0 },
+      income: { poverty: -0.6, lowerMiddle: -0.3, middle: 0, upperMiddle: 0.3, high: 0.6 },
       diabetes: { none: 0, prediabetic: -1, type1: -2, type2controlled: -1.5, type2uncontrolled: -4 },
       bp: { normal: 0, elevated: -0.5, stage1: -1.5, stage2: -3 },
       cholesterol: { optimal: 0, borderline: -1, high: -3, medication: -1.5 },
@@ -1822,7 +1843,7 @@
     };
 
     // Factors scored directly in years (not bonus-scaled): smoking, steps, sleep hours.
-    const DIRECT_YEAR_FACTORS = new Set(['smoking', 'steps', 'sleepHoursScore']);
+    const DIRECT_YEAR_FACTORS = new Set(['smoking', 'steps', 'sleepHoursScore', 'family', 'education', 'marital', 'income']);
 
     // Refine-form questions that only count once the user has actually answered them.
     // Until then they score 0 (neutral) instead of the generous form defaults.
@@ -6777,13 +6798,13 @@
       const improvements = [];
 
       const targetRanges = {
-        cardio: 3, strength: 3, steps: optionValues.steps['10kplus'], sauna: 3,
+        cardio: 3, strength: 3, steps: optionValues.steps['10kplus'], sauna: optionValues.sauna['4plus'],
         diet: 1.2, vegetables: 0.8, processed: 0.5, water: 0.35, fish: 0.5,
         sleepHoursScore: 1, sleepQuality: 0.8, sleepConsistency: 0.8,
         smoking: 0, alcohol: 0.8, stress: 1.5, social: 2,
-        meditation: 0.6, nature: 0.35, sun: 0.35,
-        checkups: 0.7, conditions: 0, family: 4,
-        education: 2.2, marital: 1.5, income: 1.5,
+        meditation: optionValues.meditation.daily, nature: optionValues.nature.daily, sun: optionValues.sun.moderateScreen,
+        checkups: 0, conditions: 0, family: optionValues.family.excellent,
+        education: optionValues.education.graduate, marital: optionValues.marital.married, income: optionValues.income.high,
         heart: 0, cancer: 0, diabetes: 0, bp: 0, cholesterol: 0, mentalHealth: 0
       };
 
@@ -7007,25 +7028,65 @@
       return scored;
     }
 
+    function bmiAdjustmentYears(values) {
+      if (values.bmiAnswered === false || !(values.height > 0) || !(values.weight > 0)) return 0;
+      const bmi = values.weight / Math.pow(values.height / 100, 2);
+      return bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
+    }
+
     // Age-conditioned base: current age + CSO remaining life expectancy for that age and sex.
     function buildBaseLifespan(values) {
-      let bmiAdjustment = 0;
-      if (values.bmiAnswered !== false && values.height > 0 && values.weight > 0) {
-        const bmi = values.weight / Math.pow(values.height / 100, 2);
-        bmiAdjustment = bmi > 18.5 && bmi < 25 ? 1 : bmi >= 30 ? -2 : 0;
-      }
-      return values.age + remainingLifeExpectancy(values.age, values.sex) + bmiAdjustment;
+      return values.age + remainingLifeExpectancy(values.age, values.sex) + bmiAdjustmentYears(values);
+    }
+
+    // Cap on the total positive adjustment, from Li et al. 2018, Circulation 138:345-355 ("Impact of
+    // healthy lifestyle factors on life expectancies in the US population"; NHS + HPFS, 123,219 adults,
+    // US 2014 death rates): with all five low-risk factors (never smoking, BMI 18.5-24.9, >=30 min/day
+    // moderate-to-vigorous activity, moderate alcohol, top-40% diet quality) life expectancy at 50 is
+    // 43.1 years (women) and 37.6 years (men), i.e. an expected age at death of 93.1 and 87.6.
+    // The model's adjustments are measured against the CSO population baseline (not against Li's
+    // "zero low-risk factors" group), so the cap is Li's projection minus the CSO baseline at 50:
+    //   women: 93.1 - (50 + 34.52) = 8.58 years;   men: 87.6 - (50 + 31.41) = 6.19 years.
+    // It is in "years at age 50" units: it applies to habit points + BMI before the age taper, and the
+    // age taper (ageEffectScale: CSO remaining life expectancy, never lower a year later) then shrinks it
+    // with age exactly as it shrinks any other effect. Only positive totals can reach it.
+    const LI_2018_E50_ALL_LOW_RISK = { female: 43.1, male: 37.6 };
+    function positiveAdjustmentCap(sex) {
+      const key = sex === 'female' ? 'female' : 'male';
+      return LI_2018_E50_ALL_LOW_RISK[key] - remainingLifeExpectancy(50, key);
+    }
+
+    // Shrinks only the positive categories so that (category total + BMI) does not exceed the cap.
+    // Totals at or below the cap, including every negative total, are returned unchanged.
+    function capPositiveAdjustment(impacts, cap, otherYears = 0) {
+      const total = sumAdjustment(impacts) + otherYears;
+      if (!(total > cap)) return impacts;
+      const keys = Object.keys(impacts);
+      const positive = keys.reduce((acc, k) => acc + Math.max(0, impacts[k]), 0);
+      if (!(positive > 0)) return impacts;
+      const factor = Math.max(0, (positive - (total - cap)) / positive);
+      const capped = {};
+      keys.forEach((k) => { capped[k] = impacts[k] > 0 ? impacts[k] * factor : impacts[k]; });
+      return capped;
     }
 
     function buildCategoryImpacts(values) {
-      // Smoking, steps and sleep hours are already in years: keep them out of the bonus scaling.
-      const impacts = applyBonusScaling(buildDiagnosis({ ...values, smoking: 0, steps: 0, sleepHoursScore: 0 }));
+      // Smoking, steps, sleep hours, family history, education, marital status and income are already
+      // in years: keep them out of the bonus scaling.
+      const impacts = applyBonusScaling(buildDiagnosis({
+        ...values, smoking: 0, steps: 0, sleepHoursScore: 0, family: 0, education: 0, marital: 0, income: 0
+      }));
       impacts.lifestyle += values.smoking;
       impacts.activity += values.steps;
       impacts.sleep += values.sleepHoursYears || 0;
-      const scale = ageEffectScale(values.age, values.sex, sumAdjustment(impacts));
-      Object.keys(impacts).forEach((key) => { impacts[key] *= scale; });
-      return impacts;
+      impacts.management += values.family || 0;
+      impacts.socioeconomic += (values.education || 0) + (values.marital || 0) + (values.income || 0);
+      // Li et al. 2018 cap (see positiveAdjustmentCap), applied after the habit sum and before the age
+      // taper, floor and clamp. BMI counts towards it because Li's five factors include normal weight.
+      const capped = capPositiveAdjustment(impacts, positiveAdjustmentCap(values.sex), bmiAdjustmentYears(values));
+      const scale = ageEffectScale(values.age, values.sex, sumAdjustment(capped));
+      Object.keys(capped).forEach((key) => { capped[key] *= scale; });
+      return capped;
     }
 
     // Pure scoring step (no DOM): scored inputs -> lifespan and category impacts.
