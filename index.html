@@ -1835,8 +1835,30 @@
 
     // Lifestyle effect sizes are "years at age 50 or younger". Older users have fewer years
     // left for a habit to add or remove, so effects shrink in proportion to remaining life.
-    function ageEffectScale(age, sex) {
+    //
+    // Guard: a person one year older with the same answers must never get a lower result.
+    // Life expectancy given survival to age x (x + e(x)) can only rise with x, but the raw
+    // ratio above can shrink positive habit years faster than the table rises (e.g. women at
+    // baseline 50 -> 51, frequent exercisers 50 -> 55/57). For a positive total adjustment we
+    // therefore use the smallest scale that keeps the result at or above what the same answers
+    // give at every younger age from 50 up. Where the raw ratio never caused a dip, the scale is
+    // unchanged; negative totals (e.g. smokers) are unaffected because shrinking them already
+    // raises the result with age.
+    function rawAgeEffectScale(age, sex) {
       return Math.min(1, remainingLifeExpectancy(age, sex) / remainingLifeExpectancy(50, sex));
+    }
+
+    function ageEffectScale(age, sex, totalAdjustment = 0) {
+      const scale = rawAgeEffectScale(age, sex);
+      if (!(totalAdjustment > 0) || !(age > 50)) return scale;
+      const tableAge = (x) => x + remainingLifeExpectancy(x, sex);
+      const here = tableAge(age);
+      let best = here + scale * totalAdjustment;
+      // Between whole ages the table is linear, so checking whole ages from 50 is enough.
+      for (let y = 50; y < age; y += 1) {
+        best = Math.max(best, tableAge(y) + rawAgeEffectScale(y, sex) * totalAdjustment);
+      }
+      return (best - here) / totalAdjustment;
     }
 
     // U-shaped sleep curve in years. Yin et al. 2017 J Am Heart Assoc dose-response meta-analysis:
@@ -2019,6 +2041,8 @@
           science: 'Science-backed'
         },
         footer: {
+          sisterSite: 'Sister site:',
+          sisterTagline: '— free finance calculators.',
           home: 'Home',
           calculator: 'Biological Age Calculator',
           about: 'About Us',
@@ -2242,6 +2266,8 @@
           science: 'Respaldado por la ciencia'
         },
         footer: {
+          sisterSite: 'Sitio hermano:',
+          sisterTagline: '— calculadoras financieras gratuitas.',
           home: 'Inicio',
           calculator: 'Calculadora de Edad Biológica',
           about: 'Sobre nosotros',
@@ -2254,6 +2280,7 @@
           body: 'Como asociado de Amazon, gano con las compras que califican. Esto significa que si haces clic en un enlace y realizas una compra, puedo recibir una pequeña comisión sin costo adicional para ti. Solo recomiendo productos que creo que realmente ayudarán a mejorar tu longevidad.'
         },
         sections: {
+          firstScreen: 'Tu primera estimación',
           demographics: '🧑 Datos Demográficos Básicos',
           activity: '🏃 Actividad Física',
           nutrition: '🥗 Nutrición y Dieta',
@@ -2266,6 +2293,7 @@
           disclaimers: '⚠️ Avisos Importantes'
         },
         labels: {
+          activityLevel: 'Ejercicio / actividad',
           age: 'Edad (18-100)',
           gender: 'Género',
           male: 'Hombre',
@@ -2335,8 +2363,17 @@
           cholesterol: { optimal: 'Óptimo (<200 mg/dL)', borderline: 'Límite alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'En medicación' },
           mentalHealth: { none: 'Ninguna', mild: 'Ansiedad/Depresión leve', moderate: 'Moderada', severe: 'Severa' }
         },
-        buttons: { calculate: 'Calcular Perspectivas de Longevidad', reset: 'Restablecer', refine: 'Afinar mi número' },
+        buttons: { calculate: 'Ver mi estimación', reset: 'Restablecer', refine: 'Afinar mi número' },
         refineNote: 'Opcional. Las respuestas adicionales pueden cambiar esta estimación. Las preguntas que dejes sin cambiar cuentan como neutras (sin efecto).',
+        choosePlaceholder: 'Elige…',
+        firstScreenNote: 'Cinco respuestas. Sin correo electrónico. Primero obtienes un número gratis; más detalle es opcional después.',
+        firstScreenHint: 'Responde edad, sexo, tabaco, sueño y ejercicio para ver tu estimación.',
+        activityOptions: {
+          low: 'Poco o nada',
+          some: 'Algo (1–2 días / semana)',
+          regular: 'Regular (3–4 días / semana)',
+          high: 'Frecuente (5+ días / semana)'
+        },
         refineInlineHint: ' con el resto del formulario: altura, dieta, calidad del sueño y más.',
         leverSource: 'Fuente: ',
         leverTips: {
@@ -2503,6 +2540,7 @@
         pageSubtitle: 'Kompleksowy, oparty na nauce estymator podkreślający modyfikowalne czynniki wpływające na długość życia.',
         topNote: 'Tylko do celów edukacyjnych — <a href="#disclaimer">zapoznaj się z ważnymi zastrzeżeniami</a>.',
         sections: {
+          firstScreen: 'Twój pierwszy szacunek',
           demographics: '🧑 Podstawowe Dane Demograficzne',
           activity: '🏃 Aktywność Fizyczna',
           nutrition: '🥗 Odżywianie i Dieta',
@@ -2515,6 +2553,7 @@
           disclaimers: '⚠️ Ważne Zastrzeżenia'
         },
         labels: {
+          activityLevel: 'Ćwiczenia / aktywność',
           age: 'Wiek (18-100)',
           gender: 'Płeć',
           male: 'Mężczyzna',
@@ -2584,8 +2623,32 @@
           cholesterol: { optimal: 'Optymalny (<200 mg/dL)', borderline: 'Na granicy (200-239 mg/dL)', high: 'Wysoki (240+ mg/dL)', medication: 'Na lekach' },
           mentalHealth: { none: 'Brak', mild: 'Łagodny niepokój/depresja', moderate: 'Umiarkowany', severe: 'Poważny' }
         },
-        buttons: { calculate: 'Oblicz Prognozy Długowieczności', reset: 'Resetuj Formularz', refine: 'Doprecyzuj mój wynik' },
+        buttons: { calculate: 'Zobacz mój szacunek', reset: 'Resetuj Formularz', refine: 'Doprecyzuj mój wynik' },
         refineNote: 'Opcjonalnie. Dodatkowe odpowiedzi mogą zmienić ten szacunek. Pytania, których nie zmienisz, liczą się jako neutralne (bez wpływu).',
+        choosePlaceholder: 'Wybierz…',
+        firstScreenNote: 'Pięć odpowiedzi. Bez e-maila. Najpierw dostajesz darmowy wynik; więcej szczegółów możesz dodać później.',
+        firstScreenHint: 'Podaj wiek, płeć, palenie, sen i ćwiczenia, aby zobaczyć swój szacunek.',
+        activityOptions: {
+          low: 'Mało lub wcale',
+          some: 'Trochę (1–2 dni / tydzień)',
+          regular: 'Regularnie (3–4 dni / tydzień)',
+          high: 'Często (5+ dni / tydzień)'
+        },
+        trustBadges: {
+          noSignup: 'Bez rejestracji',
+          private: '100% prywatnie',
+          science: 'Oparte na nauce'
+        },
+        footer: {
+          home: 'Strona główna',
+          calculator: 'Kalkulator wieku biologicznego',
+          about: 'O nas',
+          contact: 'Kontakt',
+          privacy: 'Polityka prywatności',
+          terms: 'Warunki korzystania',
+          sisterSite: 'Strona siostrzana:',
+          sisterTagline: '— darmowe kalkulatory finansowe.'
+        },
         refineInlineHint: ' za pomocą reszty formularza — wzrost, dieta, jakość snu i więcej.',
         leverSource: 'Źródło: ',
         leverTips: {
@@ -2756,6 +2819,8 @@
           science: 'Wissenschaftlich fundiert'
         },
         footer: {
+          sisterSite: 'Schwesterseite:',
+          sisterTagline: '— kostenlose Finanzrechner.',
           home: 'Startseite',
           calculator: 'Rechner für biologisches Alter',
           about: 'Über uns',
@@ -2768,6 +2833,7 @@
           body: 'Als Amazon-Partner verdiene ich an qualifizierten Käufen. Wenn du auf einen Link klickst und einen Kauf tätigst, erhalte ich möglicherweise eine kleine Provision ohne zusätzliche Kosten für dich. Ich empfehle nur Produkte, von denen ich überzeugt bin, dass sie deine Langlebigkeit wirklich unterstützen.'
         },
         sections: {
+          firstScreen: 'Deine erste Schätzung',
           demographics: '🧑 Grundlegende Demografische Daten',
           activity: '🏃 Körperliche Aktivität',
           nutrition: '🥗 Ernährung & Diät',
@@ -2780,6 +2846,7 @@
           disclaimers: '⚠️ Wichtige Hinweise'
         },
         labels: {
+          activityLevel: 'Bewegung / Aktivität',
           age: 'Alter (18-100)',
           gender: 'Geschlecht',
           male: 'Männlich',
@@ -2849,8 +2916,17 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Grenzwertig hoch (200-239 mg/dL)', high: 'Hoch (240+ mg/dL)', medication: 'Unter Medikation' },
           mentalHealth: { none: 'Keine', mild: 'Leichte Angst/Depression', moderate: 'Mittel', severe: 'Schwer' }
         },
-        buttons: { calculate: 'Langlebigkeitseinblicke Berechnen', reset: 'Formular Zurücksetzen', refine: 'Meine Zahl verfeinern' },
+        buttons: { calculate: 'Meine Schätzung ansehen', reset: 'Formular Zurücksetzen', refine: 'Meine Zahl verfeinern' },
         refineNote: 'Optional. Zusätzliche Antworten können diese Schätzung verändern. Fragen, die du unverändert lässt, zählen als neutral (ohne Wirkung).',
+        choosePlaceholder: 'Auswählen…',
+        firstScreenNote: 'Fünf Antworten. Keine E-Mail. Du bekommst zuerst eine kostenlose Zahl; mehr Details sind danach optional.',
+        firstScreenHint: 'Beantworte Alter, Geschlecht, Rauchen, Schlaf und Bewegung, um deine Schätzung zu sehen.',
+        activityOptions: {
+          low: 'Wenig oder keine',
+          some: 'Etwas (1–2 Tage / Woche)',
+          regular: 'Regelmäßig (3–4 Tage / Woche)',
+          high: 'Häufig (5+ Tage / Woche)'
+        },
         refineInlineHint: ' mit dem Rest des Formulars – Größe, Ernährung, Schlafqualität und mehr.',
         leverSource: 'Quelle: ',
         leverTips: {
@@ -3017,6 +3093,8 @@
           science: 'Fondé sur la science'
         },
         footer: {
+          sisterSite: 'Site associé :',
+          sisterTagline: '— calculateurs financiers gratuits.',
           home: 'Accueil',
           calculator: 'Calculateur d\'âge biologique',
           about: 'À propos de nous',
@@ -3029,6 +3107,7 @@
           body: 'En tant qu\'associé Amazon, je gagne des commissions sur les achats admissibles. Cela signifie que si vous cliquez sur un lien et effectuez un achat, je peux recevoir une petite commission sans frais supplémentaires pour vous. Je recommande uniquement des produits qui peuvent réellement améliorer votre longévité.'
         },
         sections: {
+          firstScreen: 'Votre première estimation',
           demographics: '🧑 Données Démographiques de Base',
           activity: '🏃 Activité Physique',
           nutrition: '🥗 Nutrition et Régime',
@@ -3041,6 +3120,7 @@
           disclaimers: '⚠️ Avertissements Importants'
         },
         labels: {
+          activityLevel: 'Exercice / activité',
           age: 'Âge (18-100)',
           gender: 'Sexe',
           male: 'Homme',
@@ -3110,8 +3190,17 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Limite haute (200-239 mg/dL)', high: 'Élevé (240+ mg/dL)', medication: 'Sous traitement' },
           mentalHealth: { none: 'Aucun', mild: 'Anxiété/Dépression légère', moderate: 'Modérée', severe: 'Sévère' }
         },
-        buttons: { calculate: 'Calculer les Perspectives de Longévité', reset: 'Réinitialiser le Formulaire', refine: 'Affiner mon chiffre' },
+        buttons: { calculate: 'Voir mon estimation', reset: 'Réinitialiser le Formulaire', refine: 'Affiner mon chiffre' },
         refineNote: 'Facultatif. Des réponses supplémentaires peuvent modifier cette estimation. Les questions que vous laissez inchangées comptent comme neutres (sans effet).',
+        choosePlaceholder: 'Choisir…',
+        firstScreenNote: 'Cinq réponses. Pas d’e-mail. Vous obtenez d’abord un chiffre gratuit ; plus de détails sont facultatifs ensuite.',
+        firstScreenHint: 'Indiquez votre âge, votre sexe, le tabac, le sommeil et l’exercice pour voir votre estimation.',
+        activityOptions: {
+          low: 'Peu ou pas',
+          some: 'Un peu (1–2 jours / semaine)',
+          regular: 'Régulier (3–4 jours / semaine)',
+          high: 'Fréquent (5+ jours / semaine)'
+        },
         refineInlineHint: ' avec le reste du formulaire : taille, alimentation, qualité du sommeil, etc.',
         leverSource: 'Source : ',
         leverTips: {
@@ -3273,6 +3362,7 @@
         pageSubtitle: '基于科学的综合评估工具，突出影响寿命的可改变因素。',
         topNote: '仅供教育用途 — <a href="#disclaimer">查看重要免责声明</a>。',
         sections: {
+          firstScreen: '您的初步估算',
           demographics: '🧑 基本人⼝统计',
           activity: '🏃 身体活动',
           nutrition: '🥗 营养与饮食',
@@ -3285,6 +3375,7 @@
           disclaimers: '⚠️ 重要免责声明'
         },
         labels: {
+          activityLevel: '运动 / 活动',
           age: '年龄 (18-100)',
           gender: '性别',
           male: '男性',
@@ -3354,8 +3445,32 @@
           cholesterol: { optimal: '理想 (<200 mg/dL)', borderline: '临界高 (200-239 mg/dL)', high: '高 (240+ mg/dL)', medication: '药物控制中' },
           mentalHealth: { none: '无', mild: '轻度焦虑/抑郁', moderate: '中度', severe: '重度' }
         },
-        buttons: { calculate: '计算长寿洞察', reset: '重置表单', refine: '细化我的数字' },
+        buttons: { calculate: '查看我的估算', reset: '重置表单', refine: '细化我的数字' },
         refineNote: '可选。补充回答可能会改变这一估算。未更改的问题按中性计算（没有影响）。',
+        choosePlaceholder: '请选择…',
+        firstScreenNote: '五个回答。无需邮箱。先免费获得一个数字；之后可选择补充更多细节。',
+        firstScreenHint: '请回答年龄、性别、吸烟、睡眠和运动，即可查看您的估算。',
+        activityOptions: {
+          low: '很少或没有',
+          some: '有一些（每周 1–2 天）',
+          regular: '规律（每周 3–4 天）',
+          high: '频繁（每周 5 天以上）'
+        },
+        trustBadges: {
+          noSignup: '无需注册',
+          private: '100% 私密',
+          science: '有科学依据'
+        },
+        footer: {
+          home: '首页',
+          calculator: '生物年龄计算器',
+          about: '关于我们',
+          contact: '联系我们',
+          privacy: '隐私政策',
+          terms: '服务条款',
+          sisterSite: '姊妹网站：',
+          sisterTagline: '— 免费理财计算器。'
+        },
         refineInlineHint: '：填写表单的其余部分——身高、饮食、睡眠质量等。',
         leverSource: '来源：',
         leverTips: {
@@ -3521,6 +3636,7 @@
         pageSubtitle: 'Strumento completo basato sulla scienza che evidenzia i fattori modificabili che influenzano la durata della vita.',
         topNote: 'Solo a scopo educativo — <a href="#disclaimer">leggi le avvertenze importanti</a>.',
         sections: {
+          firstScreen: 'La tua prima stima',
           demographics: '🧑 Dati demografici di base',
           activity: '🏃 Attività fisica',
           nutrition: '🥗 Alimentazione e dieta',
@@ -3533,6 +3649,7 @@
           disclaimers: '⚠️ Avvertenze importanti'
         },
         labels: {
+          activityLevel: 'Esercizio / attività',
           age: 'Età (18-100)',
           gender: 'Genere',
           male: 'Maschio',
@@ -3602,8 +3719,32 @@
           cholesterol: { optimal: 'Ottimale (<200 mg/dL)', borderline: 'Borderline alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'In terapia' },
           mentalHealth: { none: 'Nessuna', mild: 'Lieve ansia/depressione', moderate: 'Moderata', severe: 'Grave' }
         },
-        buttons: { calculate: 'Calcola gli insight di longevità', reset: 'Reimposta modulo', refine: 'Affina il mio numero' },
+        buttons: { calculate: 'Vedi la mia stima', reset: 'Reimposta modulo', refine: 'Affina il mio numero' },
         refineNote: 'Facoltativo. Le risposte aggiuntive possono modificare questa stima. Le domande che lasci invariate contano come neutre (nessun effetto).',
+        choosePlaceholder: 'Scegli…',
+        firstScreenNote: 'Cinque risposte. Nessuna email. Prima ricevi un numero gratuito; i dettagli in più sono facoltativi dopo.',
+        firstScreenHint: 'Rispondi su età, sesso, fumo, sonno ed esercizio per vedere la tua stima.',
+        activityOptions: {
+          low: 'Poco o niente',
+          some: 'Un po’ (1–2 giorni / settimana)',
+          regular: 'Regolare (3–4 giorni / settimana)',
+          high: 'Frequente (5+ giorni / settimana)'
+        },
+        trustBadges: {
+          noSignup: 'Nessuna registrazione',
+          private: '100% privato',
+          science: 'Basato sulla scienza'
+        },
+        footer: {
+          home: 'Home',
+          calculator: 'Calcolatore dell’età biologica',
+          about: 'Chi siamo',
+          contact: 'Contatti',
+          privacy: 'Informativa sulla privacy',
+          terms: 'Termini di servizio',
+          sisterSite: 'Sito gemello:',
+          sisterTagline: '— calcolatori finanziari gratuiti.'
+        },
         refineInlineHint: ' con il resto del modulo: altezza, dieta, qualità del sonno e altro.',
         leverSource: 'Fonte: ',
         leverTips: {
@@ -3774,6 +3915,8 @@
           science: 'Baseado em ciência'
         },
         footer: {
+          sisterSite: 'Site irmão:',
+          sisterTagline: '— calculadoras financeiras gratuitas.',
           home: 'Início',
           calculator: 'Calculadora de Idade Biológica',
           about: 'Sobre nós',
@@ -3786,6 +3929,7 @@
           body: 'Como Associado da Amazon, ganho com compras qualificadas. Isso significa que, se você clicar em um link e fizer uma compra, posso receber uma pequena comissão sem custo adicional para você. Só recomendo produtos que acredito que realmente ajudarão a melhorar sua longevidade.'
         },
         sections: {
+          firstScreen: 'Sua primeira estimativa',
           demographics: '🧑 Dados demográficos básicos',
           activity: '🏃 Atividade física',
           nutrition: '🥗 Nutrição e dieta',
@@ -3798,6 +3942,7 @@
           disclaimers: '⚠️ Avisos importantes'
         },
         labels: {
+          activityLevel: 'Exercício / atividade',
           age: 'Idade (18-100)',
           gender: 'Gênero',
           male: 'Masculino',
@@ -3867,8 +4012,17 @@
           cholesterol: { optimal: 'Ideal (<200 mg/dL)', borderline: 'Limítrofe alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'Em medicação' },
           mentalHealth: { none: 'Nenhuma', mild: 'Ansiedade/Depressão leve', moderate: 'Moderada', severe: 'Grave' }
         },
-        buttons: { calculate: 'Calcular insights de longevidade', reset: 'Redefinir formulário', refine: 'Refinar meu número' },
+        buttons: { calculate: 'Ver minha estimativa', reset: 'Redefinir formulário', refine: 'Refinar meu número' },
         refineNote: 'Opcional. Respostas extras podem alterar esta estimativa. As perguntas que você deixar sem alteração contam como neutras (sem efeito).',
+        choosePlaceholder: 'Escolha…',
+        firstScreenNote: 'Cinco respostas. Sem e-mail. Você recebe primeiro um número grátis; mais detalhes são opcionais depois.',
+        firstScreenHint: 'Responda idade, sexo, tabagismo, sono e exercício para ver sua estimativa.',
+        activityOptions: {
+          low: 'Pouco ou nada',
+          some: 'Algum (1–2 dias / semana)',
+          regular: 'Regular (3–4 dias / semana)',
+          high: 'Frequente (5+ dias / semana)'
+        },
         refineInlineHint: ' com o resto do formulário: altura, dieta, qualidade do sono e mais.',
         leverSource: 'Fonte: ',
         leverTips: {
@@ -4030,6 +4184,7 @@
         pageSubtitle: '寿命に影響する修正可能な要因を示す、科学に基づいた総合的な推計ツール。',
         topNote: '教育目的のみ — <a href="#disclaimer">重要な免責事項を確認してください</a>。',
         sections: {
+          firstScreen: '最初の推定値',
           demographics: '🧑 基本情報',
           activity: '🏃 身体活動',
           nutrition: '🥗 栄養と食事',
@@ -4042,6 +4197,7 @@
           disclaimers: '⚠️ 重要な免責事項'
         },
         labels: {
+          activityLevel: '運動・活動',
           age: '年齢 (18-100)',
           gender: '性別',
           male: '男性',
@@ -4111,8 +4267,32 @@
           cholesterol: { optimal: '最適 (<200 mg/dL)', borderline: '境界高値 (200-239 mg/dL)', high: '高い (240+ mg/dL)', medication: '薬物治療中' },
           mentalHealth: { none: 'なし', mild: '軽度の不安/抑うつ', moderate: '中等度', severe: '重度' }
         },
-        buttons: { calculate: '長寿インサイトを計算', reset: 'フォームをリセット', refine: '推定値を詳しくする' },
+        buttons: { calculate: '推定値を見る', reset: 'フォームをリセット', refine: '推定値を詳しくする' },
         refineNote: '任意です。追加で回答すると、この推定値が変わることがあります。変更しなかった質問は中立（影響なし）として扱われます。',
+        choosePlaceholder: '選択してください…',
+        firstScreenNote: '5つの質問に答えるだけ。メール登録は不要です。まず無料で数値が表示され、詳しい入力はその後お好みで。',
+        firstScreenHint: '年齢、性別、喫煙、睡眠、運動に答えると推定値が表示されます。',
+        activityOptions: {
+          low: 'ほとんどしない',
+          some: '少し（週1〜2日）',
+          regular: '定期的（週3〜4日）',
+          high: '頻繁（週5日以上）'
+        },
+        trustBadges: {
+          noSignup: '登録不要',
+          private: '100% プライベート',
+          science: '科学的根拠に基づく'
+        },
+        footer: {
+          home: 'ホーム',
+          calculator: '生物学的年齢計算ツール',
+          about: '私たちについて',
+          contact: 'お問い合わせ',
+          privacy: 'プライバシーポリシー',
+          terms: '利用規約',
+          sisterSite: '姉妹サイト：',
+          sisterTagline: '— 無料の金融計算ツール。'
+        },
         refineInlineHint: '：フォームの残りの項目（身長、食事、睡眠の質など）に答えます。',
         leverSource: '出典：',
         leverTips: {
@@ -4278,6 +4458,7 @@
         pageSubtitle: '수명에 영향을 주는 수정 가능한 요인을 보여주는 과학 기반 종합 추정 도구입니다.',
         topNote: '교육 목적 전용 — <a href="#disclaimer">중요한 면책 조항을 확인하세요</a>.',
         sections: {
+          firstScreen: '첫 번째 추정치',
           demographics: '🧑 기본 인구 통계',
           activity: '🏃 신체 활동',
           nutrition: '🥗 영양 및 식단',
@@ -4290,6 +4471,7 @@
           disclaimers: '⚠️ 중요한 면책 조항'
         },
         labels: {
+          activityLevel: '운동 / 활동',
           age: '나이 (18-100)',
           gender: '성별',
           male: '남성',
@@ -4359,8 +4541,32 @@
           cholesterol: { optimal: '최적 (<200 mg/dL)', borderline: '경계 높음 (200-239 mg/dL)', high: '높음 (240+ mg/dL)', medication: '약물 치료 중' },
           mentalHealth: { none: '없음', mild: '경미한 불안/우울', moderate: '중등도', severe: '심각' }
         },
-        buttons: { calculate: '장수 인사이트 계산', reset: '양식 초기화', refine: '내 숫자 더 정확히 보기' },
+        buttons: { calculate: '내 추정치 보기', reset: '양식 초기화', refine: '내 숫자 더 정확히 보기' },
         refineNote: '선택 사항입니다. 추가 답변에 따라 이 추정치가 달라질 수 있습니다. 변경하지 않은 질문은 중립(영향 없음)으로 계산됩니다.',
+        choosePlaceholder: '선택하세요…',
+        firstScreenNote: '다섯 가지 답변. 이메일 필요 없음. 먼저 무료로 숫자를 확인하고, 더 자세한 입력은 원하면 나중에 하세요.',
+        firstScreenHint: '나이, 성별, 흡연, 수면, 운동에 답하면 추정치를 볼 수 있습니다.',
+        activityOptions: {
+          low: '거의 안 함',
+          some: '조금 (주 1–2일)',
+          regular: '규칙적 (주 3–4일)',
+          high: '자주 (주 5일 이상)'
+        },
+        trustBadges: {
+          noSignup: '가입 불필요',
+          private: '100% 비공개',
+          science: '과학 기반'
+        },
+        footer: {
+          home: '홈',
+          calculator: '생물학적 나이 계산기',
+          about: '소개',
+          contact: '문의하기',
+          privacy: '개인정보 처리방침',
+          terms: '서비스 약관',
+          sisterSite: '자매 사이트:',
+          sisterTagline: '— 무료 금융 계산기.'
+        },
         refineInlineHint: ': 키, 식단, 수면의 질 등 나머지 양식 항목에 답해 보세요.',
         leverSource: '출처: ',
         leverTips: {
@@ -4526,6 +4732,7 @@
         pageSubtitle: 'Комплексный калькулятор, основанный на данных, который подчеркивает изменяемые факторы долголетия.',
         topNote: 'Только в образовательных целях — <a href="#disclaimer">прочитайте важные предупреждения</a>.',
         sections: {
+          firstScreen: 'Ваша первая оценка',
           demographics: '🧑 Основные демографические данные',
           activity: '🏃 Физическая активность',
           nutrition: '🥗 Питание и диета',
@@ -4538,6 +4745,7 @@
           disclaimers: '⚠️ Важные предупреждения'
         },
         labels: {
+          activityLevel: 'Упражнения / активность',
           age: 'Возраст (18-100)',
           gender: 'Пол',
           male: 'Мужчина',
@@ -4607,8 +4815,32 @@
           cholesterol: { optimal: 'Оптимально (<200 мг/дл)', borderline: 'Погранично высокое (200-239 мг/дл)', high: 'Высокое (240+ мг/дл)', medication: 'На терапии' },
           mentalHealth: { none: 'Нет', mild: 'Легкая тревога/депрессия', moderate: 'Средняя', severe: 'Тяжелая' }
         },
-        buttons: { calculate: 'Рассчитать показатели долголетия', reset: 'Сбросить форму', refine: 'Уточнить мой результат' },
+        buttons: { calculate: 'Посмотреть мою оценку', reset: 'Сбросить форму', refine: 'Уточнить мой результат' },
         refineNote: 'Необязательно. Дополнительные ответы могут изменить эту оценку. Вопросы, которые вы не меняли, считаются нейтральными (без влияния).',
+        choosePlaceholder: 'Выберите…',
+        firstScreenNote: 'Пять ответов. Без электронной почты. Сначала вы бесплатно получаете число; подробности можно добавить потом.',
+        firstScreenHint: 'Укажите возраст, пол, курение, сон и физическую активность, чтобы увидеть оценку.',
+        activityOptions: {
+          low: 'Мало или совсем нет',
+          some: 'Немного (1–2 дня в неделю)',
+          regular: 'Регулярно (3–4 дня в неделю)',
+          high: 'Часто (5+ дней в неделю)'
+        },
+        trustBadges: {
+          noSignup: 'Без регистрации',
+          private: '100% конфиденциально',
+          science: 'На основе науки'
+        },
+        footer: {
+          home: 'Главная',
+          calculator: 'Калькулятор биологического возраста',
+          about: 'О нас',
+          contact: 'Контакты',
+          privacy: 'Политика конфиденциальности',
+          terms: 'Условия использования',
+          sisterSite: 'Сайт-партнёр:',
+          sisterTagline: '— бесплатные финансовые калькуляторы.'
+        },
         refineInlineHint: ' с помощью остальной формы — рост, питание, качество сна и другое.',
         leverSource: 'Источник: ',
         leverTips: {
@@ -4774,6 +5006,7 @@
         pageSubtitle: 'أداة شاملة مبنية على العلم تسلط الضوء على العوامل القابلة للتعديل التي تؤثر على طول العمر.',
         topNote: 'لأغراض تعليمية فقط — <a href="#disclaimer">راجع التحذيرات المهمة</a>.',
         sections: {
+          firstScreen: 'تقديرك الأول',
           demographics: '🧑 البيانات الديموغرافية الأساسية',
           activity: '🏃 النشاط البدني',
           nutrition: '🥗 التغذية والنظام الغذائي',
@@ -4786,6 +5019,7 @@
           disclaimers: '⚠️ تحذيرات مهمة'
         },
         labels: {
+          activityLevel: 'التمارين / النشاط',
           age: 'العمر (18-100)',
           gender: 'الجنس',
           male: 'ذكر',
@@ -4855,8 +5089,32 @@
           cholesterol: { optimal: 'مثالي (<200 ملغ/دل)', borderline: 'مرتفع حدّي (200-239 ملغ/دل)', high: 'مرتفع (240+ ملغ/دل)', medication: 'على علاج دوائي' },
           mentalHealth: { none: 'لا يوجد', mild: 'قلق/اكتئاب خفيف', moderate: 'متوسط', severe: 'شديد' }
         },
-        buttons: { calculate: 'احسب رؤى طول العمر', reset: 'إعادة تعيين النموذج', refine: 'حسِّن تقديري' },
+        buttons: { calculate: 'اعرض تقديري', reset: 'إعادة تعيين النموذج', refine: 'حسِّن تقديري' },
         refineNote: 'اختياري. قد تُغيّر الإجابات الإضافية هذا التقدير. الأسئلة التي تتركها دون تغيير تُحتسب محايدة (بلا تأثير).',
+        choosePlaceholder: 'اختر…',
+        firstScreenNote: 'خمس إجابات. بلا بريد إلكتروني. تحصل أولًا على رقم مجاني؛ والتفاصيل الإضافية اختيارية بعد ذلك.',
+        firstScreenHint: 'أجب عن العمر والجنس والتدخين والنوم والتمارين لترى تقديرك.',
+        activityOptions: {
+          low: 'قليل أو لا شيء',
+          some: 'بعض النشاط (1–2 يوم / أسبوع)',
+          regular: 'منتظم (3–4 أيام / أسبوع)',
+          high: 'متكرر (5+ أيام / أسبوع)'
+        },
+        trustBadges: {
+          noSignup: 'لا حاجة للتسجيل',
+          private: 'خصوصية 100%',
+          science: 'مدعوم علميًا'
+        },
+        footer: {
+          home: 'الرئيسية',
+          calculator: 'حاسبة العمر البيولوجي',
+          about: 'من نحن',
+          contact: 'اتصل بنا',
+          privacy: 'سياسة الخصوصية',
+          terms: 'شروط الخدمة',
+          sisterSite: 'موقع شقيق:',
+          sisterTagline: '— حاسبات مالية مجانية.'
+        },
         refineInlineHint: ' باستخدام بقية النموذج — الطول والنظام الغذائي وجودة النوم وغير ذلك.',
         leverSource: 'المصدر: ',
         leverTips: {
@@ -5022,6 +5280,7 @@
         pageSubtitle: 'वैज्ञानिक आधार पर बना समग्र अनुमानक जो आयु को प्रभावित करने वाले बदले जा सकने वाले कारकों को दर्शाता है।',
         topNote: 'केवल शैक्षिक उद्देश्य के लिए — <a href="#disclaimer">महत्वपूर्ण अस्वीकरण देखें</a>।',
         sections: {
+          firstScreen: 'आपका पहला अनुमान',
           demographics: '🧑 मूल जनसांख्यिकी',
           activity: '🏃 शारीरिक गतिविधि',
           nutrition: '🥗 पोषण और आहार',
@@ -5034,6 +5293,7 @@
           disclaimers: '⚠️ महत्वपूर्ण अस्वीकरण'
         },
         labels: {
+          activityLevel: 'व्यायाम / गतिविधि',
           age: 'आयु (18-100)',
           gender: 'लिंग',
           male: 'पुरुष',
@@ -5103,8 +5363,32 @@
           cholesterol: { optimal: 'उत्तम (<200 mg/dL)', borderline: 'सीमांत उच्च (200-239 mg/dL)', high: 'उच्च (240+ mg/dL)', medication: 'दवा पर' },
           mentalHealth: { none: 'नहीं', mild: 'हल्का चिंता/अवसाद', moderate: 'मध्यम', severe: 'गंभीर' }
         },
-        buttons: { calculate: 'दीर्घायु इनसाइट्स की गणना करें', reset: 'फॉर्म रीसेट करें', refine: 'मेरी संख्या को और सटीक करें' },
+        buttons: { calculate: 'मेरा अनुमान देखें', reset: 'फॉर्म रीसेट करें', refine: 'मेरी संख्या को और सटीक करें' },
         refineNote: 'वैकल्पिक। अतिरिक्त उत्तर इस अनुमान को बदल सकते हैं। जिन प्रश्नों को आप नहीं बदलते, उन्हें तटस्थ (कोई प्रभाव नहीं) माना जाता है।',
+        choosePlaceholder: 'चुनें…',
+        firstScreenNote: 'पाँच उत्तर। कोई ईमेल नहीं। पहले आपको मुफ़्त में एक संख्या मिलती है; ज़्यादा जानकारी बाद में वैकल्पिक है।',
+        firstScreenHint: 'अपना अनुमान देखने के लिए आयु, लिंग, धूम्रपान, नींद और व्यायाम के बारे में बताएँ।',
+        activityOptions: {
+          low: 'बहुत कम या बिल्कुल नहीं',
+          some: 'कुछ (सप्ताह में 1–2 दिन)',
+          regular: 'नियमित (सप्ताह में 3–4 दिन)',
+          high: 'अक्सर (सप्ताह में 5+ दिन)'
+        },
+        trustBadges: {
+          noSignup: 'साइन-अप की ज़रूरत नहीं',
+          private: '100% निजी',
+          science: 'विज्ञान पर आधारित'
+        },
+        footer: {
+          home: 'होम',
+          calculator: 'जैविक आयु कैलकुलेटर',
+          about: 'हमारे बारे में',
+          contact: 'संपर्क करें',
+          privacy: 'गोपनीयता नीति',
+          terms: 'सेवा की शर्तें',
+          sisterSite: 'सहयोगी साइट:',
+          sisterTagline: '— मुफ़्त वित्तीय कैलकुलेटर।'
+        },
         refineInlineHint: ' — फ़ॉर्म के बाकी सवालों से: लंबाई, आहार, नींद की गुणवत्ता और बहुत कुछ।',
         leverSource: 'स्रोत: ',
         leverTips: {
@@ -5270,6 +5554,7 @@
         pageSubtitle: 'Yaşam süresini etkileyen değiştirilebilir faktörleri öne çıkaran bilim temelli kapsamlı bir tahminleyici.',
         topNote: 'Yalnızca eğitim amaçlıdır — <a href="#disclaimer">önemli uyarıları inceleyin</a>.',
         sections: {
+          firstScreen: 'İlk tahmininiz',
           demographics: '🧑 Temel demografik bilgiler',
           activity: '🏃 Fiziksel aktivite',
           nutrition: '🥗 Beslenme ve diyet',
@@ -5282,6 +5567,7 @@
           disclaimers: '⚠️ Önemli uyarılar'
         },
         labels: {
+          activityLevel: 'Egzersiz / aktivite',
           age: 'Yaş (18-100)',
           gender: 'Cinsiyet',
           male: 'Erkek',
@@ -5351,8 +5637,32 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Sınırda yüksek (200-239 mg/dL)', high: 'Yüksek (240+ mg/dL)', medication: 'İlaç kullanıyor' },
           mentalHealth: { none: 'Yok', mild: 'Hafif anksiyete/depresyon', moderate: 'Orta', severe: 'Şiddetli' }
         },
-        buttons: { calculate: 'Uzun ömür içgörülerini hesapla', reset: 'Formu sıfırla', refine: 'Sayımı netleştir' },
+        buttons: { calculate: 'Tahminimi gör', reset: 'Formu sıfırla', refine: 'Sayımı netleştir' },
         refineNote: 'İsteğe bağlı. Ek yanıtlar bu tahmini değiştirebilir. Değiştirmediğiniz sorular nötr (etkisiz) sayılır.',
+        choosePlaceholder: 'Seçin…',
+        firstScreenNote: 'Beş yanıt. E-posta yok. Önce ücretsiz bir sayı alırsınız; daha fazla ayrıntı sonrasında isteğe bağlıdır.',
+        firstScreenHint: 'Tahmininizi görmek için yaş, cinsiyet, sigara, uyku ve egzersiz sorularını yanıtlayın.',
+        activityOptions: {
+          low: 'Az ya da hiç',
+          some: 'Biraz (haftada 1–2 gün)',
+          regular: 'Düzenli (haftada 3–4 gün)',
+          high: 'Sık (haftada 5+ gün)'
+        },
+        trustBadges: {
+          noSignup: 'Kayıt gerekmez',
+          private: '%100 gizli',
+          science: 'Bilimsel temelli'
+        },
+        footer: {
+          home: 'Ana sayfa',
+          calculator: 'Biyolojik Yaş Hesaplayıcı',
+          about: 'Hakkımızda',
+          contact: 'İletişim',
+          privacy: 'Gizlilik Politikası',
+          terms: 'Hizmet Şartları',
+          sisterSite: 'Kardeş site:',
+          sisterTagline: '— ücretsiz finans hesaplayıcıları.'
+        },
         refineInlineHint: ' — formun geri kalanıyla: boy, beslenme, uyku kalitesi ve daha fazlası.',
         leverSource: 'Kaynak: ',
         leverTips: {
@@ -5518,6 +5828,7 @@
         pageSubtitle: 'Een compleet, wetenschappelijk onderbouwd hulpmiddel dat aanpasbare factoren voor levensduur uitlicht.',
         topNote: 'Alleen voor educatieve doeleinden — <a href="#disclaimer">bekijk de belangrijke disclaimers</a>.',
         sections: {
+          firstScreen: 'Je eerste schatting',
           demographics: '🧑 Basisgegevens',
           activity: '🏃 Lichamelijke activiteit',
           nutrition: '🥗 Voeding en dieet',
@@ -5530,6 +5841,7 @@
           disclaimers: '⚠️ Belangrijke disclaimers'
         },
         labels: {
+          activityLevel: 'Beweging / activiteit',
           age: 'Leeftijd (18-100)',
           gender: 'Geslacht',
           male: 'Man',
@@ -5599,8 +5911,32 @@
           cholesterol: { optimal: 'Optimaal (<200 mg/dL)', borderline: 'Grenzw. hoog (200-239 mg/dL)', high: 'Hoog (240+ mg/dL)', medication: 'Op medicatie' },
           mentalHealth: { none: 'Geen', mild: 'Lichte angst/depressie', moderate: 'Matig', severe: 'Ernstig' }
         },
-        buttons: { calculate: 'Bereken langleven-inzichten', reset: 'Formulier resetten', refine: 'Mijn getal verfijnen' },
+        buttons: { calculate: 'Bekijk mijn schatting', reset: 'Formulier resetten', refine: 'Mijn getal verfijnen' },
         refineNote: 'Optioneel. Extra antwoorden kunnen deze schatting veranderen. Vragen die je niet wijzigt, tellen als neutraal (geen effect).',
+        choosePlaceholder: 'Kies…',
+        firstScreenNote: 'Vijf antwoorden. Geen e-mail. Je krijgt eerst gratis een getal; meer details zijn daarna optioneel.',
+        firstScreenHint: 'Beantwoord leeftijd, geslacht, roken, slaap en beweging om je schatting te zien.',
+        activityOptions: {
+          low: 'Weinig of niets',
+          some: 'Een beetje (1–2 dagen / week)',
+          regular: 'Regelmatig (3–4 dagen / week)',
+          high: 'Vaak (5+ dagen / week)'
+        },
+        trustBadges: {
+          noSignup: 'Geen registratie nodig',
+          private: '100% privé',
+          science: 'Wetenschappelijk onderbouwd'
+        },
+        footer: {
+          home: 'Home',
+          calculator: 'Biologische leeftijd-calculator',
+          about: 'Over ons',
+          contact: 'Contact',
+          privacy: 'Privacybeleid',
+          terms: 'Gebruiksvoorwaarden',
+          sisterSite: 'Zustersite:',
+          sisterTagline: '— gratis financiële calculators.'
+        },
         refineInlineHint: ' met de rest van het formulier: lengte, voeding, slaapkwaliteit en meer.',
         leverSource: 'Bron: ',
         leverTips: {
@@ -5766,6 +6102,7 @@
         pageSubtitle: 'Ett heltäckande, vetenskapsbaserat verktyg som belyser påverkbara faktorer för livslängd.',
         topNote: 'Endast för utbildningssyfte — <a href="#disclaimer">läs viktiga ansvarsfriskrivningar</a>.',
         sections: {
+          firstScreen: 'Din första uppskattning',
           demographics: '🧑 Grundläggande demografi',
           activity: '🏃 Fysisk aktivitet',
           nutrition: '🥗 Näring och kost',
@@ -5778,6 +6115,7 @@
           disclaimers: '⚠️ Viktiga ansvarsfriskrivningar'
         },
         labels: {
+          activityLevel: 'Motion / aktivitet',
           age: 'Ålder (18-100)',
           gender: 'Kön',
           male: 'Man',
@@ -5847,8 +6185,32 @@
           cholesterol: { optimal: 'Optimalt (<200 mg/dL)', borderline: 'Gränshögt (200-239 mg/dL)', high: 'Högt (240+ mg/dL)', medication: 'På medicinering' },
           mentalHealth: { none: 'Inget', mild: 'Mild ångest/depression', moderate: 'Måttlig', severe: 'Allvarlig' }
         },
-        buttons: { calculate: 'Beräkna livslängdsinsikter', reset: 'Återställ formulär', refine: 'Förfina min siffra' },
+        buttons: { calculate: 'Visa min uppskattning', reset: 'Återställ formulär', refine: 'Förfina min siffra' },
         refineNote: 'Valfritt. Fler svar kan ändra den här uppskattningen. Frågor som du lämnar oförändrade räknas som neutrala (ingen effekt).',
+        choosePlaceholder: 'Välj…',
+        firstScreenNote: 'Fem svar. Ingen e-post. Du får först en gratis siffra; mer detaljer är valfritt efteråt.',
+        firstScreenHint: 'Svara på ålder, kön, rökning, sömn och motion för att se din uppskattning.',
+        activityOptions: {
+          low: 'Lite eller inget',
+          some: 'En del (1–2 dagar / vecka)',
+          regular: 'Regelbundet (3–4 dagar / vecka)',
+          high: 'Ofta (5+ dagar / vecka)'
+        },
+        trustBadges: {
+          noSignup: 'Ingen registrering',
+          private: '100 % privat',
+          science: 'Vetenskapligt underbyggt'
+        },
+        footer: {
+          home: 'Hem',
+          calculator: 'Kalkylator för biologisk ålder',
+          about: 'Om oss',
+          contact: 'Kontakta oss',
+          privacy: 'Integritetspolicy',
+          terms: 'Användarvillkor',
+          sisterSite: 'Systersajt:',
+          sisterTagline: '— gratis finansiella kalkylatorer.'
+        },
         refineInlineHint: ' med resten av formuläret – längd, kost, sömnkvalitet och mer.',
         leverSource: 'Källa: ',
         leverTips: {
@@ -6640,9 +7002,20 @@
       impacts.lifestyle += values.smoking;
       impacts.activity += values.steps;
       impacts.sleep += values.sleepHoursYears || 0;
-      const scale = ageEffectScale(values.age, values.sex);
+      const scale = ageEffectScale(values.age, values.sex, sumAdjustment(impacts));
       Object.keys(impacts).forEach((key) => { impacts[key] *= scale; });
       return impacts;
+    }
+
+    // Pure scoring step (no DOM): scored inputs -> lifespan and category impacts.
+    // Used by calculateLifespan() and by lifespan-monotonic.test.js.
+    function computeLifespan(scored) {
+      const impacts = buildCategoryImpacts(scored);
+      const base = buildBaseLifespan(scored);
+      // Never predict less than a quarter of the table's remaining years for this age.
+      const floor = scored.age + 0.25 * remainingLifeExpectancy(scored.age, scored.sex);
+      const lifespan = clampLifespan(Math.max(floor, base + sumAdjustment(impacts)));
+      return { lifespan, impacts };
     }
 
     function rebuildImpactGridIfVisible() {
@@ -6660,13 +7033,7 @@
       if (activityLevel !== appliedActivityPreset) applyActivityPreset(activityLevel);
       const values = collectInputs();
       const scored = neutralizeUnanswered(values);
-      const impacts = buildCategoryImpacts(scored);
-      const totalAdjustment = sumAdjustment(impacts);
-
-      const base = buildBaseLifespan(scored);
-      // Never predict less than a quarter of the table's remaining years for this age.
-      const floor = values.age + 0.25 * remainingLifeExpectancy(values.age, values.sex);
-      const lifespan = clampLifespan(Math.max(floor, base + totalAdjustment));
+      const { lifespan, impacts } = computeLifespan(scored);
       const remaining = calculateRemainingYears(lifespan, values.age);
 
       renderResults(lifespan, remaining, impacts, { scrollToResults });
@@ -6898,7 +7265,7 @@
         <a href="/contact.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.contact">Contact Us</a>
         <a href="/privacy.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.privacy">Privacy Policy</a>
         <a href="/terms.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.terms">Terms of Service</a>
-        <p style="margin: 8px 0 0; font-size: 13px; color: #4a5568;">Sister site: <a href="https://thewealthmodeler.com" style="color: #667eea; text-decoration: none; font-weight: 500;">Wealth Modeler</a> — free finance calculators.</p>
+        <p style="margin: 8px 0 0; font-size: 13px; color: #4a5568;"><span data-i18n="footer.sisterSite">Sister site:</span> <a href="https://thewealthmodeler.com" style="color: #667eea; text-decoration: none; font-weight: 500;">Wealth Modeler</a> <span data-i18n="footer.sisterTagline">— free finance calculators.</span></p>
     </div>
     <script>
       // Keep page bottom padding and scroll padding equal to the real footer height
