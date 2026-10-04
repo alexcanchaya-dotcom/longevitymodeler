@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
     <meta name="description" content="Educational lifespan estimate from lifestyle answers. Not medical advice.">
       <meta name="keywords" content="longevity calculator, life expectancy calculator, lifespan estimator, health assessment, aging science, preventive health, wellness calculator, longevity research">
     <link rel="canonical" href="https://longevitymodeler.com/">
@@ -190,8 +191,15 @@
       --accent: #5e8bfd;
       --accent-strong: #4a7de8;
       --shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-      --site-footer-offset: 168px;
+      /* Height of the fixed .site-footer. Kept in sync by a ResizeObserver near the end of
+         the page; this fallback is used before JS runs. */
+      --site-footer-h: 107px;
+      --site-footer-offset: calc(var(--site-footer-h) + 24px);
     }
+
+    /* Anything scrolled into view (results, refine form, focused fields) stops above the
+       fixed footer instead of underneath it. */
+    html { scroll-padding-bottom: calc(var(--site-footer-h) + 12px); }
 
     * { box-sizing: border-box; }
 
@@ -396,9 +404,15 @@
 
     .action-button:active { transform: translateY(0); }
 
+    /* Disabled = clearly inactive: flat grey, dashed outline, muted text, no lift.
+       The enabled gradient above is unchanged. */
     .action-button:disabled,
     .action-button:disabled:hover {
-      opacity: 0.45;
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.6);
+      outline: 1px dashed rgba(255, 255, 255, 0.4);
+      outline-offset: -1px;
+      opacity: 1;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
@@ -731,7 +745,7 @@
     }
 
     @media (max-width: 640px) {
-      :root { --site-footer-offset: 220px; }
+      :root { --site-footer-h: 72px; }
       body { padding: 18px 10px var(--site-footer-offset); }
       .container { padding: 14px 12px; }
       .section-grid { grid-template-columns: 1fr; }
@@ -919,6 +933,27 @@
         text-align: center;
         z-index: 1000;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Phones: a compact footer so it takes less of a short screen (it was 107px tall,
+       a sixth of a 360x640 screen, and sat over the result and habit-tool cards). */
+    @media (max-width: 640px) {
+        .site-footer {
+            padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
+            line-height: 1.35;
+            background: #fff;
+        }
+        .site-footer > a {
+            margin: 0 6px !important;
+            font-size: 12.5px !important;
+            display: inline-block;
+            padding: 3px 0;
+        }
+        .site-footer p {
+            margin: 2px 0 0 !important;
+            font-size: 11.5px !important;
+        }
     }
 
     .ftc-disclosure {
@@ -1892,6 +1927,12 @@
         cite: 'Harvard T.H. Chan School of Public Health',
         href: '/how-it-works.html'
       },
+      // Shown first to people who quit less than 5 years ago (relapse prevention).
+      smokeFree: {
+        tip: 'You have already quit, which is the hard part. Staying smoke-free keeps those years, and in this model the credit keeps growing until you reach 5 years without smoking. If cravings come back, a quit line or your doctor can help you stay off.',
+        cite: 'Doll et al. 2004, BMJ',
+        href: '/how-it-works.html'
+      },
       alcohol: {
         tip: 'If you drink, keep it light. This model does not reward heavy use.',
         cite: 'How this calculator works',
@@ -2078,6 +2119,16 @@
         firstScreenNote: 'Five answers. No email. You get a free number first; more detail is optional after.',
         firstScreenHint: 'Answer age, sex, smoking, sleep, and exercise to see your estimate.',
         refineNote: 'Optional. Extra answers can move this estimate. Questions you leave unchanged count as neutral (no effect).',
+        leverSource: 'Source: ',
+        habitTools: {
+          title: 'Habit tools',
+          medical: 'This calculator is for informational and educational purposes only and does not provide medical advice. Consult qualified healthcare professionals for personal recommendations.',
+          matchedTo: 'Matched to {label}',
+          tag: 'Habit tool',
+          cta: 'View on Amazon.',
+          why: 'Why we recommend it: ',
+          labels: { move: 'exercise / activity', sleep: 'sleep', bmi: 'weight / BMI' }
+        },
         refineInlineHint: ' with the rest of the form — height, diet, sleep quality, and more.',
         activityOptions: {
           low: 'Little or none',
@@ -2158,6 +2209,7 @@
           sleepQuality: 'Improve sleep quality',
           sleepConsistency: 'Keep sleep schedule regular',
           smoking: 'Eliminate smoking',
+          smokeFree: 'Stay smoke-free',
           alcohol: 'Moderate alcohol',
           stress: 'Lower stress levels',
           social: 'Strengthen social connections',
@@ -2283,8 +2335,73 @@
           cholesterol: { optimal: 'Óptimo (<200 mg/dL)', borderline: 'Límite alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'En medicación' },
           mentalHealth: { none: 'Ninguna', mild: 'Ansiedad/Depresión leve', moderate: 'Moderada', severe: 'Severa' }
         },
-        buttons: { calculate: 'Calcular Perspectivas de Longevidad', reset: 'Restablecer' },
+        buttons: { calculate: 'Calcular Perspectivas de Longevidad', reset: 'Restablecer', refine: 'Afinar mi número' },
         refineNote: 'Opcional. Las respuestas adicionales pueden cambiar esta estimación. Las preguntas que dejes sin cambiar cuentan como neutras (sin efecto).',
+        refineInlineHint: ' con el resto del formulario: altura, dieta, calidad del sueño y más.',
+        leverSource: 'Fuente: ',
+        leverTips: {
+          cardio: 'Avanza hacia movimiento moderado regular la mayoría de los días de la semana.',
+          strength: 'Añade dos o tres sesiones de fuerza en días no consecutivos.',
+          steps: 'Suma caminatas y otra actividad física a tus días normales.',
+          sauna: 'Si el calor ya forma parte de tu rutina, unas pocas sesiones tranquilas por semana es el patrón que mira este modelo.',
+          diet: 'Orienta tus comidas hacia verduras, aceite de oliva, pescado y menos alimentos envasados.',
+          vegetables: 'Añade una ración extra de verduras la mayoría de los días.',
+          processed: 'Cambia un producto envasado diario por una opción sencilla de comida real.',
+          water: 'Ten agua a mano y bebe de forma constante a lo largo del día.',
+          fish: 'Incluye pescado azul un par de veces por semana si encaja con tu dieta.',
+          sleepHoursScore: 'Mantén un horario de sueño regular de 7–8 horas cuando puedas.',
+          sleepQuality: 'Usa una habitación oscura, silenciosa y fresca, y relájate sin pantallas antes de dormir.',
+          sleepConsistency: 'Levántate a la misma hora la mayoría de los días, también los fines de semana.',
+          smoking: 'Si fumas, buscar ayuda para dejarlo es el mayor cambio de estilo de vida en este modelo.',
+          smokeFree: 'Ya lo dejaste, que es lo más difícil. Seguir sin fumar conserva esos años y, en este modelo, el beneficio sigue creciendo hasta que cumples 5 años sin fumar. Si vuelven las ganas, una línea de ayuda para dejar de fumar o tu médico pueden ayudarte a no recaer.',
+          alcohol: 'Si bebes, que sea poco. Este modelo no premia el consumo elevado.',
+          stress: 'Prueba un breve momento diario para desconectar: un paseo, respirar con calma o tiempo con alguien de confianza.',
+          social: 'Planea un contacto regular o una actividad compartida cada semana.',
+          meditation: 'Unos minutos de calma la mayoría de los días bastan para este modelo.',
+          nature: 'Pasa un poco de tiempo al aire libre cada semana, aunque sea un paseo corto.',
+          sun: 'Toma algo de luz del día, sin quemarte. Usa sombra o protección cuando haga falta.',
+          checkups: 'Mantén tus revisiones habituales para conocer tu tensión arterial, colesterol y otros marcadores.',
+          conditions: 'Trabaja con un profesional sanitario cualquier enfermedad crónica. Este modelo no sustituye esa atención.',
+          diabetes: 'El control del azúcar en sangre corresponde a tu profesional sanitario.',
+          bp: 'Hazte controlar la tensión arterial y sigue el plan que ya tienes.',
+          cholesterol: 'Pregunta a tu profesional sanitario por la dieta, la actividad y si tu plan actual sigue siendo adecuado.',
+          mentalHealth: 'El apoyo de un profesional cualificado es el siguiente paso adecuado.'
+        },
+        habitTools: {
+          title: 'Herramientas de hábitos',
+          medical: 'Esta calculadora tiene fines informativos y educativos únicamente y no ofrece consejo médico. Consulta a profesionales sanitarios cualificados para recomendaciones personales.',
+          matchedTo: 'Relacionado con {label}',
+          tag: 'Herramienta de hábitos',
+          cta: 'Ver en Amazon.',
+          why: 'Por qué la recomendamos: ',
+          labels: { move: 'ejercicio / actividad', sleep: 'sueño', bmi: 'peso / IMC' },
+          products: {
+            bands: {
+              description: 'Bandas portátiles para fuerza en casa y ejercicio / actividad diaria.',
+              whyRecommend: 'Una forma sencilla de añadir entrenamiento de fuerza cuando el ejercicio o la actividad es una de tus principales brechas de hábitos.'
+            },
+            walking_shoes: {
+              description: 'Calzado para caminar a diario y moverte más. La talla, el color y la versión de hombre o mujer se eligen en Amazon: elige tu talla en la página del producto o, si lo necesitas, el modelo Ghost Max de mujer equivalente.',
+              whyRecommend: 'Un calzado cómodo para caminar facilita crear el hábito de hacer ejercicio y moverte.'
+            },
+            pedometer: {
+              description: 'Un control sencillo de tu movimiento diario, no un gadget de longevidad.',
+              whyRecommend: 'Un control sencillo de actividad puede ayudarte a ver si te mueves lo suficiente.'
+            },
+            sleep_mask: {
+              description: 'Bloquea la luz para noches más oscuras. No es un suplemento ni un kit de clínica del sueño.',
+              whyRecommend: 'Una herramienta de sueño sin pastillas cuando el sueño es una de tus principales brechas de hábitos.'
+            },
+            blackout_curtain: {
+              description: 'Oscurece la habitación para un sueño más regular. No es una pastilla ni un combinado de melatonina.',
+              whyRecommend: 'Oscurecer la habitación es un cambio sencillo del entorno de sueño, sin suplementos.'
+            },
+            scale: {
+              description: 'Un control básico del peso, sin kit «inteligente» de longevidad y sin pastillas.',
+              whyRecommend: 'Si aparece una brecha de IMC o peso, calzado para caminar y/o una báscula sencilla son las únicas herramientas que mostramos. Sin pastillas.'
+            }
+          }
+        },
         results: {
           estimated: 'Esperanza de vida estimada',
           yearsLabel: 'años',
@@ -2358,6 +2475,7 @@
           sleepQuality: 'Mejora la calidad del sueño',
           sleepConsistency: 'Mantén un horario de sueño regular',
           smoking: 'Elimina el tabaco',
+          smokeFree: 'Sigue sin fumar',
           alcohol: 'Modera el alcohol',
           stress: 'Reduce los niveles de estrés',
           social: 'Fortalece las conexiones sociales',
@@ -2466,8 +2584,77 @@
           cholesterol: { optimal: 'Optymalny (<200 mg/dL)', borderline: 'Na granicy (200-239 mg/dL)', high: 'Wysoki (240+ mg/dL)', medication: 'Na lekach' },
           mentalHealth: { none: 'Brak', mild: 'Łagodny niepokój/depresja', moderate: 'Umiarkowany', severe: 'Poważny' }
         },
-        buttons: { calculate: 'Oblicz Prognozy Długowieczności', reset: 'Resetuj Formularz' },
+        buttons: { calculate: 'Oblicz Prognozy Długowieczności', reset: 'Resetuj Formularz', refine: 'Doprecyzuj mój wynik' },
         refineNote: 'Opcjonalnie. Dodatkowe odpowiedzi mogą zmienić ten szacunek. Pytania, których nie zmienisz, liczą się jako neutralne (bez wpływu).',
+        refineInlineHint: ' za pomocą reszty formularza — wzrost, dieta, jakość snu i więcej.',
+        leverSource: 'Źródło: ',
+        leverTips: {
+          cardio: 'Dąż do regularnego, umiarkowanego ruchu przez większość dni w tygodniu.',
+          strength: 'Dodaj dwie lub trzy sesje siłowe w dni, które nie następują po sobie.',
+          steps: 'Dodaj spacery i inną codzienną aktywność do zwykłych dni.',
+          sauna: 'Jeśli ciepło jest już częścią twojej rutyny, kilka spokojnych sesji w tygodniu to wzorzec, który bierze pod uwagę ten model.',
+          diet: 'Przesuń posiłki w stronę warzyw, oliwy, ryb i mniejszej ilości pakowanej żywności.',
+          vegetables: 'Dodaj jedną dodatkową porcję warzyw przez większość dni.',
+          processed: 'Zamień jeden codzienny produkt pakowany na prostą, nieprzetworzoną opcję.',
+          water: 'Trzymaj wodę pod ręką i pij regularnie przez cały dzień.',
+          fish: 'Jedz tłuste ryby kilka razy w tygodniu, jeśli pasuje to do twojej diety.',
+          sleepHoursScore: 'Gdy możesz, trzymaj się regularnego okna snu 7–8 godzin.',
+          sleepQuality: 'Śpij w ciemnym, cichym i chłodnym pokoju i wyciszaj się bez ekranów.',
+          sleepConsistency: 'Wstawaj o tej samej porze przez większość dni, także w weekendy.',
+          smoking: 'Jeśli palisz, skorzystanie z pomocy w rzuceniu to największa zmiana stylu życia w tym modelu.',
+          smokeFree: 'Palenie masz już za sobą — to najtrudniejsza część. Niepalenie pozwala zachować te lata, a w tym modelu korzyść rośnie, aż minie 5 lat bez palenia. Jeśli wróci chęć zapalenia, telefoniczna poradnia antynikotynowa lub lekarz pomogą ci wytrwać.',
+          alcohol: 'Jeśli pijesz, to niewiele. Ten model nie nagradza dużego spożycia.',
+          stress: 'Spróbuj krótkiego codziennego wyciszenia: spaceru, spokojnego oddechu lub czasu z zaufaną osobą.',
+          social: 'Zaplanuj co tydzień jeden stały kontakt lub wspólną aktywność.',
+          meditation: 'Kilka spokojnych minut przez większość dni wystarczy dla tego modelu.',
+          nature: 'Spędzaj co tydzień trochę czasu na zewnątrz, choćby na krótkim spacerze.',
+          sun: 'Łap trochę światła dziennego, ale bez poparzeń. W razie potrzeby korzystaj z cienia lub ochrony.',
+          checkups: 'Chodź na rutynowe wizyty, aby znać swoje ciśnienie, cholesterol i inne wskaźniki.',
+          conditions: 'Lecz choroby przewlekłe razem z lekarzem. Ten model nie zastąpi takiej opieki.',
+          diabetes: 'Kontrola poziomu cukru we krwi to zadanie dla ciebie i twojego lekarza.',
+          bp: 'Sprawdzaj ciśnienie krwi i trzymaj się planu, który już masz.',
+          cholesterol: 'Zapytaj lekarza o dietę, aktywność i to, czy obecny plan nadal jest odpowiedni.',
+          mentalHealth: 'Wsparcie wykwalifikowanego specjalisty to właściwy następny krok.'
+        },
+        habitTools: {
+          title: 'Narzędzia do nawyków',
+          medical: 'Ten kalkulator służy wyłącznie celom informacyjnym i edukacyjnym i nie stanowi porady medycznej. W sprawie osobistych zaleceń skonsultuj się z wykwalifikowanym personelem medycznym.',
+          matchedTo: 'Dopasowane do: {label}',
+          tag: 'Narzędzie do nawyków',
+          cta: 'Zobacz na Amazon.',
+          why: 'Dlaczego to polecamy: ',
+          labels: { move: 'ćwiczenia / aktywność', sleep: 'sen', bmi: 'waga / BMI' },
+          products: {
+            bands: {
+              description: 'Przenośne taśmy do ćwiczeń siłowych w domu i codziennej aktywności.',
+              whyRecommend: 'Prosty sposób na dodanie treningu oporowego, gdy ćwiczenia lub aktywność należą do twoich głównych luk w nawykach.'
+            },
+            walking_shoes: {
+              description: 'Codzienne buty do chodzenia, by więcej się ruszać. Rozmiar, kolor i wersję damską lub męską wybierasz na Amazonie — wybierz rozmiar na stronie produktu albo, w razie potrzeby, odpowiedni damski model Ghost Max.',
+              whyRecommend: 'Wygodne buty do chodzenia ułatwiają zbudowanie nawyku ruchu i aktywności.'
+            },
+            pedometer: {
+              description: 'Prosta kontrola codziennego ruchu — nie gadżet na długowieczność.',
+              whyRecommend: 'Prosta kontrola aktywności pomoże ci zauważyć, czy ruszasz się wystarczająco.'
+            },
+            sleep_mask: {
+              description: 'Blokuje światło, by noce były ciemniejsze. To nie suplement ani zestaw z kliniki snu.',
+              whyRecommend: 'Narzędzie do snu bez tabletek, gdy sen należy do twoich głównych luk w nawykach.'
+            },
+            blackout_curtain: {
+              description: 'Zaciemnia pokój, by sen był bardziej regularny. To nie tabletka ani zestaw z melatoniną.',
+              whyRecommend: 'Zaciemnienie pokoju to prosta zmiana otoczenia snu — bez suplementów.'
+            },
+            scale: {
+              description: 'Podstawowa kontrola wagi — bez „inteligentnego” zestawu na długowieczność i bez tabletek.',
+              whyRecommend: 'Jeśli na ekranie widać lukę w BMI lub wadze, pokazujemy tylko buty do chodzenia i/lub prostą wagę. Bez tabletek.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'Informacja o linkach partnerskich:',
+          body: 'Jako partner programu Amazon Associates zarabiam na kwalifikujących się zakupach. Oznacza to, że jeśli klikniesz link i dokonasz zakupu, mogę otrzymać niewielką prowizję bez dodatkowych kosztów dla ciebie. Polecam tylko produkty, które moim zdaniem naprawdę mogą pomóc poprawić twoją długowieczność.'
+        },
         results: {
           estimated: 'Szacowana długość życia',
           yearsLabel: 'lat',
@@ -2536,6 +2723,7 @@
           sleepQuality: 'Popraw jakość snu',
           sleepConsistency: 'Utrzymuj regularne godziny snu',
           smoking: 'Rzuć palenie',
+          smokeFree: 'Nie wracaj do palenia',
           alcohol: 'Umiarkuj alkohol',
           stress: 'Obniż poziom stresu',
           social: 'Wzmacniaj relacje społeczne',
@@ -2661,8 +2849,73 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Grenzwertig hoch (200-239 mg/dL)', high: 'Hoch (240+ mg/dL)', medication: 'Unter Medikation' },
           mentalHealth: { none: 'Keine', mild: 'Leichte Angst/Depression', moderate: 'Mittel', severe: 'Schwer' }
         },
-        buttons: { calculate: 'Langlebigkeitseinblicke Berechnen', reset: 'Formular Zurücksetzen' },
+        buttons: { calculate: 'Langlebigkeitseinblicke Berechnen', reset: 'Formular Zurücksetzen', refine: 'Meine Zahl verfeinern' },
         refineNote: 'Optional. Zusätzliche Antworten können diese Schätzung verändern. Fragen, die du unverändert lässt, zählen als neutral (ohne Wirkung).',
+        refineInlineHint: ' mit dem Rest des Formulars – Größe, Ernährung, Schlafqualität und mehr.',
+        leverSource: 'Quelle: ',
+        leverTips: {
+          cardio: 'Arbeite auf regelmäßige moderate Bewegung an den meisten Tagen der Woche hin.',
+          strength: 'Plane zwei bis drei Krafteinheiten an nicht aufeinanderfolgenden Tagen ein.',
+          steps: 'Bau Gehen und andere Alltagsbewegung in ganz normale Tage ein.',
+          sauna: 'Wenn Wärme schon Teil deiner Routine ist: Ein paar ruhige Saunagänge pro Woche sind das Muster, das dieses Modell betrachtet.',
+          diet: 'Stell deine Mahlzeiten auf mehr Gemüse, Olivenöl, Fisch und weniger abgepackte Lebensmittel um.',
+          vegetables: 'Iss an den meisten Tagen eine zusätzliche Portion Gemüse.',
+          processed: 'Ersetze ein tägliches abgepacktes Produkt durch eine einfache, unverarbeitete Alternative.',
+          water: 'Halte Wasser griffbereit und trinke über den Tag verteilt.',
+          fish: 'Iss ein- bis zweimal pro Woche fetten Fisch, wenn das zu deiner Ernährung passt.',
+          sleepHoursScore: 'Halte, wenn möglich, ein regelmäßiges Schlaffenster von 7–8 Stunden ein.',
+          sleepQuality: 'Schlaf in einem dunklen, ruhigen, kühlen Raum und komm ohne Bildschirme zur Ruhe.',
+          sleepConsistency: 'Steh an den meisten Tagen zur gleichen Zeit auf, auch am Wochenende.',
+          smoking: 'Wenn du rauchst, ist Hilfe beim Aufhören der größte Lebensstil-Hebel in diesem Modell.',
+          smokeFree: 'Du hast schon aufgehört – das ist der schwerste Teil. Rauchfrei zu bleiben sichert diese Jahre, und in diesem Modell wächst der Vorteil weiter, bis du 5 Jahre rauchfrei bist. Wenn das Verlangen zurückkommt, helfen ein Rauchstopp-Telefon oder deine Ärztin bzw. dein Arzt, dabeizubleiben.',
+          alcohol: 'Wenn du trinkst, dann wenig. Dieses Modell belohnt hohen Konsum nicht.',
+          stress: 'Probier eine kurze tägliche Auszeit: ein Spaziergang, ruhiges Atmen oder Zeit mit einem Menschen, dem du vertraust.',
+          social: 'Plane jede Woche einen festen Kontakt oder eine gemeinsame Aktivität ein.',
+          meditation: 'Ein paar ruhige Minuten an den meisten Tagen reichen für dieses Modell.',
+          nature: 'Verbring jede Woche etwas Zeit draußen, und sei es nur ein kurzer Spaziergang.',
+          sun: 'Hol dir etwas Tageslicht, aber keinen Sonnenbrand. Nutze bei Bedarf Schatten oder Sonnenschutz.',
+          checkups: 'Nimm Routineuntersuchungen wahr, damit Blutdruck, Cholesterin und andere Werte bekannt sind.',
+          conditions: 'Behandle chronische Erkrankungen gemeinsam mit medizinischem Fachpersonal. Dieses Modell kann diese Betreuung nicht ersetzen.',
+          diabetes: 'Die Blutzuckereinstellung gehört in die Hände deiner Ärztin bzw. deines Arztes.',
+          bp: 'Lass deinen Blutdruck messen und halte dich an den Plan, den du schon hast.',
+          cholesterol: 'Frag deine Ärztin bzw. deinen Arzt nach Ernährung, Bewegung und ob dein aktueller Plan noch passt.',
+          mentalHealth: 'Unterstützung durch qualifizierte Fachleute ist der richtige nächste Schritt.'
+        },
+        habitTools: {
+          title: 'Gewohnheits-Helfer',
+          medical: 'Dieser Rechner dient ausschließlich Informations- und Bildungszwecken und bietet keine medizinische Beratung. Wende dich für persönliche Empfehlungen an qualifiziertes medizinisches Fachpersonal.',
+          matchedTo: 'Passend zu: {label}',
+          tag: 'Gewohnheits-Helfer',
+          cta: 'Bei Amazon ansehen.',
+          why: 'Warum wir es empfehlen: ',
+          labels: { move: 'Bewegung / Aktivität', sleep: 'Schlaf', bmi: 'Gewicht / BMI' },
+          products: {
+            bands: {
+              description: 'Handliche Bänder für Krafttraining zu Hause und tägliche Bewegung.',
+              whyRecommend: 'Eine einfache Möglichkeit, Krafttraining einzubauen, wenn Bewegung oder Aktivität zu deinen größten Gewohnheitslücken gehört.'
+            },
+            walking_shoes: {
+              description: 'Alltagsschuhe zum Gehen für mehr Bewegung. Größe, Farbe und Damen- oder Herrenmodell wählst du bei Amazon – such dir deine Größe auf der Produktseite aus oder, falls nötig, das passende Ghost-Max-Damenmodell.',
+              whyRecommend: 'Bequeme Schuhe zum Gehen machen es leichter, eine Bewegungsgewohnheit aufzubauen.'
+            },
+            pedometer: {
+              description: 'Ein einfacher Check deiner täglichen Bewegung – kein Langlebigkeits-Gadget.',
+              whyRecommend: 'Ein einfacher Aktivitäts-Check hilft dir zu merken, ob du dich genug bewegst.'
+            },
+            sleep_mask: {
+              description: 'Blockt Licht für dunklere Nächte. Kein Nahrungsergänzungsmittel und kein Schlaflabor-Set.',
+              whyRecommend: 'Ein Schlafhelfer ohne Tabletten, wenn Schlaf zu deinen größten Gewohnheitslücken gehört.'
+            },
+            blackout_curtain: {
+              description: 'Verdunkelt den Raum für gleichmäßigeren Schlaf. Keine Tablette und kein Melatonin-Mix.',
+              whyRecommend: 'Ein dunkler Raum ist eine einfache Änderung der Schlafumgebung – ohne Nahrungsergänzungsmittel.'
+            },
+            scale: {
+              description: 'Ein einfacher Gewichts-Check – kein „smartes“ Langlebigkeits-Set und keine Tabletten.',
+              whyRecommend: 'Wenn eine BMI- oder Gewichtslücke angezeigt wird, zeigen wir nur Schuhe zum Gehen und/oder eine einfache Waage. Keine Tabletten.'
+            }
+          }
+        },
         results: {
           estimated: 'Geschätzte Lebensspanne',
           yearsLabel: 'Jahre',
@@ -2731,6 +2984,7 @@
           sleepQuality: 'Schlafqualität verbessern',
           sleepConsistency: 'Schlafrhythmus regelmäßig halten',
           smoking: 'Rauchen eliminieren',
+          smokeFree: 'Rauchfrei bleiben',
           alcohol: 'Alkohol mäßigen',
           stress: 'Stresslevel senken',
           social: 'Soziale Kontakte stärken',
@@ -2856,8 +3110,73 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Limite haute (200-239 mg/dL)', high: 'Élevé (240+ mg/dL)', medication: 'Sous traitement' },
           mentalHealth: { none: 'Aucun', mild: 'Anxiété/Dépression légère', moderate: 'Modérée', severe: 'Sévère' }
         },
-        buttons: { calculate: 'Calculer les Perspectives de Longévité', reset: 'Réinitialiser le Formulaire' },
+        buttons: { calculate: 'Calculer les Perspectives de Longévité', reset: 'Réinitialiser le Formulaire', refine: 'Affiner mon chiffre' },
         refineNote: 'Facultatif. Des réponses supplémentaires peuvent modifier cette estimation. Les questions que vous laissez inchangées comptent comme neutres (sans effet).',
+        refineInlineHint: ' avec le reste du formulaire : taille, alimentation, qualité du sommeil, etc.',
+        leverSource: 'Source : ',
+        leverTips: {
+          cardio: 'Visez une activité modérée régulière la plupart des jours de la semaine.',
+          strength: 'Ajoutez deux ou trois séances de renforcement musculaire, sur des jours non consécutifs.',
+          steps: 'Intégrez de la marche et d’autres activités physiques à vos journées ordinaires.',
+          sauna: 'Si la chaleur fait déjà partie de votre routine, quelques séances calmes par semaine correspondent à ce que ce modèle prend en compte.',
+          diet: 'Orientez vos repas vers les légumes, l’huile d’olive, le poisson et moins d’aliments emballés.',
+          vegetables: 'Ajoutez une portion de légumes supplémentaire la plupart des jours.',
+          processed: 'Remplacez un produit emballé quotidien par une option simple et peu transformée.',
+          water: 'Gardez de l’eau à portée de main et buvez régulièrement tout au long de la journée.',
+          fish: 'Mangez du poisson gras deux fois par semaine si cela convient à votre alimentation.',
+          sleepHoursScore: 'Gardez une plage de sommeil régulière de 7 à 8 heures quand vous le pouvez.',
+          sleepQuality: 'Dormez dans une chambre sombre, calme et fraîche, et détendez-vous sans écrans.',
+          sleepConsistency: 'Levez-vous à la même heure la plupart des jours, week-ends compris.',
+          smoking: 'Si vous fumez, vous faire aider pour arrêter est le plus grand changement de mode de vie dans ce modèle.',
+          smokeFree: 'Vous avez déjà arrêté, c’est le plus difficile. Rester non-fumeur préserve ces années, et dans ce modèle le bénéfice continue d’augmenter jusqu’à 5 ans sans tabac. Si l’envie revient, une ligne d’aide à l’arrêt du tabac ou votre médecin peuvent vous aider à tenir.',
+          alcohol: 'Si vous buvez, restez modéré. Ce modèle ne récompense pas une forte consommation.',
+          stress: 'Essayez un court moment de détente chaque jour : une marche, une respiration calme ou du temps avec une personne de confiance.',
+          social: 'Prévoyez chaque semaine un contact régulier ou une activité partagée.',
+          meditation: 'Quelques minutes de calme la plupart des jours suffisent pour ce modèle.',
+          nature: 'Passez un peu de temps dehors chaque semaine, même pour une courte promenade.',
+          sun: 'Prenez un peu de lumière du jour, sans coup de soleil. Utilisez l’ombre ou une protection si nécessaire.',
+          checkups: 'Faites vos visites de routine pour connaître votre tension, votre cholestérol et d’autres indicateurs.',
+          conditions: 'Suivez toute maladie chronique avec un professionnel de santé. Ce modèle ne remplace pas ces soins.',
+          diabetes: 'La gestion de la glycémie relève de votre professionnel de santé.',
+          bp: 'Faites contrôler votre tension artérielle et suivez le plan que vous avez déjà.',
+          cholesterol: 'Interrogez votre professionnel de santé sur l’alimentation, l’activité et l’adéquation de votre plan actuel.',
+          mentalHealth: 'L’aide d’un professionnel qualifié est la bonne prochaine étape.'
+        },
+        habitTools: {
+          title: 'Outils pour vos habitudes',
+          medical: 'Ce calculateur est fourni uniquement à des fins d’information et d’éducation et ne constitue pas un avis médical. Consultez des professionnels de santé qualifiés pour des recommandations personnalisées.',
+          matchedTo: 'Associé à : {label}',
+          tag: 'Outil d’habitude',
+          cta: 'Voir sur Amazon.',
+          why: 'Pourquoi nous le recommandons : ',
+          labels: { move: 'exercice / activité', sleep: 'sommeil', bmi: 'poids / IMC' },
+          products: {
+            bands: {
+              description: 'Bandes portables pour le renforcement à la maison et l’activité quotidienne.',
+              whyRecommend: 'Une façon simple d’ajouter du renforcement musculaire quand l’exercice ou l’activité fait partie de vos principaux écarts d’habitudes.'
+            },
+            walking_shoes: {
+              description: 'Chaussures de marche pour bouger davantage au quotidien. La taille, la couleur et la version homme ou femme se choisissent sur Amazon : choisissez votre taille sur la page du produit ou, si besoin, le modèle Ghost Max femme correspondant.',
+              whyRecommend: 'Des chaussures de marche confortables facilitent l’installation d’une habitude d’exercice et d’activité.'
+            },
+            pedometer: {
+              description: 'Un suivi simple de votre activité quotidienne, pas un gadget de longévité.',
+              whyRecommend: 'Un suivi simple de l’activité peut vous aider à voir si vous bougez assez.'
+            },
+            sleep_mask: {
+              description: 'Bloque la lumière pour des nuits plus sombres. Ni complément alimentaire ni kit de clinique du sommeil.',
+              whyRecommend: 'Un outil de sommeil sans comprimé quand le sommeil fait partie de vos principaux écarts d’habitudes.'
+            },
+            blackout_curtain: {
+              description: 'Assombrit la pièce pour un sommeil plus régulier. Ni comprimé ni cocktail de mélatonine.',
+              whyRecommend: 'L’obscurité de la chambre est un changement simple de l’environnement de sommeil, sans compléments.'
+            },
+            scale: {
+              description: 'Un contrôle de base du poids, sans kit « intelligent » de longévité ni comprimés.',
+              whyRecommend: 'Si un écart d’IMC ou de poids apparaît, des chaussures de marche et/ou une balance simple sont les seuls outils que nous proposons. Pas de comprimés.'
+            }
+          }
+        },
         results: {
           estimated: 'Durée de vie estimée',
           yearsLabel: 'ans',
@@ -2926,6 +3245,7 @@
           sleepQuality: 'Améliorer la qualité du sommeil',
           sleepConsistency: 'Garder un rythme de sommeil régulier',
           smoking: 'Éliminer le tabac',
+          smokeFree: 'Rester non-fumeur',
           alcohol: 'Modérer l’alcool',
           stress: 'Réduire le stress',
           social: 'Renforcer les liens sociaux',
@@ -3034,8 +3354,77 @@
           cholesterol: { optimal: '理想 (<200 mg/dL)', borderline: '临界高 (200-239 mg/dL)', high: '高 (240+ mg/dL)', medication: '药物控制中' },
           mentalHealth: { none: '无', mild: '轻度焦虑/抑郁', moderate: '中度', severe: '重度' }
         },
-        buttons: { calculate: '计算长寿洞察', reset: '重置表单' },
+        buttons: { calculate: '计算长寿洞察', reset: '重置表单', refine: '细化我的数字' },
         refineNote: '可选。补充回答可能会改变这一估算。未更改的问题按中性计算（没有影响）。',
+        refineInlineHint: '：填写表单的其余部分——身高、饮食、睡眠质量等。',
+        leverSource: '来源：',
+        leverTips: {
+          cardio: '逐步做到每周大多数日子都有规律的中等强度活动。',
+          strength: '每周安排两到三次力量训练，不要连续两天进行。',
+          steps: '在平常的日子里多走路，增加日常运动和活动。',
+          sauna: '如果热疗已是您日常的一部分，每周几次放松的桑拿就是本模型所参考的模式。',
+          diet: '让饮食更多偏向蔬菜、橄榄油和鱼类，减少包装食品。',
+          vegetables: '大多数日子多吃一份蔬菜。',
+          processed: '每天把一种包装食品换成简单的天然食物。',
+          water: '把水放在手边，全天均匀饮水。',
+          fish: '如果符合您的饮食习惯，每周吃一两次富含脂肪的鱼。',
+          sleepHoursScore: '尽量保持规律的 7–8 小时睡眠时段。',
+          sleepQuality: '保持卧室黑暗、安静、凉爽，睡前放下屏幕慢慢放松。',
+          sleepConsistency: '大多数日子在同一时间起床，周末也一样。',
+          smoking: '如果您吸烟，寻求帮助戒烟是本模型中最大的生活方式改变。',
+          smokeFree: '您已经戒烟了，这是最难的一步。继续不吸烟能保住这些年，在本模型中，这份收益会持续增加，直到您戒烟满 5 年。如果烟瘾再次出现，戒烟热线或您的医生可以帮助您坚持下去。',
+          alcohol: '如果饮酒，请保持少量。本模型不会奖励大量饮酒。',
+          stress: '每天试着短暂放松一下：散步、平静地呼吸，或与信任的人相处。',
+          social: '每周安排一次固定的联系或共同活动。',
+          meditation: '大多数日子静下心来几分钟，对本模型来说就足够了。',
+          nature: '每周花一点时间到户外，哪怕只是短暂散步。',
+          sun: '适量接触日光，但不要晒伤。需要时使用遮阳或防晒。',
+          checkups: '定期体检，了解自己的血压、胆固醇和其他指标。',
+          conditions: '与医生一起管理任何慢性疾病。本模型无法替代这种医疗照护。',
+          diabetes: '血糖管理应交由您的医生负责。',
+          bp: '检查血压，并遵循您现有的治疗方案。',
+          cholesterol: '向医生咨询饮食、运动，以及您目前的方案是否仍然合适。',
+          mentalHealth: '寻求合格专业人士的支持是正确的下一步。'
+        },
+        habitTools: {
+          title: '习惯工具',
+          medical: '本计算器仅供信息和教育用途，不提供医疗建议。如需个人建议，请咨询合格的医疗专业人员。',
+          matchedTo: '对应：{label}',
+          tag: '习惯工具',
+          cta: '在亚马逊查看。',
+          why: '推荐理由：',
+          labels: { move: '运动 / 活动', sleep: '睡眠', bmi: '体重 / BMI' },
+          products: {
+            bands: {
+              description: '便携弹力带，适合在家做力量训练和日常运动。',
+              whyRecommend: '当运动或活动是您主要的习惯短板之一时，这是加入抗阻训练的简单方法。'
+            },
+            walking_shoes: {
+              description: '日常步行鞋，帮助您多运动多活动。尺码、颜色和男女款在亚马逊上选择——请在商品页面选择尺码，如有需要可选择对应的女款 Ghost Max。',
+              whyRecommend: '舒适的步行鞋让养成运动和活动习惯更容易。'
+            },
+            pedometer: {
+              description: '简单记录每日活动量——不是长寿小工具。',
+              whyRecommend: '简单的活动记录可以帮您了解自己活动是否足够。'
+            },
+            sleep_mask: {
+              description: '遮挡光线，让夜晚更黑。不是保健品，也不是睡眠诊所套装。',
+              whyRecommend: '当睡眠是您主要的习惯短板之一时，这是一种无需服药的睡眠工具。'
+            },
+            blackout_curtain: {
+              description: '让房间变暗，睡眠更规律。不是药片，也不是褪黑素组合。',
+              whyRecommend: '让房间变暗是改善睡眠环境的简单方法——无需保健品。'
+            },
+            scale: {
+              description: '基础的体重测量——不是“智能长寿”套装，也没有药片。',
+              whyRecommend: '如果屏幕上出现 BMI 或体重短板，我们只展示步行鞋和/或简单的体重秤。不推荐任何药片。'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: '联盟披露：',
+          body: '作为亚马逊联盟成员，我会从符合条件的购买中获得收入。这意味着如果您点击链接并购买，我可能会获得少量佣金，您无需支付任何额外费用。我只推荐我认为真正有助于改善长寿的产品。'
+        },
         results: {
           estimated: '预估寿命',
           yearsLabel: '年',
@@ -3104,6 +3493,7 @@
           sleepQuality: '提升睡眠质量',
           sleepConsistency: '保持规律作息',
           smoking: '戒烟',
+          smokeFree: '继续保持不吸烟',
           alcohol: '控制饮酒',
           stress: '降低压力水平',
           social: '加强社交联系',
@@ -3212,8 +3602,77 @@
           cholesterol: { optimal: 'Ottimale (<200 mg/dL)', borderline: 'Borderline alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'In terapia' },
           mentalHealth: { none: 'Nessuna', mild: 'Lieve ansia/depressione', moderate: 'Moderata', severe: 'Grave' }
         },
-        buttons: { calculate: 'Calcola gli insight di longevità', reset: 'Reimposta modulo' },
+        buttons: { calculate: 'Calcola gli insight di longevità', reset: 'Reimposta modulo', refine: 'Affina il mio numero' },
         refineNote: 'Facoltativo. Le risposte aggiuntive possono modificare questa stima. Le domande che lasci invariate contano come neutre (nessun effetto).',
+        refineInlineHint: ' con il resto del modulo: altezza, dieta, qualità del sonno e altro.',
+        leverSource: 'Fonte: ',
+        leverTips: {
+          cardio: 'Punta a un movimento moderato regolare nella maggior parte dei giorni della settimana.',
+          strength: 'Aggiungi due o tre sessioni di forza in giorni non consecutivi.',
+          steps: 'Aggiungi camminate e altra attività fisica alle giornate normali.',
+          sauna: 'Se il calore fa già parte della tua routine, qualche sessione tranquilla a settimana è lo schema che questo modello considera.',
+          diet: 'Orienta i pasti verso verdure, olio d’oliva, pesce e meno cibi confezionati.',
+          vegetables: 'Aggiungi una porzione extra di verdure nella maggior parte dei giorni.',
+          processed: 'Sostituisci un prodotto confezionato quotidiano con un’alternativa semplice e poco lavorata.',
+          water: 'Tieni l’acqua a portata di mano e bevi con regolarità durante la giornata.',
+          fish: 'Includi pesce grasso un paio di volte a settimana, se è compatibile con la tua dieta.',
+          sleepHoursScore: 'Quando puoi, mantieni una fascia di sonno regolare di 7–8 ore.',
+          sleepQuality: 'Dormi in una stanza buia, silenziosa e fresca e rilassati senza schermi.',
+          sleepConsistency: 'Alzati alla stessa ora quasi tutti i giorni, anche nel fine settimana.',
+          smoking: 'Se fumi, farti aiutare a smettere è il cambiamento di stile di vita più grande in questo modello.',
+          smokeFree: 'Hai già smesso, ed è la parte più difficile. Restare senza fumo conserva quegli anni e, in questo modello, il beneficio continua a crescere finché non arrivi a 5 anni senza fumare. Se torna la voglia, una linea di supporto per smettere di fumare o il tuo medico possono aiutarti a non ricominciare.',
+          alcohol: 'Se bevi, fallo con moderazione. Questo modello non premia il consumo elevato.',
+          stress: 'Prova un breve momento di decompressione ogni giorno: una passeggiata, un respiro calmo o del tempo con una persona di fiducia.',
+          social: 'Pianifica ogni settimana un contatto fisso o un’attività condivisa.',
+          meditation: 'Pochi minuti di calma nella maggior parte dei giorni bastano per questo modello.',
+          nature: 'Trascorri un po’ di tempo all’aperto ogni settimana, anche solo una breve passeggiata.',
+          sun: 'Prendi un po’ di luce del giorno, senza scottarti. Usa ombra o protezione quando serve.',
+          checkups: 'Fai le visite di routine per conoscere pressione, colesterolo e altri valori.',
+          conditions: 'Gestisci eventuali malattie croniche con un professionista sanitario. Questo modello non può sostituire quelle cure.',
+          diabetes: 'La gestione della glicemia spetta al tuo medico.',
+          bp: 'Fatti controllare la pressione e segui il piano che hai già.',
+          cholesterol: 'Chiedi al tuo medico di dieta, attività e se il tuo piano attuale è ancora adatto.',
+          mentalHealth: 'Il supporto di un professionista qualificato è il passo giusto da fare.'
+        },
+        habitTools: {
+          title: 'Strumenti per le abitudini',
+          medical: 'Questo calcolatore ha solo scopi informativi ed educativi e non fornisce consigli medici. Per raccomandazioni personali consulta professionisti sanitari qualificati.',
+          matchedTo: 'Abbinato a: {label}',
+          tag: 'Strumento per le abitudini',
+          cta: 'Vedi su Amazon.',
+          why: 'Perché lo consigliamo: ',
+          labels: { move: 'esercizio / attività', sleep: 'sonno', bmi: 'peso / IMC' },
+          products: {
+            bands: {
+              description: 'Fasce portatili per allenare la forza a casa e per l’attività quotidiana.',
+              whyRecommend: 'Un modo semplice per aggiungere allenamento di forza quando esercizio o attività sono tra le tue principali lacune di abitudini.'
+            },
+            walking_shoes: {
+              description: 'Scarpe da camminata per muoverti di più ogni giorno. Taglia, colore e versione uomo o donna si scelgono su Amazon: scegli la taglia nella pagina del prodotto o, se serve, il modello Ghost Max da donna corrispondente.',
+              whyRecommend: 'Scarpe comode per camminare rendono più facile creare l’abitudine all’esercizio e al movimento.'
+            },
+            pedometer: {
+              description: 'Un semplice controllo del movimento quotidiano, non un gadget per la longevità.',
+              whyRecommend: 'Un semplice controllo dell’attività può aiutarti a capire se ti muovi abbastanza.'
+            },
+            sleep_mask: {
+              description: 'Blocca la luce per notti più buie. Non è un integratore né un kit da clinica del sonno.',
+              whyRecommend: 'Uno strumento per il sonno senza pillole, quando il sonno è tra le tue principali lacune di abitudini.'
+            },
+            blackout_curtain: {
+              description: 'Oscura la stanza per un sonno più regolare. Non è una pillola né un mix di melatonina.',
+              whyRecommend: 'Oscurare la stanza è un semplice cambiamento dell’ambiente del sonno, senza integratori.'
+            },
+            scale: {
+              description: 'Un semplice controllo del peso: nessun kit “smart” per la longevità e nessuna pillola.',
+              whyRecommend: 'Se compare una lacuna di IMC o di peso, mostriamo solo scarpe da camminata e/o una bilancia semplice. Niente pillole.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'Informativa sugli affiliati:',
+          body: 'In qualità di Affiliato Amazon, ricevo un guadagno dagli acquisti idonei. Ciò significa che, se fai clic su un link ed effettui un acquisto, potrei ricevere una piccola commissione senza costi aggiuntivi per te. Consiglio solo prodotti che ritengo possano davvero aiutarti a migliorare la tua longevità.'
+        },
         results: {
           estimated: 'Durata di vita stimata',
           yearsLabel: 'anni',
@@ -3282,6 +3741,7 @@
           sleepQuality: 'Migliora la qualità del sonno',
           sleepConsistency: 'Mantieni un ritmo di sonno regolare',
           smoking: 'Elimina il fumo',
+          smokeFree: 'Resta senza fumo',
           alcohol: 'Modera l’alcol',
           stress: 'Riduci i livelli di stress',
           social: 'Rafforza le connessioni sociali',
@@ -3407,8 +3867,73 @@
           cholesterol: { optimal: 'Ideal (<200 mg/dL)', borderline: 'Limítrofe alto (200-239 mg/dL)', high: 'Alto (240+ mg/dL)', medication: 'Em medicação' },
           mentalHealth: { none: 'Nenhuma', mild: 'Ansiedade/Depressão leve', moderate: 'Moderada', severe: 'Grave' }
         },
-        buttons: { calculate: 'Calcular insights de longevidade', reset: 'Redefinir formulário' },
+        buttons: { calculate: 'Calcular insights de longevidade', reset: 'Redefinir formulário', refine: 'Refinar meu número' },
         refineNote: 'Opcional. Respostas extras podem alterar esta estimativa. As perguntas que você deixar sem alteração contam como neutras (sem efeito).',
+        refineInlineHint: ' com o resto do formulário: altura, dieta, qualidade do sono e mais.',
+        leverSource: 'Fonte: ',
+        leverTips: {
+          cardio: 'Avance para movimento moderado regular na maioria dos dias da semana.',
+          strength: 'Inclua duas ou três sessões de força em dias não consecutivos.',
+          steps: 'Acrescente caminhadas e outras atividades físicas aos seus dias comuns.',
+          sauna: 'Se o calor já faz parte da sua rotina, algumas sessões tranquilas por semana são o padrão que este modelo considera.',
+          diet: 'Direcione suas refeições para legumes e verduras, azeite, peixe e menos alimentos embalados.',
+          vegetables: 'Acrescente uma porção extra de vegetais na maioria dos dias.',
+          processed: 'Troque um produto embalado diário por uma opção simples e natural.',
+          water: 'Mantenha água por perto e beba aos poucos ao longo do dia.',
+          fish: 'Inclua peixes gordos duas vezes por semana, se isso combinar com sua dieta.',
+          sleepHoursScore: 'Quando puder, mantenha uma janela de sono regular de 7–8 horas.',
+          sleepQuality: 'Durma em um quarto escuro, silencioso e fresco e relaxe sem telas.',
+          sleepConsistency: 'Acorde no mesmo horário na maioria dos dias, inclusive nos fins de semana.',
+          smoking: 'Se você fuma, buscar ajuda para parar é a maior mudança de estilo de vida neste modelo.',
+          smokeFree: 'Você já parou de fumar, e essa é a parte mais difícil. Continuar sem fumar preserva esses anos e, neste modelo, o benefício continua crescendo até você completar 5 anos sem fumar. Se a vontade voltar, uma linha de apoio para deixar de fumar ou seu médico podem ajudar você a não recair.',
+          alcohol: 'Se você bebe, beba pouco. Este modelo não recompensa o consumo elevado.',
+          stress: 'Experimente um breve momento diário para desacelerar: uma caminhada, respiração calma ou tempo com alguém de confiança.',
+          social: 'Planeje um contato regular ou uma atividade compartilhada toda semana.',
+          meditation: 'Alguns minutos de calma na maioria dos dias bastam para este modelo.',
+          nature: 'Passe um pouco de tempo ao ar livre toda semana, mesmo que seja uma caminhada curta.',
+          sun: 'Pegue um pouco de luz do dia, sem se queimar. Use sombra ou proteção quando necessário.',
+          checkups: 'Mantenha as consultas de rotina para conhecer sua pressão arterial, colesterol e outros indicadores.',
+          conditions: 'Cuide de qualquer doença crônica com um profissional de saúde. Este modelo não substitui esse cuidado.',
+          diabetes: 'O controle da glicemia cabe ao seu profissional de saúde.',
+          bp: 'Verifique a pressão arterial e siga o plano que você já tem.',
+          cholesterol: 'Pergunte ao seu profissional de saúde sobre dieta, atividade e se o seu plano atual ainda é adequado.',
+          mentalHealth: 'O apoio de um profissional qualificado é o próximo passo certo.'
+        },
+        habitTools: {
+          title: 'Ferramentas de hábitos',
+          medical: 'Esta calculadora tem fins apenas informativos e educativos e não oferece aconselhamento médico. Consulte profissionais de saúde qualificados para recomendações pessoais.',
+          matchedTo: 'Relacionado a: {label}',
+          tag: 'Ferramenta de hábito',
+          cta: 'Ver na Amazon.',
+          why: 'Por que recomendamos: ',
+          labels: { move: 'exercício / atividade', sleep: 'sono', bmi: 'peso / IMC' },
+          products: {
+            bands: {
+              description: 'Faixas portáteis para treino de força em casa e atividade diária.',
+              whyRecommend: 'Uma forma simples de incluir treino de resistência quando exercício ou atividade é uma das suas principais lacunas de hábitos.'
+            },
+            walking_shoes: {
+              description: 'Calçado de caminhada para se movimentar mais no dia a dia. Tamanho, cor e versão masculina ou feminina são escolhidos na Amazon: escolha seu tamanho na página do produto ou, se precisar, o modelo Ghost Max feminino correspondente.',
+              whyRecommend: 'Um calçado confortável para caminhar facilita criar o hábito de exercício e atividade.'
+            },
+            pedometer: {
+              description: 'Um controle simples do movimento diário, não um gadget de longevidade.',
+              whyRecommend: 'Um controle simples de atividade pode ajudar você a perceber se está se movimentando o suficiente.'
+            },
+            sleep_mask: {
+              description: 'Bloqueia a luz para noites mais escuras. Não é suplemento nem kit de clínica do sono.',
+              whyRecommend: 'Uma ferramenta de sono sem comprimidos quando o sono é uma das suas principais lacunas de hábitos.'
+            },
+            blackout_curtain: {
+              description: 'Escurece o quarto para um sono mais regular. Não é comprimido nem combinação de melatonina.',
+              whyRecommend: 'Escurecer o quarto é uma mudança simples no ambiente de sono, sem suplementos.'
+            },
+            scale: {
+              description: 'Um controle básico do peso, sem kit “inteligente” de longevidade e sem comprimidos.',
+              whyRecommend: 'Se aparecer uma lacuna de IMC ou peso, calçado de caminhada e/ou uma balança simples são as únicas ferramentas que mostramos. Sem comprimidos.'
+            }
+          }
+        },
         results: {
           estimated: 'Expectativa de vida estimada',
           yearsLabel: 'anos',
@@ -3477,6 +4002,7 @@
           sleepQuality: 'Melhorar a qualidade do sono',
           sleepConsistency: 'Manter rotina de sono regular',
           smoking: 'Eliminar o tabaco',
+          smokeFree: 'Continuar sem fumar',
           alcohol: 'Moderar o álcool',
           stress: 'Reduzir níveis de estresse',
           social: 'Fortalecer conexões sociais',
@@ -3585,8 +4111,77 @@
           cholesterol: { optimal: '最適 (<200 mg/dL)', borderline: '境界高値 (200-239 mg/dL)', high: '高い (240+ mg/dL)', medication: '薬物治療中' },
           mentalHealth: { none: 'なし', mild: '軽度の不安/抑うつ', moderate: '中等度', severe: '重度' }
         },
-        buttons: { calculate: '長寿インサイトを計算', reset: 'フォームをリセット' },
+        buttons: { calculate: '長寿インサイトを計算', reset: 'フォームをリセット', refine: '推定値を詳しくする' },
         refineNote: '任意です。追加で回答すると、この推定値が変わることがあります。変更しなかった質問は中立（影響なし）として扱われます。',
+        refineInlineHint: '：フォームの残りの項目（身長、食事、睡眠の質など）に答えます。',
+        leverSource: '出典：',
+        leverTips: {
+          cardio: '週のほとんどの日に、適度な運動を定期的に行えるよう少しずつ増やしましょう。',
+          strength: '連続しない日に、週2〜3回の筋力トレーニングを取り入れましょう。',
+          steps: 'ふだんの日に、歩くことやその他の日常的な運動・活動を加えましょう。',
+          sauna: '温熱習慣がすでにある場合、週に数回の落ち着いたサウナがこのモデルの想定するパターンです。',
+          diet: '野菜、オリーブオイル、魚を中心にし、包装食品を減らした食事にしましょう。',
+          vegetables: 'ほとんどの日に、野菜をもう1皿増やしましょう。',
+          processed: '毎日の包装食品を1つ、シンプルな自然食品に置き換えましょう。',
+          water: '水を手元に置き、1日を通してこまめに飲みましょう。',
+          fish: '食事に合うなら、週に1〜2回は脂ののった魚を取り入れましょう。',
+          sleepHoursScore: 'できるだけ、7〜8時間の規則的な睡眠時間を確保しましょう。',
+          sleepQuality: '暗く静かで涼しい部屋を使い、寝る前は画面を見ずにくつろぎましょう。',
+          sleepConsistency: '週末も含め、ほとんどの日に同じ時刻に起きましょう。',
+          smoking: '喫煙している場合、禁煙のためのサポートを受けることが、このモデルで最も大きな生活習慣の改善です。',
+          smokeFree: 'あなたはすでに禁煙しています。それが一番難しい部分です。禁煙を続けることでその年数を守れます。このモデルでは、禁煙5年に達するまで効果が増え続けます。吸いたい気持ちが戻ってきたら、禁煙相談窓口や医師が続ける手助けをしてくれます。',
+          alcohol: '飲酒する場合は控えめに。このモデルは多量の飲酒を評価しません。',
+          stress: '毎日少しリラックスする時間を作ってみましょう。散歩、ゆっくりした呼吸、信頼できる人と過ごす時間などです。',
+          social: '毎週、定期的な連絡や一緒に行う活動を1つ予定しましょう。',
+          meditation: 'ほとんどの日に数分の静かな時間があれば、このモデルでは十分です。',
+          nature: '短い散歩でもよいので、毎週少し屋外で過ごしましょう。',
+          sun: '日焼けしない程度に日光を浴びましょう。必要に応じて日陰や日焼け止めを使いましょう。',
+          checkups: '定期的に受診し、血圧、コレステロールなどの数値を把握しておきましょう。',
+          conditions: '慢性疾患は医療者と一緒に管理しましょう。このモデルはその治療の代わりにはなりません。',
+          diabetes: '血糖管理は主治医に任せましょう。',
+          bp: '血圧を測ってもらい、すでにある治療計画に従いましょう。',
+          cholesterol: '食事、運動、そして現在の治療計画が今も合っているかを主治医に相談しましょう。',
+          mentalHealth: '資格のある専門家のサポートを受けることが、適切な次の一歩です。'
+        },
+        habitTools: {
+          title: '習慣づくりのツール',
+          medical: 'この計算ツールは情報提供と教育のみを目的としており、医学的な助言を提供するものではありません。個別の推奨については、資格のある医療専門家にご相談ください。',
+          matchedTo: '{label}に対応',
+          tag: '習慣づくりのツール',
+          cta: 'Amazonで見る。',
+          why: 'おすすめする理由：',
+          labels: { move: '運動・活動', sleep: '睡眠', bmi: '体重・BMI' },
+          products: {
+            bands: {
+              description: '自宅での筋力トレーニングや日常の運動・活動に使える持ち運びやすいバンドです。',
+              whyRecommend: '運動や活動が主な習慣のギャップの一つである場合に、筋力トレーニングを取り入れる簡単な方法です。'
+            },
+            walking_shoes: {
+              description: '運動・活動を増やすための普段使いのウォーキングシューズです。サイズ、色、男女のモデルはAmazonで選びます。商品ページでサイズを選ぶか、必要に応じて対応する女性用Ghost Maxを選んでください。',
+              whyRecommend: '履き心地のよいウォーキングシューズがあると、運動・活動の習慣を作りやすくなります。'
+            },
+            pedometer: {
+              description: '毎日の活動量をシンプルに確認するためのもので、長寿ガジェットではありません。',
+              whyRecommend: 'シンプルな活動量チェックで、十分に体を動かしているかに気づきやすくなります。'
+            },
+            sleep_mask: {
+              description: '光を遮って夜をより暗くします。サプリメントや睡眠クリニック用キットではありません。',
+              whyRecommend: '睡眠が主な習慣のギャップの一つである場合の、薬を使わない睡眠ツールです。'
+            },
+            blackout_curtain: {
+              description: '部屋を暗くして、より規則的な睡眠を助けます。薬やメラトニンのセットではありません。',
+              whyRecommend: '部屋を暗くするのは、サプリメントを使わない簡単な睡眠環境の改善です。'
+            },
+            scale: {
+              description: '基本的な体重チェック用です。「スマート長寿」キットでも薬でもありません。',
+              whyRecommend: '画面にBMIや体重のギャップが表示された場合、紹介するのはウォーキングシューズやシンプルな体重計だけです。薬は紹介しません。'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'アフィリエイトに関する開示：',
+          body: 'Amazonアソシエイトとして、私は対象となる購入から収入を得ています。リンクをクリックして購入された場合、お客様に追加費用なしで少額の手数料を受け取ることがあります。長寿の向上に本当に役立つと考える製品のみをおすすめしています。'
+        },
         results: {
           estimated: '推定寿命',
           yearsLabel: '年',
@@ -3655,6 +4250,7 @@
           sleepQuality: '睡眠の質を高める',
           sleepConsistency: '睡眠リズムを整える',
           smoking: '喫煙をなくす',
+          smokeFree: '禁煙を続ける',
           alcohol: 'アルコールを控えめにする',
           stress: 'ストレスレベルを下げる',
           social: '社会的つながりを強化する',
@@ -3763,8 +4359,77 @@
           cholesterol: { optimal: '최적 (<200 mg/dL)', borderline: '경계 높음 (200-239 mg/dL)', high: '높음 (240+ mg/dL)', medication: '약물 치료 중' },
           mentalHealth: { none: '없음', mild: '경미한 불안/우울', moderate: '중등도', severe: '심각' }
         },
-        buttons: { calculate: '장수 인사이트 계산', reset: '양식 초기화' },
+        buttons: { calculate: '장수 인사이트 계산', reset: '양식 초기화', refine: '내 숫자 더 정확히 보기' },
         refineNote: '선택 사항입니다. 추가 답변에 따라 이 추정치가 달라질 수 있습니다. 변경하지 않은 질문은 중립(영향 없음)으로 계산됩니다.',
+        refineInlineHint: ': 키, 식단, 수면의 질 등 나머지 양식 항목에 답해 보세요.',
+        leverSource: '출처: ',
+        leverTips: {
+          cardio: '일주일 중 대부분의 날에 규칙적인 중간 강도 운동을 하도록 조금씩 늘려 보세요.',
+          strength: '연속되지 않는 날에 주 2~3회 근력 운동을 추가하세요.',
+          steps: '평범한 날에도 걷기와 그 밖의 일상 운동·활동을 더해 보세요.',
+          sauna: '이미 온열 습관이 있다면, 일주일에 몇 번의 편안한 사우나가 이 모델이 보는 패턴입니다.',
+          diet: '채소, 올리브유, 생선 위주로 식사를 바꾸고 포장 식품은 줄이세요.',
+          vegetables: '대부분의 날에 채소를 한 접시 더 드세요.',
+          processed: '매일 먹는 포장 식품 하나를 간단한 자연식품으로 바꿔 보세요.',
+          water: '물을 가까이 두고 하루 종일 꾸준히 마시세요.',
+          fish: '식단에 맞는다면 일주일에 한두 번 기름진 생선을 드세요.',
+          sleepHoursScore: '가능하면 규칙적인 7~8시간 수면 시간을 지키세요.',
+          sleepQuality: '어둡고 조용하고 서늘한 방에서 자고, 잠들기 전에는 화면 없이 긴장을 푸세요.',
+          sleepConsistency: '주말을 포함해 대부분의 날에 같은 시간에 일어나세요.',
+          smoking: '흡연 중이라면, 금연을 위해 도움을 받는 것이 이 모델에서 가장 큰 생활 습관 변화입니다.',
+          smokeFree: '이미 담배를 끊으셨습니다. 가장 어려운 단계를 해내셨어요. 금연을 유지하면 그 햇수를 지킬 수 있고, 이 모델에서는 금연 5년이 될 때까지 효과가 계속 커집니다. 다시 담배가 당긴다면 금연 상담 전화나 의사가 계속 유지하도록 도와줄 수 있습니다.',
+          alcohol: '술을 마신다면 가볍게 드세요. 이 모델은 과음을 좋게 평가하지 않습니다.',
+          stress: '매일 잠깐이라도 마음을 내려놓는 시간을 가져 보세요. 산책, 차분한 호흡, 믿을 수 있는 사람과 보내는 시간 등이 좋습니다.',
+          social: '매주 정기적인 안부 연락이나 함께하는 활동을 하나 계획하세요.',
+          meditation: '대부분의 날에 몇 분간 조용히 보내는 것으로 이 모델에서는 충분합니다.',
+          nature: '짧은 산책이라도 좋으니 매주 조금씩 야외에서 시간을 보내세요.',
+          sun: '햇볕에 타지 않을 정도로 짧게 햇빛을 쬐세요. 필요하면 그늘이나 자외선 차단제를 사용하세요.',
+          checkups: '혈압, 콜레스테롤 등 수치를 알 수 있도록 정기 검진을 받으세요.',
+          conditions: '만성 질환은 의료진과 함께 관리하세요. 이 모델은 그런 진료를 대신할 수 없습니다.',
+          diabetes: '혈당 관리는 담당 의사와 함께하세요.',
+          bp: '혈압을 측정하고 이미 받은 치료 계획을 따르세요.',
+          cholesterol: '식단, 활동, 그리고 현재 치료 계획이 여전히 맞는지 담당 의사와 상의하세요.',
+          mentalHealth: '자격을 갖춘 전문가의 도움을 받는 것이 올바른 다음 단계입니다.'
+        },
+        habitTools: {
+          title: '습관 도구',
+          medical: '이 계산기는 정보 제공 및 교육 목적으로만 제공되며 의학적 조언을 제공하지 않습니다. 개인적인 권장 사항은 자격을 갖춘 의료 전문가와 상담하세요.',
+          matchedTo: '{label} 관련',
+          tag: '습관 도구',
+          cta: 'Amazon에서 보기.',
+          why: '추천 이유: ',
+          labels: { move: '운동 / 활동', sleep: '수면', bmi: '체중 / BMI' },
+          products: {
+            bands: {
+              description: '집에서 하는 근력 운동과 일상 운동·활동을 위한 휴대용 밴드입니다.',
+              whyRecommend: '운동이나 활동이 주요 습관 공백 중 하나일 때 근력 운동을 더하는 간단한 방법입니다.'
+            },
+            walking_shoes: {
+              description: '운동과 활동을 늘리기 위한 일상용 워킹화입니다. 사이즈, 색상, 남녀 모델은 Amazon에서 선택합니다. 상품 페이지에서 사이즈를 고르거나, 필요하면 해당 여성용 Ghost Max 제품을 선택하세요.',
+              whyRecommend: '편안한 워킹화가 있으면 운동과 활동 습관을 만들기가 더 쉬워집니다.'
+            },
+            pedometer: {
+              description: '하루 활동량을 간단히 확인하는 기기로, 장수 가젯이 아닙니다.',
+              whyRecommend: '간단한 활동량 확인으로 충분히 움직이고 있는지 알아차리는 데 도움이 됩니다.'
+            },
+            sleep_mask: {
+              description: '빛을 차단해 밤을 더 어둡게 해 줍니다. 보충제나 수면 클리닉 키트가 아닙니다.',
+              whyRecommend: '수면이 주요 습관 공백 중 하나일 때 쓸 수 있는, 약이 아닌 수면 도구입니다.'
+            },
+            blackout_curtain: {
+              description: '방을 어둡게 해 더 규칙적인 수면을 돕습니다. 약이나 멜라토닌 세트가 아닙니다.',
+              whyRecommend: '방을 어둡게 하는 것은 보충제 없이 수면 환경을 바꾸는 간단한 방법입니다.'
+            },
+            scale: {
+              description: '기본적인 체중 확인용입니다. ‘스마트 장수’ 키트도, 약도 아닙니다.',
+              whyRecommend: '화면에 BMI나 체중 공백이 표시되면, 워킹화 및/또는 간단한 체중계만 보여 드립니다. 약은 없습니다.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: '제휴 고지:',
+          body: 'Amazon 어소시에이트로서 저는 자격을 갖춘 구매로부터 수익을 얻습니다. 즉, 링크를 클릭해 구매하시면 추가 비용 없이 소액의 수수료를 받을 수 있습니다. 장수에 실제로 도움이 된다고 생각하는 제품만 추천합니다.'
+        },
         results: {
           estimated: '예상 수명',
           yearsLabel: '년',
@@ -3833,6 +4498,7 @@
           sleepQuality: '수면의 질 향상',
           sleepConsistency: '규칙적인 수면 리듬 유지',
           smoking: '흡연 완전히 중단',
+          smokeFree: '금연 유지하기',
           alcohol: '음주 절제',
           stress: '스트레스 수준 낮추기',
           social: '사회적 연결 강화',
@@ -3941,8 +4607,77 @@
           cholesterol: { optimal: 'Оптимально (<200 мг/дл)', borderline: 'Погранично высокое (200-239 мг/дл)', high: 'Высокое (240+ мг/дл)', medication: 'На терапии' },
           mentalHealth: { none: 'Нет', mild: 'Легкая тревога/депрессия', moderate: 'Средняя', severe: 'Тяжелая' }
         },
-        buttons: { calculate: 'Рассчитать показатели долголетия', reset: 'Сбросить форму' },
+        buttons: { calculate: 'Рассчитать показатели долголетия', reset: 'Сбросить форму', refine: 'Уточнить мой результат' },
         refineNote: 'Необязательно. Дополнительные ответы могут изменить эту оценку. Вопросы, которые вы не меняли, считаются нейтральными (без влияния).',
+        refineInlineHint: ' с помощью остальной формы — рост, питание, качество сна и другое.',
+        leverSource: 'Источник: ',
+        leverTips: {
+          cardio: 'Постепенно переходите к регулярной умеренной активности в большинство дней недели.',
+          strength: 'Добавьте две-три силовые тренировки в непоследовательные дни.',
+          steps: 'Добавьте ходьбу и другую повседневную активность в обычные дни.',
+          sauna: 'Если тепловые процедуры уже входят в ваш распорядок, несколько спокойных сеансов в неделю — это то, что учитывает эта модель.',
+          diet: 'Сместите рацион в сторону овощей, оливкового масла, рыбы и меньшего количества упакованных продуктов.',
+          vegetables: 'Добавляйте одну дополнительную порцию овощей в большинство дней.',
+          processed: 'Замените один ежедневный упакованный продукт простой натуральной едой.',
+          water: 'Держите воду под рукой и пейте понемногу в течение дня.',
+          fish: 'Ешьте жирную рыбу пару раз в неделю, если это подходит вашему рациону.',
+          sleepHoursScore: 'По возможности соблюдайте регулярное окно сна 7–8 часов.',
+          sleepQuality: 'Спите в тёмной, тихой и прохладной комнате и расслабляйтесь перед сном без экранов.',
+          sleepConsistency: 'Вставайте в одно и то же время в большинство дней, включая выходные.',
+          smoking: 'Если вы курите, помощь в отказе от курения — самое большое изменение образа жизни в этой модели.',
+          smokeFree: 'Вы уже бросили курить — а это самое трудное. Если не возвращаться к курению, эти годы сохранятся, а в этой модели польза продолжает расти, пока вы не проживёте 5 лет без сигарет. Если тяга вернётся, телефонная линия помощи в отказе от курения или ваш врач помогут удержаться.',
+          alcohol: 'Если вы пьёте, то немного. Эта модель не поощряет большое потребление.',
+          stress: 'Попробуйте каждый день ненадолго переключаться: прогулка, спокойное дыхание или время с человеком, которому вы доверяете.',
+          social: 'Планируйте каждую неделю один регулярный созвон или совместное занятие.',
+          meditation: 'Нескольких спокойных минут в большинство дней достаточно для этой модели.',
+          nature: 'Проводите немного времени на свежем воздухе каждую неделю, хотя бы короткую прогулку.',
+          sun: 'Бывайте на дневном свете, но без ожогов. При необходимости используйте тень или защиту.',
+          checkups: 'Регулярно проходите осмотры, чтобы знать своё давление, холестерин и другие показатели.',
+          conditions: 'Контролируйте хронические заболевания вместе с врачом. Эта модель не заменяет такую помощь.',
+          diabetes: 'Контролем уровня сахара в крови должен заниматься ваш врач.',
+          bp: 'Проверяйте давление и следуйте уже назначенному плану.',
+          cholesterol: 'Спросите врача о питании, активности и о том, подходит ли вам текущий план.',
+          mentalHealth: 'Поддержка квалифицированного специалиста — правильный следующий шаг.'
+        },
+        habitTools: {
+          title: 'Помощники для привычек',
+          medical: 'Этот калькулятор предназначен только для информационных и образовательных целей и не является медицинской консультацией. За персональными рекомендациями обращайтесь к квалифицированным медицинским специалистам.',
+          matchedTo: 'Подобрано для: {label}',
+          tag: 'Помощник для привычек',
+          cta: 'Смотреть на Amazon.',
+          why: 'Почему мы это рекомендуем: ',
+          labels: { move: 'упражнения / активность', sleep: 'сон', bmi: 'вес / ИМТ' },
+          products: {
+            bands: {
+              description: 'Компактные ленты для силовых упражнений дома и ежедневной активности.',
+              whyRecommend: 'Простой способ добавить силовые тренировки, если упражнения или активность — один из ваших главных пробелов в привычках.'
+            },
+            walking_shoes: {
+              description: 'Повседневная обувь для ходьбы, чтобы больше двигаться. Размер, цвет и мужскую или женскую модель вы выбираете на Amazon — укажите размер на странице товара или при необходимости выберите соответствующую женскую модель Ghost Max.',
+              whyRecommend: 'Удобная обувь для ходьбы помогает выработать привычку к движению и активности.'
+            },
+            pedometer: {
+              description: 'Простой контроль ежедневного движения — не гаджет для долголетия.',
+              whyRecommend: 'Простой контроль активности поможет заметить, достаточно ли вы двигаетесь.'
+            },
+            sleep_mask: {
+              description: 'Блокирует свет, чтобы ночи были темнее. Это не добавка и не набор из клиники сна.',
+              whyRecommend: 'Средство для сна без таблеток, если сон — один из ваших главных пробелов в привычках.'
+            },
+            blackout_curtain: {
+              description: 'Затемняют комнату для более регулярного сна. Это не таблетки и не набор с мелатонином.',
+              whyRecommend: 'Затемнение комнаты — простое изменение обстановки для сна, без добавок.'
+            },
+            scale: {
+              description: 'Простой контроль веса — без «умного» набора для долголетия и без таблеток.',
+              whyRecommend: 'Если на экране виден пробел по ИМТ или весу, мы показываем только обувь для ходьбы и/или простые весы. Никаких таблеток.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'Партнёрское раскрытие:',
+          body: 'Как участник партнёрской программы Amazon, я получаю доход с соответствующих покупок. Это значит, что если вы перейдёте по ссылке и совершите покупку, я могу получить небольшую комиссию без дополнительных затрат для вас. Я рекомендую только те товары, которые, по моему мнению, действительно помогают улучшить долголетие.'
+        },
         results: {
           estimated: 'Прогнозируемая продолжительность жизни',
           yearsLabel: 'лет',
@@ -4011,6 +4746,7 @@
           sleepQuality: 'Улучшить качество сна',
           sleepConsistency: 'Держать регулярный режим сна',
           smoking: 'Полностью исключить курение',
+          smokeFree: 'Не возвращаться к курению',
           alcohol: 'Умерить употребление алкоголя',
           stress: 'Снизить уровень стресса',
           social: 'Укрепить социальные связи',
@@ -4119,8 +4855,77 @@
           cholesterol: { optimal: 'مثالي (<200 ملغ/دل)', borderline: 'مرتفع حدّي (200-239 ملغ/دل)', high: 'مرتفع (240+ ملغ/دل)', medication: 'على علاج دوائي' },
           mentalHealth: { none: 'لا يوجد', mild: 'قلق/اكتئاب خفيف', moderate: 'متوسط', severe: 'شديد' }
         },
-        buttons: { calculate: 'احسب رؤى طول العمر', reset: 'إعادة تعيين النموذج' },
+        buttons: { calculate: 'احسب رؤى طول العمر', reset: 'إعادة تعيين النموذج', refine: 'حسِّن تقديري' },
         refineNote: 'اختياري. قد تُغيّر الإجابات الإضافية هذا التقدير. الأسئلة التي تتركها دون تغيير تُحتسب محايدة (بلا تأثير).',
+        refineInlineHint: ' باستخدام بقية النموذج — الطول والنظام الغذائي وجودة النوم وغير ذلك.',
+        leverSource: 'المصدر: ',
+        leverTips: {
+          cardio: 'تدرّج نحو حركة معتدلة منتظمة في معظم أيام الأسبوع.',
+          strength: 'أضف جلستين أو ثلاثًا من تمارين المقاومة في أيام غير متتالية.',
+          steps: 'أضف المشي وغيره من النشاط البدني اليومي إلى أيامك العادية.',
+          sauna: 'إذا كانت جلسات الحرارة جزءًا من روتينك بالفعل، فبضع جلسات هادئة أسبوعيًا هي النمط الذي ينظر إليه هذا النموذج.',
+          diet: 'اتجه في وجباتك نحو الخضروات وزيت الزيتون والسمك وقلّل الأطعمة المعلبة.',
+          vegetables: 'أضف حصة إضافية من الخضروات في معظم الأيام.',
+          processed: 'استبدل منتجًا معلبًا واحدًا يوميًا بخيار بسيط من الطعام الطبيعي.',
+          water: 'احتفظ بالماء بالقرب منك واشرب بانتظام طوال اليوم.',
+          fish: 'تناول الأسماك الدهنية مرتين أسبوعيًا إذا كان ذلك يناسب نظامك الغذائي.',
+          sleepHoursScore: 'حافظ على فترة نوم منتظمة من 7 إلى 8 ساعات متى استطعت.',
+          sleepQuality: 'نم في غرفة مظلمة وهادئة وباردة، واسترخِ قبل النوم بعيدًا عن الشاشات.',
+          sleepConsistency: 'استيقظ في الوقت نفسه في معظم الأيام، بما في ذلك عطلات نهاية الأسبوع.',
+          smoking: 'إذا كنت تدخّن، فإن طلب المساعدة للإقلاع هو أكبر تغيير في نمط الحياة في هذا النموذج.',
+          smokeFree: 'لقد أقلعت عن التدخين بالفعل، وهذا هو الجزء الأصعب. البقاء بعيدًا عن التدخين يحافظ على تلك السنوات، وفي هذا النموذج تستمر الفائدة في الازدياد حتى تبلغ 5 سنوات دون تدخين. إذا عادت الرغبة في التدخين، يمكن لخط مساعدة الإقلاع عن التدخين أو طبيبك مساعدتك على الاستمرار.',
+          alcohol: 'إذا كنت تشرب، فليكن ذلك قليلًا. هذا النموذج لا يكافئ الإفراط في الشرب.',
+          stress: 'جرّب وقتًا قصيرًا يوميًا للاسترخاء: نزهة، أو تنفسًا هادئًا، أو وقتًا مع شخص تثق به.',
+          social: 'خطّط لتواصل منتظم أو نشاط مشترك كل أسبوع.',
+          meditation: 'بضع دقائق هادئة في معظم الأيام تكفي في هذا النموذج.',
+          nature: 'اقضِ بعض الوقت في الهواء الطلق كل أسبوع، ولو في نزهة قصيرة.',
+          sun: 'تعرّض لضوء النهار لفترة قصيرة دون أن تُصاب بحروق. استخدم الظل أو الحماية عند الحاجة.',
+          checkups: 'واظب على الزيارات الدورية لتعرف ضغط الدم والكوليسترول وغيرها من المؤشرات.',
+          conditions: 'تعامل مع أي أمراض مزمنة بالتعاون مع مختص صحي. لا يمكن لهذا النموذج أن يحل محل تلك الرعاية.',
+          diabetes: 'إدارة سكر الدم من اختصاص طبيبك.',
+          bp: 'افحص ضغط الدم والتزم بالخطة التي لديك بالفعل.',
+          cholesterol: 'اسأل طبيبك عن النظام الغذائي والنشاط وما إذا كانت خطتك الحالية لا تزال مناسبة.',
+          mentalHealth: 'الدعم من مختص مؤهل هو الخطوة التالية الصحيحة.'
+        },
+        habitTools: {
+          title: 'أدوات العادات',
+          medical: 'هذه الحاسبة لأغراض إعلامية وتعليمية فقط ولا تقدم نصيحة طبية. استشر مختصين صحيين مؤهلين للحصول على توصيات شخصية.',
+          matchedTo: 'مرتبط بـ: {label}',
+          tag: 'أداة عادات',
+          cta: 'اعرضه على Amazon.',
+          why: 'لماذا نوصي به: ',
+          labels: { move: 'التمارين / النشاط', sleep: 'النوم', bmi: 'الوزن / مؤشر كتلة الجسم' },
+          products: {
+            bands: {
+              description: 'أشرطة محمولة لتمارين القوة في المنزل وللنشاط اليومي.',
+              whyRecommend: 'طريقة بسيطة لإضافة تمارين المقاومة عندما تكون التمارين أو النشاط من أكبر فجوات عاداتك.'
+            },
+            walking_shoes: {
+              description: 'حذاء مشي يومي لمزيد من التمارين والنشاط. يتم اختيار المقاس واللون والطراز الرجالي أو النسائي على Amazon — اختر مقاسك من صفحة المنتج، أو طراز Ghost Max النسائي المطابق عند الحاجة.',
+              whyRecommend: 'حذاء المشي المريح يسهّل بناء عادة التمارين والنشاط.'
+            },
+            pedometer: {
+              description: 'أداة بسيطة لمتابعة حركتك اليومية — وليست جهازًا لطول العمر.',
+              whyRecommend: 'تساعدك المتابعة البسيطة للنشاط على ملاحظة ما إذا كنت تتحرك بما يكفي.'
+            },
+            sleep_mask: {
+              description: 'يحجب الضوء لليالٍ أكثر ظلمة. ليس مكمّلًا غذائيًا ولا مجموعة من عيادة نوم.',
+              whyRecommend: 'أداة نوم بلا حبوب عندما يكون النوم من أكبر فجوات عاداتك.'
+            },
+            blackout_curtain: {
+              description: 'تعتّم الغرفة لنوم أكثر انتظامًا. ليست حبوبًا ولا خليطًا من الميلاتونين.',
+              whyRecommend: 'تعتيم الغرفة تغيير بسيط في بيئة النوم — بلا مكمّلات.'
+            },
+            scale: {
+              description: 'أداة أساسية لقياس الوزن — بلا مجموعة «ذكية» لطول العمر وبلا حبوب.',
+              whyRecommend: 'إذا ظهرت على الشاشة فجوة في مؤشر كتلة الجسم أو الوزن، فإن حذاء المشي و/أو ميزانًا بسيطًا هما الأداتان الوحيدتان اللتان نعرضهما. بلا حبوب.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'إفصاح عن التسويق بالعمولة:',
+          body: 'بصفتي عضوًا في برنامج Amazon Associates، أحصل على عائد من المشتريات المؤهلة. هذا يعني أنه إذا نقرت على رابط وأجريت عملية شراء، فقد أحصل على عمولة صغيرة دون أي تكلفة إضافية عليك. لا أوصي إلا بالمنتجات التي أعتقد أنها ستساعد حقًا في تحسين طول عمرك.'
+        },
         results: {
           estimated: 'العمر المتوقع المقدر',
           yearsLabel: 'سنة',
@@ -4189,6 +4994,7 @@
           sleepQuality: 'رفع جودة النوم',
           sleepConsistency: 'الحفاظ على جدول نوم منتظم',
           smoking: 'التوقف عن التدخين',
+          smokeFree: 'البقاء بعيدًا عن التدخين',
           alcohol: 'الاعتدال في الكحول',
           stress: 'خفض مستويات التوتر',
           social: 'تعزيز الروابط الاجتماعية',
@@ -4297,8 +5103,77 @@
           cholesterol: { optimal: 'उत्तम (<200 mg/dL)', borderline: 'सीमांत उच्च (200-239 mg/dL)', high: 'उच्च (240+ mg/dL)', medication: 'दवा पर' },
           mentalHealth: { none: 'नहीं', mild: 'हल्का चिंता/अवसाद', moderate: 'मध्यम', severe: 'गंभीर' }
         },
-        buttons: { calculate: 'दीर्घायु इनसाइट्स की गणना करें', reset: 'फॉर्म रीसेट करें' },
+        buttons: { calculate: 'दीर्घायु इनसाइट्स की गणना करें', reset: 'फॉर्म रीसेट करें', refine: 'मेरी संख्या को और सटीक करें' },
         refineNote: 'वैकल्पिक। अतिरिक्त उत्तर इस अनुमान को बदल सकते हैं। जिन प्रश्नों को आप नहीं बदलते, उन्हें तटस्थ (कोई प्रभाव नहीं) माना जाता है।',
+        refineInlineHint: ' — फ़ॉर्म के बाकी सवालों से: लंबाई, आहार, नींद की गुणवत्ता और बहुत कुछ।',
+        leverSource: 'स्रोत: ',
+        leverTips: {
+          cardio: 'सप्ताह के ज़्यादातर दिनों में नियमित मध्यम गतिविधि की ओर धीरे-धीरे बढ़ें।',
+          strength: 'लगातार न होने वाले दिनों में दो या तीन स्ट्रेंथ ट्रेनिंग सेशन जोड़ें।',
+          steps: 'सामान्य दिनों में पैदल चलना और अन्य दैनिक व्यायाम / गतिविधि जोड़ें।',
+          sauna: 'अगर गर्मी वाले सेशन पहले से आपकी दिनचर्या का हिस्सा हैं, तो सप्ताह में कुछ शांत सेशन ही वह पैटर्न है जिसे यह मॉडल देखता है।',
+          diet: 'अपने भोजन को सब्ज़ियों, जैतून के तेल, मछली की ओर ले जाएँ और पैकेट वाले खाद्य पदार्थ कम करें।',
+          vegetables: 'ज़्यादातर दिनों में सब्ज़ियों की एक अतिरिक्त सर्विंग जोड़ें।',
+          processed: 'रोज़ के एक पैकेट वाले खाद्य पदार्थ को किसी सादे, प्राकृतिक विकल्प से बदलें।',
+          water: 'पानी पास रखें और पूरे दिन थोड़ा-थोड़ा पीते रहें।',
+          fish: 'अगर यह आपके आहार में फिट बैठता है, तो सप्ताह में एक-दो बार वसायुक्त मछली शामिल करें।',
+          sleepHoursScore: 'जब संभव हो, 7–8 घंटे की नियमित नींद का समय बनाए रखें।',
+          sleepQuality: 'अंधेरे, शांत और ठंडे कमरे में सोएँ और सोने से पहले स्क्रीन के बिना आराम करें।',
+          sleepConsistency: 'सप्ताहांत सहित ज़्यादातर दिनों में एक ही समय पर उठें।',
+          smoking: 'अगर आप धूम्रपान करते हैं, तो छोड़ने के लिए मदद लेना इस मॉडल में जीवनशैली का सबसे बड़ा बदलाव है।',
+          smokeFree: 'आप पहले ही धूम्रपान छोड़ चुके हैं, और यही सबसे कठिन हिस्सा है। धूम्रपान-मुक्त बने रहने से वे साल बने रहते हैं, और इस मॉडल में यह लाभ तब तक बढ़ता रहता है जब तक आप 5 साल धूम्रपान-मुक्त नहीं हो जाते। अगर तलब लौट आए, तो क्विट-लाइन या आपके डॉक्टर आपको दूर बने रहने में मदद कर सकते हैं।',
+          alcohol: 'अगर आप पीते हैं, तो कम पिएँ। यह मॉडल ज़्यादा शराब पीने को बढ़ावा नहीं देता।',
+          stress: 'रोज़ थोड़ी देर तनाव कम करने की कोशिश करें: टहलना, शांत साँसें लेना, या किसी भरोसेमंद व्यक्ति के साथ समय बिताना।',
+          social: 'हर सप्ताह एक नियमित बातचीत या साथ मिलकर कोई गतिविधि तय करें।',
+          meditation: 'ज़्यादातर दिनों में कुछ शांत मिनट इस मॉडल के लिए काफ़ी हैं।',
+          nature: 'हर सप्ताह थोड़ा समय बाहर बिताएँ, चाहे एक छोटी सैर ही क्यों न हो।',
+          sun: 'थोड़ी देर दिन की रोशनी लें, पर धूप से जलें नहीं। ज़रूरत हो तो छाया या सुरक्षा का उपयोग करें।',
+          checkups: 'नियमित जाँच करवाते रहें ताकि ब्लड प्रेशर, कोलेस्ट्रॉल और अन्य संकेतकों की जानकारी रहे।',
+          conditions: 'किसी भी लंबी बीमारी को स्वास्थ्य विशेषज्ञ के साथ मिलकर संभालें। यह मॉडल उस देखभाल की जगह नहीं ले सकता।',
+          diabetes: 'ब्लड शुगर का प्रबंधन आपके डॉक्टर के साथ होना चाहिए।',
+          bp: 'ब्लड प्रेशर की जाँच करवाएँ और जो योजना आपके पास पहले से है उसका पालन करें।',
+          cholesterol: 'अपने डॉक्टर से आहार, गतिविधि और इस बारे में पूछें कि क्या आपकी मौजूदा योजना अब भी सही है।',
+          mentalHealth: 'किसी योग्य विशेषज्ञ से सहायता लेना सही अगला कदम है।'
+        },
+        habitTools: {
+          title: 'आदत बनाने वाले टूल',
+          medical: 'यह कैलकुलेटर केवल जानकारी और शैक्षिक उद्देश्यों के लिए है और चिकित्सा सलाह नहीं देता। व्यक्तिगत सुझावों के लिए योग्य स्वास्थ्य विशेषज्ञों से परामर्श करें।',
+          matchedTo: '{label} से जुड़ा',
+          tag: 'आदत टूल',
+          cta: 'Amazon पर देखें।',
+          why: 'हम इसकी सलाह क्यों देते हैं: ',
+          labels: { move: 'व्यायाम / गतिविधि', sleep: 'नींद', bmi: 'वज़न / BMI' },
+          products: {
+            bands: {
+              description: 'घर पर स्ट्रेंथ ट्रेनिंग और दैनिक व्यायाम / गतिविधि के लिए पोर्टेबल बैंड।',
+              whyRecommend: 'जब व्यायाम या गतिविधि आपकी मुख्य आदत-कमियों में से एक हो, तब रेज़िस्टेंस ट्रेनिंग जोड़ने का एक आसान तरीका।'
+            },
+            walking_shoes: {
+              description: 'ज़्यादा व्यायाम और गतिविधि के लिए रोज़ पहनने वाले वॉकिंग शूज़। साइज़, रंग और पुरुष या महिला मॉडल Amazon पर चुने जाते हैं — प्रोडक्ट पेज पर अपना साइज़ चुनें, या ज़रूरत हो तो मिलती-जुलती महिलाओं की Ghost Max लिस्टिंग चुनें।',
+              whyRecommend: 'आरामदायक वॉकिंग शूज़ व्यायाम और गतिविधि की आदत बनाना आसान बनाते हैं।'
+            },
+            pedometer: {
+              description: 'दैनिक गतिविधि की एक सरल जाँच — कोई दीर्घायु गैजेट नहीं।',
+              whyRecommend: 'गतिविधि की एक सरल जाँच से आपको पता चल सकता है कि आप पर्याप्त चल-फिर रहे हैं या नहीं।'
+            },
+            sleep_mask: {
+              description: 'रातों को ज़्यादा अंधेरा बनाने के लिए रोशनी रोकता है। यह कोई सप्लीमेंट या स्लीप-क्लिनिक किट नहीं है।',
+              whyRecommend: 'जब नींद आपकी मुख्य आदत-कमियों में से एक हो, तब बिना गोली वाला नींद का टूल।'
+            },
+            blackout_curtain: {
+              description: 'ज़्यादा नियमित नींद के लिए कमरे में अंधेरा करते हैं। यह कोई गोली या मेलाटोनिन का मिश्रण नहीं है।',
+              whyRecommend: 'कमरे में अंधेरा करना नींद के माहौल में एक सरल बदलाव है — बिना सप्लीमेंट के।'
+            },
+            scale: {
+              description: 'वज़न की एक बुनियादी जाँच — कोई “स्मार्ट दीर्घायु” किट नहीं और कोई गोली नहीं।',
+              whyRecommend: 'अगर स्क्रीन पर BMI या वज़न की कमी दिखती है, तो हम केवल वॉकिंग शूज़ और/या एक सरल वज़न मशीन दिखाते हैं। कोई गोली नहीं।'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'संबद्ध प्रकटीकरण:',
+          body: 'Amazon एसोसिएट के रूप में, मैं योग्य खरीदारी से कमाई करता हूँ। इसका मतलब है कि अगर आप किसी लिंक पर क्लिक करके खरीदारी करते हैं, तो मुझे आपके लिए बिना किसी अतिरिक्त लागत के एक छोटा कमीशन मिल सकता है। मैं केवल उन्हीं उत्पादों की सलाह देता हूँ जो मुझे लगता है कि सचमुच आपकी दीर्घायु बेहतर करने में मदद करेंगे।'
+        },
         results: {
           estimated: 'अनुमानित जीवन प्रत्याशा',
           yearsLabel: 'वर्ष',
@@ -4367,6 +5242,7 @@
           sleepQuality: 'नींद की गुणवत्ता सुधारें',
           sleepConsistency: 'नियमित नींद अनुसूची रखें',
           smoking: 'धूम्रपान समाप्त करें',
+          smokeFree: 'धूम्रपान-मुक्त बने रहें',
           alcohol: 'शराब का सेवन सीमित करें',
           stress: 'तनाव स्तर घटाएँ',
           social: 'सामाजिक जुड़ाव मजबूत करें',
@@ -4475,8 +5351,77 @@
           cholesterol: { optimal: 'Optimal (<200 mg/dL)', borderline: 'Sınırda yüksek (200-239 mg/dL)', high: 'Yüksek (240+ mg/dL)', medication: 'İlaç kullanıyor' },
           mentalHealth: { none: 'Yok', mild: 'Hafif anksiyete/depresyon', moderate: 'Orta', severe: 'Şiddetli' }
         },
-        buttons: { calculate: 'Uzun ömür içgörülerini hesapla', reset: 'Formu sıfırla' },
+        buttons: { calculate: 'Uzun ömür içgörülerini hesapla', reset: 'Formu sıfırla', refine: 'Sayımı netleştir' },
         refineNote: 'İsteğe bağlı. Ek yanıtlar bu tahmini değiştirebilir. Değiştirmediğiniz sorular nötr (etkisiz) sayılır.',
+        refineInlineHint: ' — formun geri kalanıyla: boy, beslenme, uyku kalitesi ve daha fazlası.',
+        leverSource: 'Kaynak: ',
+        leverTips: {
+          cardio: 'Haftanın çoğu gününde düzenli, orta düzeyde harekete doğru ilerleyin.',
+          strength: 'Art arda olmayan günlerde iki veya üç direnç antrenmanı ekleyin.',
+          steps: 'Sıradan günlerinize yürüyüş ve diğer günlük egzersiz / aktiviteleri ekleyin.',
+          sauna: 'Sıcak uygulamalar zaten rutininizin bir parçasıysa, haftada birkaç sakin seans bu modelin dikkate aldığı düzendir.',
+          diet: 'Öğünlerinizi sebze, zeytinyağı ve balığa doğru kaydırın; paketli gıdaları azaltın.',
+          vegetables: 'Çoğu gün bir porsiyon fazladan sebze ekleyin.',
+          processed: 'Her gün tükettiğiniz paketli bir ürünü basit, doğal bir seçenekle değiştirin.',
+          water: 'Suyu yakınınızda tutun ve gün boyunca düzenli olarak için.',
+          fish: 'Beslenmenize uygunsa haftada birkaç kez yağlı balık tüketin.',
+          sleepHoursScore: 'Mümkün olduğunda 7–8 saatlik düzenli bir uyku aralığı koruyun.',
+          sleepQuality: 'Karanlık, sessiz ve serin bir odada uyuyun; yatmadan önce ekransız gevşeyin.',
+          sleepConsistency: 'Hafta sonları dahil çoğu gün aynı saatte uyanın.',
+          smoking: 'Sigara içiyorsanız, bırakmak için destek almak bu modeldeki en büyük yaşam tarzı değişikliğidir.',
+          smokeFree: 'Sigarayı zaten bıraktınız; en zor kısım buydu. Sigarasız kalmak bu yılları korur ve bu modelde fayda, sigarasız 5 yılı doldurana kadar artmaya devam eder. İstek geri gelirse bir sigara bırakma danışma hattı veya doktorunuz bırakmış kalmanıza yardımcı olabilir.',
+          alcohol: 'İçiyorsanız az için. Bu model yoğun tüketimi ödüllendirmez.',
+          stress: 'Her gün kısa bir rahatlama molası deneyin: bir yürüyüş, sakin nefes ya da güvendiğiniz biriyle vakit.',
+          social: 'Her hafta düzenli bir görüşme veya ortak bir etkinlik planlayın.',
+          meditation: 'Çoğu gün birkaç sakin dakika bu model için yeterlidir.',
+          nature: 'Kısa bir yürüyüş bile olsa her hafta biraz açık havada vakit geçirin.',
+          sun: 'Biraz gün ışığı alın ama yanmayın. Gerektiğinde gölge veya koruma kullanın.',
+          checkups: 'Tansiyon, kolesterol ve diğer değerlerinizi bilmek için rutin kontrollerinizi sürdürün.',
+          conditions: 'Kronik hastalıklarınızı bir sağlık uzmanıyla birlikte yönetin. Bu model o bakımın yerini tutamaz.',
+          diabetes: 'Kan şekeri yönetimi doktorunuzla birlikte yapılmalıdır.',
+          bp: 'Tansiyonunuzu ölçtürün ve hâlihazırdaki planınızı izleyin.',
+          cholesterol: 'Doktorunuza beslenme, aktivite ve mevcut planınızın hâlâ uygun olup olmadığını sorun.',
+          mentalHealth: 'Nitelikli bir uzmandan destek almak doğru bir sonraki adımdır.'
+        },
+        habitTools: {
+          title: 'Alışkanlık araçları',
+          medical: 'Bu hesaplayıcı yalnızca bilgilendirme ve eğitim amaçlıdır ve tıbbi tavsiye vermez. Kişisel öneriler için nitelikli sağlık uzmanlarına danışın.',
+          matchedTo: 'Eşleşen alan: {label}',
+          tag: 'Alışkanlık aracı',
+          cta: 'Amazon’da görüntüle.',
+          why: 'Neden öneriyoruz: ',
+          labels: { move: 'egzersiz / aktivite', sleep: 'uyku', bmi: 'kilo / BKİ' },
+          products: {
+            bands: {
+              description: 'Evde kuvvet çalışması ve günlük egzersiz / aktivite için taşınabilir bantlar.',
+              whyRecommend: 'Egzersiz veya aktivite başlıca alışkanlık açıklarınızdan biri olduğunda direnç antrenmanı eklemenin basit bir yolu.'
+            },
+            walking_shoes: {
+              description: 'Daha fazla egzersiz ve aktivite için günlük yürüyüş ayakkabısı. Numara, renk ve kadın/erkek modeli Amazon’da seçilir — ürün sayfasında numaranızı seçin veya gerekirse eşdeğer kadın Ghost Max ürününü tercih edin.',
+              whyRecommend: 'Rahat yürüyüş ayakkabıları egzersiz ve aktivite alışkanlığı kazanmayı kolaylaştırır.'
+            },
+            pedometer: {
+              description: 'Günlük hareket için basit bir aktivite takibi — bir uzun ömür cihazı değil.',
+              whyRecommend: 'Basit bir aktivite takibi, yeterince hareket edip etmediğinizi fark etmenize yardımcı olabilir.'
+            },
+            sleep_mask: {
+              description: 'Daha karanlık geceler için ışığı engeller. Takviye veya uyku kliniği seti değildir.',
+              whyRecommend: 'Uyku başlıca alışkanlık açıklarınızdan biri olduğunda hap içermeyen bir uyku aracı.'
+            },
+            blackout_curtain: {
+              description: 'Daha düzenli uyku için odayı karartır. Hap ya da melatonin karışımı değildir.',
+              whyRecommend: 'Odayı karartmak, takviye gerektirmeyen basit bir uyku ortamı değişikliğidir.'
+            },
+            scale: {
+              description: 'Temel bir kilo kontrolü — “akıllı uzun ömür” seti yok, hap yok.',
+              whyRecommend: 'Ekranda bir BKİ veya kilo açığı görünürse yalnızca yürüyüş ayakkabısı ve/veya basit bir tartı gösteririz. Hap yok.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'Satış ortaklığı açıklaması:',
+          body: 'Bir Amazon İş Ortağı olarak uygun satın alımlardan kazanç elde ediyorum. Bu, bir bağlantıya tıklayıp satın alma yaptığınızda size ek bir maliyet olmadan küçük bir komisyon alabileceğim anlamına gelir. Yalnızca uzun ömrünüzü gerçekten iyileştirmeye yardımcı olacağına inandığım ürünleri öneriyorum.'
+        },
         results: {
           estimated: 'Tahmini yaşam süresi',
           yearsLabel: 'yıl',
@@ -4545,6 +5490,7 @@
           sleepQuality: 'Uyku kalitesini iyileştir',
           sleepConsistency: 'Düzenli uyku ritmi koru',
           smoking: 'Sigarayı tamamen bırak',
+          smokeFree: 'Sigarasız kalmaya devam et',
           alcohol: 'Alkolü sınırlı tut',
           stress: 'Stres seviyesini düşür',
           social: 'Sosyal bağları güçlendir',
@@ -4653,8 +5599,77 @@
           cholesterol: { optimal: 'Optimaal (<200 mg/dL)', borderline: 'Grenzw. hoog (200-239 mg/dL)', high: 'Hoog (240+ mg/dL)', medication: 'Op medicatie' },
           mentalHealth: { none: 'Geen', mild: 'Lichte angst/depressie', moderate: 'Matig', severe: 'Ernstig' }
         },
-        buttons: { calculate: 'Bereken langleven-inzichten', reset: 'Formulier resetten' },
+        buttons: { calculate: 'Bereken langleven-inzichten', reset: 'Formulier resetten', refine: 'Mijn getal verfijnen' },
         refineNote: 'Optioneel. Extra antwoorden kunnen deze schatting veranderen. Vragen die je niet wijzigt, tellen als neutraal (geen effect).',
+        refineInlineHint: ' met de rest van het formulier: lengte, voeding, slaapkwaliteit en meer.',
+        leverSource: 'Bron: ',
+        leverTips: {
+          cardio: 'Werk toe naar regelmatige, matige beweging op de meeste dagen van de week.',
+          strength: 'Voeg twee of drie krachttrainingen toe op niet-opeenvolgende dagen.',
+          steps: 'Voeg wandelen en andere dagelijkse beweging toe aan gewone dagen.',
+          sauna: 'Als warmte al deel uitmaakt van je routine, zijn een paar rustige sessies per week het patroon waar dit model naar kijkt.',
+          diet: 'Verschuif je maaltijden richting groenten, olijfolie, vis en minder verpakt voedsel.',
+          vegetables: 'Eet op de meeste dagen een extra portie groenten.',
+          processed: 'Vervang één dagelijks verpakt product door een eenvoudige, onbewerkte optie.',
+          water: 'Houd water binnen handbereik en drink verspreid over de dag.',
+          fish: 'Eet een paar keer per week vette vis als dat bij je eetpatroon past.',
+          sleepHoursScore: 'Houd waar mogelijk een vast slaapvenster van 7–8 uur aan.',
+          sleepQuality: 'Slaap in een donkere, stille, koele kamer en kom tot rust zonder schermen.',
+          sleepConsistency: 'Sta op de meeste dagen op hetzelfde tijdstip op, ook in het weekend.',
+          smoking: 'Als je rookt, is hulp zoeken bij stoppen de grootste leefstijlverandering in dit model.',
+          smokeFree: 'Je bent al gestopt, en dat is het moeilijkste deel. Rookvrij blijven houdt die jaren vast, en in dit model blijft het voordeel groeien tot je 5 jaar rookvrij bent. Komt de trek terug, dan kunnen een stoplijn of je huisarts je helpen om niet terug te vallen.',
+          alcohol: 'Als je drinkt, houd het dan licht. Dit model beloont veel drinken niet.',
+          stress: 'Probeer elke dag even tot rust te komen: een wandeling, rustig ademhalen of tijd met iemand die je vertrouwt.',
+          social: 'Plan elke week één vast contactmoment of een gezamenlijke activiteit.',
+          meditation: 'Een paar rustige minuten op de meeste dagen is genoeg voor dit model.',
+          nature: 'Breng elke week wat tijd buiten door, al is het maar een korte wandeling.',
+          sun: 'Pak wat daglicht, maar verbrand niet. Gebruik schaduw of bescherming als dat nodig is.',
+          checkups: 'Ga op routinecontrole zodat je bloeddruk, cholesterol en andere waarden bekend zijn.',
+          conditions: 'Behandel langdurige aandoeningen samen met een zorgverlener. Dit model kan die zorg niet vervangen.',
+          diabetes: 'Het beheer van je bloedsuiker hoort bij je arts.',
+          bp: 'Laat je bloeddruk controleren en volg het plan dat je al hebt.',
+          cholesterol: 'Vraag je arts naar voeding, beweging en of je huidige plan nog past.',
+          mentalHealth: 'Steun van een gekwalificeerde professional is de juiste volgende stap.'
+        },
+        habitTools: {
+          title: 'Hulpmiddelen voor gewoontes',
+          medical: 'Deze calculator is uitsluitend bedoeld voor informatieve en educatieve doeleinden en geeft geen medisch advies. Raadpleeg gekwalificeerde zorgprofessionals voor persoonlijke aanbevelingen.',
+          matchedTo: 'Gekoppeld aan: {label}',
+          tag: 'Hulpmiddel voor gewoontes',
+          cta: 'Bekijk op Amazon.',
+          why: 'Waarom we het aanraden: ',
+          labels: { move: 'beweging / activiteit', sleep: 'slaap', bmi: 'gewicht / BMI' },
+          products: {
+            bands: {
+              description: 'Draagbare banden voor krachttraining thuis en dagelijkse beweging.',
+              whyRecommend: 'Een eenvoudige manier om krachttraining toe te voegen als beweging of activiteit een van je grootste gewoontegaten is.'
+            },
+            walking_shoes: {
+              description: 'Alledaagse wandelschoenen voor meer beweging en activiteit. Maat, kleur en heren- of damesmodel kies je op Amazon: kies je maat op de productpagina, of zo nodig het bijpassende Ghost Max-damesmodel.',
+              whyRecommend: 'Comfortabele wandelschoenen maken het makkelijker om een beweeggewoonte op te bouwen.'
+            },
+            pedometer: {
+              description: 'Een eenvoudige controle van je dagelijkse beweging — geen longevity-gadget.',
+              whyRecommend: 'Een eenvoudige activiteitencheck helpt je te merken of je genoeg beweegt.'
+            },
+            sleep_mask: {
+              description: 'Houdt licht tegen voor donkerdere nachten. Geen supplement of slaapkliniekset.',
+              whyRecommend: 'Een slaaphulpmiddel zonder pillen als slaap een van je grootste gewoontegaten is.'
+            },
+            blackout_curtain: {
+              description: 'Verduisteren de kamer voor regelmatiger slapen. Geen pil of melatoninemix.',
+              whyRecommend: 'Een donkere kamer is een eenvoudige aanpassing van je slaapomgeving — zonder supplementen.'
+            },
+            scale: {
+              description: 'Een eenvoudige gewichtscheck — geen ‘slimme’ longevity-set en geen pillen.',
+              whyRecommend: 'Als er een BMI- of gewichtsgat op het scherm staat, tonen we alleen wandelschoenen en/of een eenvoudige weegschaal. Geen pillen.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'Affiliate-melding:',
+          body: 'Als Amazon Associate verdien ik aan in aanmerking komende aankopen. Dit betekent dat als je op een link klikt en iets koopt, ik een kleine commissie kan ontvangen zonder extra kosten voor jou. Ik raad alleen producten aan waarvan ik denk dat ze echt kunnen helpen je levensduur te verbeteren.'
+        },
         results: {
           estimated: 'Geschatte levensduur',
           yearsLabel: 'jaar',
@@ -4723,6 +5738,7 @@
           sleepQuality: 'Slaapkwaliteit verbeteren',
           sleepConsistency: 'Regelmatig slaapschema aanhouden',
           smoking: 'Roken elimineren',
+          smokeFree: 'Rookvrij blijven',
           alcohol: 'Alcohol matigen',
           stress: 'Stressniveau verlagen',
           social: 'Sociale banden versterken',
@@ -4831,8 +5847,77 @@
           cholesterol: { optimal: 'Optimalt (<200 mg/dL)', borderline: 'Gränshögt (200-239 mg/dL)', high: 'Högt (240+ mg/dL)', medication: 'På medicinering' },
           mentalHealth: { none: 'Inget', mild: 'Mild ångest/depression', moderate: 'Måttlig', severe: 'Allvarlig' }
         },
-        buttons: { calculate: 'Beräkna livslängdsinsikter', reset: 'Återställ formulär' },
+        buttons: { calculate: 'Beräkna livslängdsinsikter', reset: 'Återställ formulär', refine: 'Förfina min siffra' },
         refineNote: 'Valfritt. Fler svar kan ändra den här uppskattningen. Frågor som du lämnar oförändrade räknas som neutrala (ingen effekt).',
+        refineInlineHint: ' med resten av formuläret – längd, kost, sömnkvalitet och mer.',
+        leverSource: 'Källa: ',
+        leverTips: {
+          cardio: 'Arbeta mot regelbunden måttlig rörelse de flesta dagar i veckan.',
+          strength: 'Lägg till två eller tre styrkepass på dagar som inte följer på varandra.',
+          steps: 'Lägg till promenader och annan vardagsmotion / aktivitet på vanliga dagar.',
+          sauna: 'Om värme redan är en del av din rutin är några lugna pass i veckan det mönster som modellen tittar på.',
+          diet: 'Styr måltiderna mot grönsaker, olivolja, fisk och färre förpackade livsmedel.',
+          vegetables: 'Ät en extra portion grönsaker de flesta dagar.',
+          processed: 'Byt ut en förpackad produkt varje dag mot ett enkelt, oprocessat alternativ.',
+          water: 'Ha vatten nära till hands och drick jämnt under dagen.',
+          fish: 'Ät fet fisk ett par gånger i veckan om det passar din kost.',
+          sleepHoursScore: 'Håll ett regelbundet sömnfönster på 7–8 timmar när du kan.',
+          sleepQuality: 'Sov i ett mörkt, tyst och svalt rum och varva ner utan skärmar.',
+          sleepConsistency: 'Vakna vid samma tid de flesta dagar, även på helger.',
+          smoking: 'Om du röker är hjälp att sluta den största livsstilsförändringen i den här modellen.',
+          smokeFree: 'Du har redan slutat, och det är det svåraste. Att fortsätta vara rökfri behåller de åren, och i den här modellen fortsätter vinsten att växa tills du har varit rökfri i 5 år. Om suget kommer tillbaka kan en sluta röka-linje eller din läkare hjälpa dig att hålla upp.',
+          alcohol: 'Om du dricker, håll det lätt. Den här modellen belönar inte hög konsumtion.',
+          stress: 'Testa en kort daglig nedvarvning: en promenad, lugn andning eller tid med någon du litar på.',
+          social: 'Planera en regelbunden kontakt eller gemensam aktivitet varje vecka.',
+          meditation: 'Några lugna minuter de flesta dagar räcker för den här modellen.',
+          nature: 'Tillbringa lite tid utomhus varje vecka, även en kort promenad.',
+          sun: 'Få lite dagsljus, men bränn dig inte. Använd skugga eller skydd vid behov.',
+          checkups: 'Gå på rutinbesök så att blodtryck, kolesterol och andra värden är kända.',
+          conditions: 'Hantera långvariga sjukdomar tillsammans med vårdpersonal. Den här modellen kan inte ersätta den vården.',
+          diabetes: 'Blodsockerkontroll hör hemma hos din läkare.',
+          bp: 'Låt kontrollera ditt blodtryck och följ den plan du redan har.',
+          cholesterol: 'Fråga din läkare om kost, aktivitet och om din nuvarande plan fortfarande passar.',
+          mentalHealth: 'Stöd från en kvalificerad professionell är rätt nästa steg.'
+        },
+        habitTools: {
+          title: 'Vanehjälpmedel',
+          medical: 'Den här kalkylatorn är endast avsedd för informations- och utbildningsändamål och ger inte medicinsk rådgivning. Rådfråga kvalificerad vårdpersonal för personliga rekommendationer.',
+          matchedTo: 'Kopplat till: {label}',
+          tag: 'Vanehjälpmedel',
+          cta: 'Visa på Amazon.',
+          why: 'Därför rekommenderar vi den: ',
+          labels: { move: 'motion / aktivitet', sleep: 'sömn', bmi: 'vikt / BMI' },
+          products: {
+            bands: {
+              description: 'Bärbara band för styrketräning hemma och daglig motion / aktivitet.',
+              whyRecommend: 'Ett enkelt sätt att lägga till styrketräning när motion eller aktivitet är en av dina största vaneluckor.'
+            },
+            walking_shoes: {
+              description: 'Vardagliga promenadskor för mer motion och aktivitet. Storlek, färg och dam- eller herrmodell väljs på Amazon – välj din storlek på produktsidan, eller vid behov motsvarande Ghost Max för damer.',
+              whyRecommend: 'Bekväma promenadskor gör det lättare att bygga en vana av motion och aktivitet.'
+            },
+            pedometer: {
+              description: 'En enkel koll på din dagliga rörelse – inte en livslängdsgadget.',
+              whyRecommend: 'En enkel aktivitetskoll kan hjälpa dig att märka om du rör dig tillräckligt.'
+            },
+            sleep_mask: {
+              description: 'Stänger ute ljus för mörkare nätter. Inget kosttillskott eller sömnklinikkit.',
+              whyRecommend: 'Ett sömnhjälpmedel utan piller när sömn är en av dina största vaneluckor.'
+            },
+            blackout_curtain: {
+              description: 'Mörklägger rummet för jämnare sömn. Inget piller eller melatoninpaket.',
+              whyRecommend: 'Ett mörkt rum är en enkel förändring av sömnmiljön – utan kosttillskott.'
+            },
+            scale: {
+              description: 'En enkel viktkontroll – inget ”smart” livslängdskit och inga piller.',
+              whyRecommend: 'Om en BMI- eller viktlucka syns på skärmen visar vi bara promenadskor och/eller en enkel våg. Inga piller.'
+            }
+          }
+        },
+        affiliateDisclosure: {
+          title: 'Information om affiliatelänkar:',
+          body: 'Som Amazon Associate tjänar jag pengar på kvalificerade köp. Det innebär att om du klickar på en länk och gör ett köp kan jag få en liten provision utan extra kostnad för dig. Jag rekommenderar bara produkter som jag tror verkligen kan hjälpa dig att förbättra din livslängd.'
+        },
         results: {
           estimated: 'Beräknad livslängd',
           yearsLabel: 'år',
@@ -4901,6 +5986,7 @@
           sleepQuality: 'Förbättra sömnkvalitet',
           sleepConsistency: 'Håll ett regelbundet sömnschema',
           smoking: 'Eliminera rökning',
+          smokeFree: 'Fortsätt vara rökfri',
           alcohol: 'Måttlig alkoholkonsumtion',
           stress: 'Sänk stressnivån',
           social: 'Stärk sociala band',
@@ -5081,6 +6167,8 @@
       setText('refineNumber', t.buttons.refine || translations.en.buttons.refine);
       setText('refineNote', t.refineNote || translations.en.refineNote);
       setText('refineInlineHint', t.refineInlineHint || translations.en.refineInlineHint);
+      setText('habitToolsTitle', t.habitTools?.title || translations.en.habitTools.title);
+      setText('habitToolsMedical', t.habitTools?.medical || translations.en.habitTools.medical);
       populateActivityOptions(lang);
       setText('sectionDemographics', t.sections.demographics);
       setText('sectionActivity', t.sections.activity);
@@ -5346,6 +6434,18 @@
             category: Object.entries(categoryWeights).find(([, meta]) => meta.keys.includes(factor))?.[0]
           });
         }
+
+        // Quit less than 5 years ago: nothing left to "quit", but staying quit is what protects
+        // the years already regained. Relapse would mean going back to the current-smoker value,
+        // so the years at stake are the same as the quit lever (current smoker -> former 5+ years).
+        // This only ranks the lever; it does not change the score.
+        if (factor === 'smoking' && current === optionValues.smoking.formerRecent) {
+          improvements.push({
+            factor: 'smokeFree',
+            potentialGain: optionValues.smoking.former5 - optionValues.smoking.current,
+            category: 'lifestyle'
+          });
+        }
       });
 
       improvements.sort((a, b) => b.potentialGain - a.potentialGain);
@@ -5380,17 +6480,18 @@
         heading.appendChild(title);
         card.appendChild(heading);
 
-        if (guide.tip) {
+        const tipText = t.leverTips?.[item.factor] || guide.tip;
+        if (tipText) {
           const tip = document.createElement('p');
           tip.className = 'lever-tip';
-          tip.textContent = guide.tip;
+          tip.textContent = tipText;
           card.appendChild(tip);
         }
 
         if (guide.cite) {
           const cite = document.createElement('p');
           cite.className = 'lever-cite';
-          cite.appendChild(document.createTextNode('Source: '));
+          cite.appendChild(document.createTextNode(t.leverSource || en.leverSource || 'Source: '));
           if (guide.href) {
             const link = document.createElement('a');
             link.href = guide.href;
@@ -5645,7 +6746,24 @@
             hideHabitTools();
         }
 
+        // Card text in the current language; English (and products.js) as the fallback.
+        // Amazon product names stay as listed on Amazon.
+        function habitToolText() {
+            const en = translations.en.habitTools;
+            const t = (translations[currentLanguage] && translations[currentLanguage].habitTools) || {};
+            return {
+                tag: t.tag || en.tag,
+                cta: t.cta || en.cta,
+                why: t.why || en.why,
+                matchedTo: (label) => (t.matchedTo || en.matchedTo).replace('{label}', label),
+                label: (category, fallback) => (t.labels && t.labels[category]) || (en.labels && en.labels[category]) || fallback,
+                product: (id) => (t.products && t.products[id]) || {}
+            };
+        }
+
         function renderHabitToolCard(product) {
+            const tx = habitToolText();
+            const localized = tx.product(product.id);
             const card = document.createElement('article');
             card.className = 'product-recommendation';
             card.dataset.productId = product.id;
@@ -5654,8 +6772,8 @@
             const tag = document.createElement('div');
             tag.className = 'product-tag';
             tag.textContent = product.matchedLabel
-                ? `Matched to ${product.matchedLabel}`
-                : 'Habit tool';
+                ? tx.matchedTo(tx.label(product.matchedCategory, product.matchedLabel))
+                : tx.tag;
             card.appendChild(tag);
 
             const content = document.createElement('div');
@@ -5668,7 +6786,7 @@
                 imageWrap.replaceChildren();
                 const fallback = document.createElement('div');
                 fallback.className = 'product-image-fallback';
-                fallback.textContent = product.name || 'Habit tool';
+                fallback.textContent = product.name || tx.tag;
                 imageWrap.appendChild(fallback);
             }
 
@@ -5695,7 +6813,7 @@
 
             const subtitle = document.createElement('p');
             subtitle.className = 'product-subtitle';
-            subtitle.textContent = product.description;
+            subtitle.textContent = localized.description || product.description;
             info.appendChild(subtitle);
 
             if (product.isPlaceholder) {
@@ -5707,7 +6825,7 @@
 
             const link = document.createElement('a');
             link.className = 'product-cta';
-            link.textContent = 'View on Amazon.';
+            link.textContent = tx.cta;
             link.rel = 'nofollow noopener sponsored';
             const href = product.amazonLink || '#';
             link.href = href;
@@ -5719,9 +6837,9 @@
             const why = document.createElement('p');
             why.className = 'product-why';
             const whyLabel = document.createElement('strong');
-            whyLabel.textContent = 'Why we recommend it: ';
+            whyLabel.textContent = tx.why;
             why.appendChild(whyLabel);
-            why.appendChild(document.createTextNode(product.whyRecommend || ''));
+            why.appendChild(document.createTextNode(localized.whyRecommend || product.whyRecommend || ''));
             info.appendChild(why);
 
             content.appendChild(info);
@@ -5782,6 +6900,20 @@
         <a href="/terms.html" style="margin: 0 15px; color: #667eea; text-decoration: none; font-weight: 500; font-size: 14px;" data-i18n="footer.terms">Terms of Service</a>
         <p style="margin: 8px 0 0; font-size: 13px; color: #4a5568;">Sister site: <a href="https://thewealthmodeler.com" style="color: #667eea; text-decoration: none; font-weight: 500;">Wealth Modeler</a> — free finance calculators.</p>
     </div>
+    <script>
+      // Keep page bottom padding and scroll padding equal to the real footer height
+      // (it changes with screen width, language and font size).
+      (function () {
+        var footer = document.querySelector('.site-footer');
+        if (!footer) return;
+        function syncFooterHeight() {
+          document.documentElement.style.setProperty('--site-footer-h', Math.ceil(footer.getBoundingClientRect().height) + 'px');
+        }
+        syncFooterHeight();
+        if (window.ResizeObserver) new ResizeObserver(syncFooterHeight).observe(footer);
+        else window.addEventListener('resize', syncFooterHeight);
+      })();
+    </script>
 
     <!-- Adsterra Native Banner: loads only after advertising consent -->
     <script type="text/plain" data-category="advertising" data-cookiecategory="advertising" async="async" data-cfasync="false" src="https://pl28303337.effectgatecpm.com/0ea0851237926ead7a37c53cfb0951a5/invoke.js"></script>
