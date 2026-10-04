@@ -420,3 +420,116 @@ if (typeof document !== 'undefined') {
     });
   })();
 }
+
+
+// Refine prominence (#39): primary CTA after the free estimate. No precise/accurate/more exact copy.
+// Locked English copy: 'Want a fuller picture?' + 'Add more answers'. Other languages come from
+// translations[lang].refinePrimary in index.html (same pattern as #45), with this English as the fallback.
+// Shows no numbers or previews of its own: it only opens the existing refine form, which is scored by
+// index.html (computeLifespan + ageEffectScale).
+var REFINE_PRIMARY_EN = {
+  title: 'Want a fuller picture?',
+  button: 'Add more answers',
+  summary: 'Optional — add more answers for a fuller picture of this estimate.'
+};
+
+function refinePrimaryCopy(translationsTable, lang) {
+  var own = translationsTable && translationsTable[lang] && translationsTable[lang].refinePrimary;
+  var copy = {};
+  Object.keys(REFINE_PRIMARY_EN).forEach(function (key) {
+    copy[key] = (own && typeof own[key] === 'string' && own[key].trim()) ? own[key] : REFINE_PRIMARY_EN[key];
+  });
+  return copy;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.REFINE_PRIMARY_EN = REFINE_PRIMARY_EN;
+  module.exports.refinePrimaryCopy = refinePrimaryCopy;
+}
+
+if (typeof document !== 'undefined') {
+  (function () {
+    function ready(fn) {
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+      else fn();
+    }
+
+    function currentCopy() {
+      var table = typeof translations !== 'undefined' ? translations : null;
+      var lang = typeof currentLanguage !== 'undefined' ? currentLanguage : 'en';
+      return refinePrimaryCopy(table, lang);
+    }
+
+    function openRefine() {
+      if (typeof openRefineForm === 'function') { openRefineForm(); return; }
+      var details = document.getElementById('refineDetails');
+      if (!details) return;
+      details.open = true;
+      details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Re-apply the copy in the current language (the page resets #refineSummary on every language change).
+    function refreshRefinePrimary() {
+      var copy = currentCopy();
+      var summary = document.getElementById('refineSummary');
+      if (summary) summary.textContent = copy.summary;
+      var title = document.getElementById('refinePrimaryTitle');
+      if (title) title.textContent = copy.title;
+      var button = document.getElementById('refineNumberPrimary');
+      if (button) button.textContent = copy.button;
+    }
+
+    function upgrade() {
+      var summary = document.getElementById('refineSummary');
+      if (summary) {
+        summary.style.fontWeight = '500';
+        summary.style.fontSize = '15px';
+        summary.style.color = 'var(--text-secondary)';
+      }
+
+      var oldNote = document.querySelector('.refine-inline-note');
+      if (oldNote && !document.getElementById('refinePrimary')) {
+        var block = document.createElement('div');
+        block.className = 'refine-primary';
+        block.id = 'refinePrimary';
+        block.innerHTML =
+          '<h3 class="refine-primary-title" id="refinePrimaryTitle"></h3>' +
+          '<button type="button" class="refine-primary-button" id="refineNumberPrimary"></button>';
+        oldNote.replaceWith(block);
+
+        var style = document.createElement('style');
+        style.id = 'refinePrimaryStyles';
+        style.textContent = [
+          '.refine-primary{margin:18px 0 8px;padding:16px 16px 14px;border-radius:16px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.08);}',
+          '.refine-primary-title{margin:0 0 12px;font-size:20px;font-weight:700;letter-spacing:0.2px;color:#fff;line-height:1.35;}',
+          '.refine-primary-button{display:inline-flex;align-items:center;justify-content:center;width:100%;max-width:420px;border:none;border-radius:14px;padding:14px 18px;font:inherit;font-size:16px;font-weight:700;color:#1a2340;background:linear-gradient(135deg,#f4f7ff,#d7e2ff);box-shadow:0 10px 24px rgba(10,16,40,0.28);cursor:pointer;}',
+          '.refine-primary-button:hover{filter:brightness(1.04);}'
+        ].join('');
+        document.head.appendChild(style);
+
+        document.getElementById('refineNumberPrimary').addEventListener('click', openRefine);
+      }
+      refreshRefinePrimary();
+    }
+
+    function wrapApplyLanguage() {
+      if (typeof applyLanguage !== 'function') return false;
+      if (applyLanguage.__refinePrimaryWrapped) return true;
+      var original = applyLanguage;
+      function wrapped(lang) {
+        var result = original(lang);
+        refreshRefinePrimary();
+        return result;
+      }
+      wrapped.__refinePrimaryWrapped = true;
+      applyLanguage = wrapped;
+      try { window.applyLanguage = wrapped; } catch (e) {}
+      return true;
+    }
+
+    ready(function () {
+      wrapApplyLanguage();
+      upgrade();
+    });
+  })();
+}

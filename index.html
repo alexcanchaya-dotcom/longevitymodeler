@@ -745,8 +745,10 @@
     }
 
     @media (max-width: 640px) {
-      :root { --site-footer-h: 72px; }
-      body { padding: 18px 10px var(--site-footer-offset); }
+      /* Phones: the footer is part of the page flow (see .site-footer below), so the body
+         needs no extra bottom room for it and stacks the footer under the container. */
+      body { padding: 18px 10px 0; flex-direction: column; justify-content: flex-start; }
+      html { scroll-padding-bottom: 0; }
       .container { padding: 14px 12px; }
       .section-grid { grid-template-columns: 1fr; }
       .inputs-grid { grid-template-columns: 1fr; }
@@ -936,14 +938,17 @@
         padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Phones: a compact footer so it takes less of a short screen (it was 107px tall,
-       a sixth of a 360x640 screen, and sat over the result and habit-tool cards). */
+    /* Phones: the footer sits at the end of the page instead of being fixed to the bottom
+       of the screen, so it never covers the result, levers or habit-tool cards. */
     @media (max-width: 640px) {
         .site-footer {
-            padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
+            position: static;
+            margin: 16px -10px 0;
+            padding: 6px 10px;
             line-height: 1.35;
             background: #fff;
         }
+        .product-cta { scroll-margin-bottom: 0; }
         .site-footer > a {
             margin: 0 6px !important;
             font-size: 12.5px !important;
@@ -2175,6 +2180,7 @@
           labels: { move: 'exercise / activity', sleep: 'sleep', bmi: 'weight / BMI' }
         },
         refineInlineHint: ' with the rest of the form — height, diet, sleep quality, and more.',
+        refinePrimary: { title: 'Want a fuller picture?', button: 'Add more answers', summary: 'Optional — add more answers for a fuller picture of this estimate.' },
         activityOptions: {
           low: 'Little or none',
           some: 'Some (1–2 days / week)',
@@ -2396,6 +2402,7 @@
           high: 'Frecuente (5+ días / semana)'
         },
         refineInlineHint: ' con el resto del formulario: altura, dieta, calidad del sueño y más.',
+        refinePrimary: { title: '¿Quieres una visión más completa?', button: 'Añade más respuestas', summary: 'Opcional: añade más respuestas para tener una visión más completa de esta estimación.' },
         leverSource: 'Fuente: ',
         leverTips: {
           cardio: 'Avanza hacia movimiento moderado regular la mayoría de los días de la semana.',
@@ -2671,6 +2678,7 @@
           sisterTagline: '— darmowe kalkulatory finansowe.'
         },
         refineInlineHint: ' za pomocą reszty formularza — wzrost, dieta, jakość snu i więcej.',
+        refinePrimary: { title: 'Chcesz pełniejszego obrazu?', button: 'Dodaj więcej odpowiedzi', summary: 'Opcjonalnie — dodaj więcej odpowiedzi, aby uzyskać pełniejszy obraz tego szacunku.' },
         leverSource: 'Źródło: ',
         leverTips: {
           cardio: 'Dąż do regularnego, umiarkowanego ruchu przez większość dni w tygodniu.',
@@ -2949,6 +2957,7 @@
           high: 'Häufig (5+ Tage / Woche)'
         },
         refineInlineHint: ' mit dem Rest des Formulars – Größe, Ernährung, Schlafqualität und mehr.',
+        refinePrimary: { title: 'Möchtest du ein vollständigeres Bild?', button: 'Weitere Antworten hinzufügen', summary: 'Optional – füge weitere Antworten hinzu, um ein vollständigeres Bild dieser Schätzung zu bekommen.' },
         leverSource: 'Quelle: ',
         leverTips: {
           cardio: 'Arbeite auf regelmäßige moderate Bewegung an den meisten Tagen der Woche hin.',
@@ -3223,6 +3232,7 @@
           high: 'Fréquent (5+ jours / semaine)'
         },
         refineInlineHint: ' avec le reste du formulaire : taille, alimentation, qualité du sommeil, etc.',
+        refinePrimary: { title: 'Vous voulez une vision plus complète ?', button: 'Ajouter des réponses', summary: 'Facultatif — ajoutez des réponses pour une vision plus complète de cette estimation.' },
         leverSource: 'Source : ',
         leverTips: {
           cardio: 'Visez une activité modérée régulière la plupart des jours de la semaine.',
@@ -3493,6 +3503,7 @@
           sisterTagline: '— 免费理财计算器。'
         },
         refineInlineHint: '：填写表单的其余部分——身高、饮食、睡眠质量等。',
+        refinePrimary: { title: '想了解更全面的情况吗？', button: '补充更多回答', summary: '可选——补充更多回答，让这个估算的情况更全面。' },
         leverSource: '来源：',
         leverTips: {
           cardio: '逐步做到每周大多数日子都有规律的中等强度活动。',
@@ -3767,6 +3778,7 @@
           sisterTagline: '— calcolatori finanziari gratuiti.'
         },
         refineInlineHint: ' con il resto del modulo: altezza, dieta, qualità del sonno e altro.',
+        refinePrimary: { title: 'Vuoi un quadro più completo?', button: 'Aggiungi altre risposte', summary: 'Facoltativo: aggiungi altre risposte per un quadro più completo di questa stima.' },
         leverSource: 'Fonte: ',
         leverTips: {
           cardio: 'Punta a un movimento moderato regolare nella maggior parte dei giorni della settimana.',
@@ -4045,6 +4057,7 @@
           high: 'Frequente (5+ dias / semana)'
         },
         refineInlineHint: ' com o resto do formulário: altura, dieta, qualidade do sono e mais.',
+        refinePrimary: { title: 'Quer uma visão mais completa?', button: 'Adicionar mais respostas', summary: 'Opcional — adicione mais respostas para ter uma visão mais completa desta estimativa.' },
         leverSource: 'Fonte: ',
         leverTips: {
           cardio: 'Avance para movimento moderado regular na maioria dos dias da semana.',
@@ -4315,6 +4328,7 @@
           sisterTagline: '— 無料の金融計算ツール。'
         },
         refineInlineHint: '：フォームの残りの項目（身長、食事、睡眠の質など）に答えます。',
+        refinePrimary: { title: 'もっと全体像を知りたいですか？', button: '回答を追加する', summary: '任意：回答を追加すると、この推定値の全体像がよりわかります。' },
         leverSource: '出典：',
         leverTips: {
           cardio: '週のほとんどの日に、適度な運動を定期的に行えるよう少しずつ増やしましょう。',
@@ -4589,6 +4603,7 @@
           sisterTagline: '— 무료 금융 계산기.'
         },
         refineInlineHint: ': 키, 식단, 수면의 질 등 나머지 양식 항목에 답해 보세요.',
+        refinePrimary: { title: '더 온전한 그림을 보고 싶으신가요?', button: '답변 더 추가하기', summary: '선택 사항 — 답변을 더 추가하면 이 추정치를 더 온전하게 볼 수 있습니다.' },
         leverSource: '출처: ',
         leverTips: {
           cardio: '일주일 중 대부분의 날에 규칙적인 중간 강도 운동을 하도록 조금씩 늘려 보세요.',
@@ -4863,6 +4878,7 @@
           sisterTagline: '— бесплатные финансовые калькуляторы.'
         },
         refineInlineHint: ' с помощью остальной формы — рост, питание, качество сна и другое.',
+        refinePrimary: { title: 'Хотите более полную картину?', button: 'Добавить ответы', summary: 'Необязательно — добавьте ответы, чтобы получить более полную картину этой оценки.' },
         leverSource: 'Источник: ',
         leverTips: {
           cardio: 'Постепенно переходите к регулярной умеренной активности в большинство дней недели.',
@@ -5137,6 +5153,7 @@
           sisterTagline: '— حاسبات مالية مجانية.'
         },
         refineInlineHint: ' باستخدام بقية النموذج — الطول والنظام الغذائي وجودة النوم وغير ذلك.',
+        refinePrimary: { title: 'هل تريد صورة أشمل؟', button: 'أضف المزيد من الإجابات', summary: 'اختياري — أضف المزيد من الإجابات للحصول على صورة أشمل لهذا التقدير.' },
         leverSource: 'المصدر: ',
         leverTips: {
           cardio: 'تدرّج نحو حركة معتدلة منتظمة في معظم أيام الأسبوع.',
@@ -5411,6 +5428,7 @@
           sisterTagline: '— मुफ़्त वित्तीय कैलकुलेटर।'
         },
         refineInlineHint: ' — फ़ॉर्म के बाकी सवालों से: लंबाई, आहार, नींद की गुणवत्ता और बहुत कुछ।',
+        refinePrimary: { title: 'क्या आप और पूरी तस्वीर चाहते हैं?', button: 'और जवाब जोड़ें', summary: 'वैकल्पिक — इस अनुमान की और पूरी तस्वीर के लिए और जवाब जोड़ें।' },
         leverSource: 'स्रोत: ',
         leverTips: {
           cardio: 'सप्ताह के ज़्यादातर दिनों में नियमित मध्यम गतिविधि की ओर धीरे-धीरे बढ़ें।',
@@ -5685,6 +5703,7 @@
           sisterTagline: '— ücretsiz finans hesaplayıcıları.'
         },
         refineInlineHint: ' — formun geri kalanıyla: boy, beslenme, uyku kalitesi ve daha fazlası.',
+        refinePrimary: { title: 'Daha eksiksiz bir tablo mu istiyorsunuz?', button: 'Daha fazla yanıt ekleyin', summary: 'İsteğe bağlı — bu tahminin daha eksiksiz bir tablosu için daha fazla yanıt ekleyin.' },
         leverSource: 'Kaynak: ',
         leverTips: {
           cardio: 'Haftanın çoğu gününde düzenli, orta düzeyde harekete doğru ilerleyin.',
@@ -5959,6 +5978,7 @@
           sisterTagline: '— gratis financiële calculators.'
         },
         refineInlineHint: ' met de rest van het formulier: lengte, voeding, slaapkwaliteit en meer.',
+        refinePrimary: { title: 'Wil je een vollediger beeld?', button: 'Meer antwoorden toevoegen', summary: 'Optioneel — voeg meer antwoorden toe voor een vollediger beeld van deze schatting.' },
         leverSource: 'Bron: ',
         leverTips: {
           cardio: 'Werk toe naar regelmatige, matige beweging op de meeste dagen van de week.',
@@ -6233,6 +6253,7 @@
           sisterTagline: '— gratis finansiella kalkylatorer.'
         },
         refineInlineHint: ' med resten av formuläret – längd, kost, sömnkvalitet och mer.',
+        refinePrimary: { title: 'Vill du få en fullständigare bild?', button: 'Lägg till fler svar', summary: 'Valfritt – lägg till fler svar för en fullständigare bild av den här uppskattningen.' },
         leverSource: 'Källa: ',
         leverTips: {
           cardio: 'Arbeta mot regelbunden måttlig rörelse de flesta dagar i veckan.',
