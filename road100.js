@@ -5,17 +5,18 @@
  * To publish a video, paste its 11-character YouTube ID into `videoId`
  * (one-line edit). Entries with an empty videoId render NOTHING. If every
  * videoId is empty, the whole Road to 100 section stays hidden.
- * All five videos currently target the homepage (index.html).
- * Tracked link for each video (for the YouTube description):
+ * Keep every videoId '' until that video is PUBLIC on YouTube.
+ * List = Peter's real uploads (Notion "Road to 100 years YouTube", 5 Oct 2026),
+ * in going-public order. All three target the homepage (page 'index').
+ * Tracked link for each video (YouTube description + pinned comment only;
+ * never add tracking parameters to the embed itself):
  *   https://longevitymodeler.com/?utm_source=youtube&utm_campaign=road100&utm_content=<slug>
  * ===================================================================
  */
 window.ROAD100_VIDEOS = [
-  { slug: 'life-expectancy-5-answers', title: 'Life Expectancy Calculator: 5 Answers, Under a Minute', videoId: '', page: 'index' },
-  { slug: 'what-moved-my-number', title: "I Checked My Life Expectancy in 60 Seconds. Here's What Moved It", videoId: '', page: 'index' },
-  { slug: 'habits-vs-calculator', title: 'Aiming for 100? The Habits That Matter vs What the Calculator Asks', videoId: '', page: 'index' },
-  { slug: 'can-you-reach-100', title: 'Can You Reach 100? What the Real Numbers Say', videoId: '', page: 'index' },
-  { slug: 'joke-quizzes-vs-real', title: 'Joke Lifespan Quizzes vs a Real Life Expectancy Calculator', videoId: '', page: 'index' }
+  { slug: 'sauna-evidence', title: 'Aiming for 100? What the Sauna Research Really Shows', videoId: '', page: 'index' },
+  { slug: 'life-expectancy-5-answers', title: "I Checked My Life Expectancy in 60 Seconds. Here's What Moved It", videoId: '', page: 'index' },
+  { slug: 'habits-vs-calculator', title: 'Aiming for 100? The Habits That Matter vs What the Calculator Asks', videoId: '', page: 'index' }
 ];
 /* ========================== END OF EDIT AREA ========================== */
 
