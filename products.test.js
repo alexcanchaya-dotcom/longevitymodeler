@@ -141,4 +141,13 @@ test('catalog Amazon links are unchanged', () => {
   assert(affiliateProducts.bands.amazonLink === 'https://amzn.to/3LW2jF4', 'bands link changed');
 });
 
+test('Soothing Stories copy: English locked, other languages from translations, English fallback', () => {
+  const { SOOTHING_STORIES_EN, soothingStoriesCopy } = require('./products');
+  assert(SOOTHING_STORIES_EN.title === "Can't sleep? Try a soothing story.", 'English title changed');
+  const de = soothingStoriesCopy({ de: { soothingStories: { title: 'Kannst du nicht schlafen?', sub: '' } } }, 'de');
+  assert(de.title === 'Kannst du nicht schlafen?', 'expected German title');
+  assert(de.sub === SOOTHING_STORIES_EN.sub, 'empty translation must fall back to English');
+  assert(soothingStoriesCopy(null, 'es').primary === 'Marco Polo sleep', 'missing table falls back to English');
+});
+
 console.log('\n' + passed + ' tests passed');
