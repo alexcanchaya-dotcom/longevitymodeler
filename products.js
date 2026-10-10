@@ -293,6 +293,30 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // Soothing Stories sleep cross-link (Ready AUTH ship 22 Sep 2026).
 // Own PR — not Refine #39. Educational; never claims stories fix sleep or add years.
+// Locked English copy below; other languages come from translations[lang].soothingStories in index.html,
+// with this English as the fallback (same pattern as refinePrimaryCopy).
+var SOOTHING_STORIES_EN = {
+  aria: 'Soothing Stories',
+  title: "Can't sleep? Try a soothing story.",
+  sub: 'From Soothing Stories on YouTube — calm listening, not medical advice.',
+  primary: 'Marco Polo sleep',
+  secondary: 'William'
+};
+
+function soothingStoriesCopy(translationsTable, lang) {
+  var own = translationsTable && translationsTable[lang] && translationsTable[lang].soothingStories;
+  var copy = {};
+  Object.keys(SOOTHING_STORIES_EN).forEach(function (key) {
+    copy[key] = (own && typeof own[key] === 'string' && own[key].trim()) ? own[key] : SOOTHING_STORIES_EN[key];
+  });
+  return copy;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports.SOOTHING_STORIES_EN = SOOTHING_STORIES_EN;
+  module.exports.soothingStoriesCopy = soothingStoriesCopy;
+}
+
 if (typeof document !== 'undefined') {
   (function () {
     var PRIMARY_URL = 'https://youtu.be/Up8AEZjP0wE'; // Marco Polo sleep
@@ -321,6 +345,46 @@ if (typeof document !== 'undefined') {
       document.head.appendChild(style);
     }
 
+    function currentStoriesCopy() {
+      var table = typeof translations !== 'undefined' ? translations : null;
+      var lang = typeof currentLanguage !== 'undefined' ? currentLanguage : 'en';
+      return soothingStoriesCopy(table, lang);
+    }
+
+    function applyStoriesCopy(card) {
+      card = card || document.getElementById('soothingStories');
+      if (!card || typeof card.querySelector !== 'function') return;
+      var copy = currentStoriesCopy();
+      if (typeof card.setAttribute === 'function') card.setAttribute('aria-label', copy.aria);
+      var parts = [
+        ['.soothing-stories-title', copy.title],
+        ['.soothing-stories-sub', copy.sub],
+        ['.soothing-stories-primary', copy.primary],
+        ['.soothing-stories-secondary', copy.secondary]
+      ];
+      parts.forEach(function (part) {
+        var node = card.querySelector(part[0]);
+        if (node) node.textContent = part[1];
+      });
+    }
+
+    function wrapApplyLanguageForStories() {
+      if (typeof applyLanguage !== 'function') return false;
+      if (applyLanguage.__soothingStoriesWrapped) return true;
+      var original = applyLanguage;
+      function wrapped(lang) {
+        var result = original(lang);
+        applyStoriesCopy();
+        return result;
+      }
+      // Keep earlier wrappers' flags visible so they do not wrap twice.
+      Object.keys(original).forEach(function (k) { wrapped[k] = original[k]; });
+      wrapped.__soothingStoriesWrapped = true;
+      applyLanguage = wrapped;
+      try { window.applyLanguage = wrapped; } catch (e) {}
+      return true;
+    }
+
     function ensureCard() {
       var existing = document.getElementById('soothingStories');
       if (existing) return existing;
@@ -331,14 +395,14 @@ if (typeof document !== 'undefined') {
       card.id = 'soothingStories';
       card.className = 'soothing-stories';
       card.hidden = true;
-      card.setAttribute('aria-label', 'Soothing Stories');
       card.innerHTML =
-        "<h3 class=\"soothing-stories-title\">Can't sleep? Try a soothing story.</h3>" +
-        '<p class="soothing-stories-sub">From Soothing Stories on YouTube — calm listening, not medical advice.</p>' +
+        '<h3 class="soothing-stories-title"></h3>' +
+        '<p class="soothing-stories-sub"></p>' +
         '<div class="soothing-stories-links">' +
-        '<a class="soothing-stories-primary" href="' + PRIMARY_URL + '" target="_blank" rel="noopener noreferrer">Marco Polo sleep</a>' +
-        '<a class="soothing-stories-secondary" href="' + SECONDARY_URL + '" target="_blank" rel="noopener noreferrer">William</a>' +
+        '<a class="soothing-stories-primary" href="' + PRIMARY_URL + '" target="_blank" rel="noopener noreferrer"></a>' +
+        '<a class="soothing-stories-secondary" href="' + SECONDARY_URL + '" target="_blank" rel="noopener noreferrer"></a>' +
         '</div>';
+      applyStoriesCopy(card);
 
       // Order: tip levers → Stories → Amazon habit tools. Never replace Amazon cards.
       if (habit && habit.parentNode) {
@@ -411,6 +475,8 @@ if (typeof document !== 'undefined') {
     ready(function () {
       ensureStyles();
       ensureCard();
+      wrapApplyLanguageForStories();
+      applyStoriesCopy();
       var tries = 0;
       (function install() {
         if (wrapHabitTools()) return;

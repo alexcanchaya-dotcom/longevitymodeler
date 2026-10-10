@@ -79,6 +79,40 @@
           });
         }
 
+        // Non-English banner text lives in translations[lang].cookieConsent (same meaning as the English below).
+        function buildCookieConsentTranslations() {
+          const out = {};
+          if (typeof translations === 'undefined') return out;
+          Object.keys(translations).forEach(function (lang) {
+            const c = translations[lang] && translations[lang].cookieConsent;
+            if (!c || lang === 'en') return;
+            out[lang] = {
+              consentModal: {
+                title: c.title,
+                description: c.description,
+                acceptAllBtn: c.acceptAll,
+                acceptNecessaryBtn: c.rejectAll,
+                showPreferencesBtn: c.managePreferences
+              },
+              preferencesModal: {
+                title: c.prefsTitle,
+                acceptAllBtn: c.acceptAll,
+                acceptNecessaryBtn: c.rejectAll,
+                savePreferencesBtn: c.savePreferences,
+                closeIconLabel: c.close,
+                sections: [
+                  { title: c.usageTitle, description: c.usageDescription },
+                  { title: c.necessaryTitle, linkedCategory: 'necessary', description: c.necessaryDescription },
+                  { title: c.analyticsTitle, linkedCategory: 'analytics', description: c.analyticsDescription },
+                  { title: c.advertisingTitle, linkedCategory: 'advertising', description: c.advertisingDescription },
+                  { title: c.moreTitle, description: c.moreDescription }
+                ]
+              }
+            };
+          });
+          return out;
+        }
+
         window.addEventListener('load', function () {
           if (!window.CookieConsent) return;
           CookieConsent.run({
@@ -105,7 +139,9 @@
             },
             language: {
               default: 'en',
-              translations: {
+              autoDetect: 'document',
+              rtl: 'ar',
+              translations: Object.assign(buildCookieConsentTranslations(), {
                 en: {
                   consentModal: {
                     title: 'We value your privacy',
@@ -147,12 +183,13 @@
                     ]
                   }
                 }
-              }
+              })
             },
             onFirstConsent: updateConsentFromPreferences,
             onConsent: updateConsentFromPreferences,
             onChange: updateConsentFromPreferences
           });
+          window.__cookieConsentStarted = true;
         });
       </script>
 
@@ -994,21 +1031,21 @@
       <span id="languageLabel">Language</span>
       <select id="languagePicker" aria-label="Language selector">
         <option value="en">🇬🇧 EN (English)</option>
-        <option value="es">🇪🇸 ES (Spanish)</option>
-        <option value="pl">🇵🇱 PL (Polish)</option>
-        <option value="de">🇩🇪 DE (German)</option>
-        <option value="fr">🇫🇷 FR (French)</option>
-        <option value="zh">🇨🇳 ZH (Chinese)</option>
-        <option value="it">🇮🇹 IT (Italian)</option>
-        <option value="pt">🇵🇹 PT (Portuguese)</option>
-        <option value="ja">🇯🇵 JA (Japanese)</option>
-        <option value="ko">🇰🇷 KO (Korean)</option>
-        <option value="ru">🇷🇺 RU (Russian)</option>
-        <option value="ar">🇸🇦 AR (Arabic)</option>
-        <option value="hi">🇮🇳 HI (Hindi)</option>
-        <option value="tr">🇹🇷 TR (Turkish)</option>
-        <option value="nl">🇳🇱 NL (Dutch)</option>
-        <option value="sv">🇸🇪 SV (Swedish)</option>
+        <option value="es">🇪🇸 ES (Español)</option>
+        <option value="pl">🇵🇱 PL (Polski)</option>
+        <option value="de">🇩🇪 DE (Deutsch)</option>
+        <option value="fr">🇫🇷 FR (Français)</option>
+        <option value="zh">🇨🇳 ZH (中文)</option>
+        <option value="it">🇮🇹 IT (Italiano)</option>
+        <option value="pt">🇵🇹 PT (Português)</option>
+        <option value="ja">🇯🇵 JA (日本語)</option>
+        <option value="ko">🇰🇷 KO (한국어)</option>
+        <option value="ru">🇷🇺 RU (Русский)</option>
+        <option value="ar">🇸🇦 AR (العربية)</option>
+        <option value="hi">🇮🇳 HI (हिन्दी)</option>
+        <option value="tr">🇹🇷 TR (Türkçe)</option>
+        <option value="nl">🇳🇱 NL (Nederlands)</option>
+        <option value="sv">🇸🇪 SV (Svenska)</option>
       </select>
     </div>
     <header>
@@ -1119,13 +1156,13 @@
           </div>
 
                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);">
-           <h3 style="margin: 0 0 12px; font-size: 15px;">📚 Learn More About Longevity</h3>
+           <h3 style="margin: 0 0 12px; font-size: 15px;">📚 <span data-i18n="learnMore.title">Learn More About Longevity</span></h3>
            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
-             <a href="/how-it-works.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🧬 How This Calculator Works</a>
-             <a href="/exercise-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🏃 Exercise & Longevity Science</a>
-             <a href="/nutrition-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🥗 Nutrition & Aging Research</a>
-             <a href="/sleep-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">😴 Sleep Science for Longevity</a>
-             <a href="/results-guide.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">📊 Understanding Your Results</a>
+             <a href="/how-it-works.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🧬 <span data-i18n="learnMore.howItWorks">How This Calculator Works</span></a>
+             <a href="/exercise-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🏃 <span data-i18n="learnMore.exercise">Exercise & Longevity Science</span></a>
+             <a href="/nutrition-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">🥗 <span data-i18n="learnMore.nutrition">Nutrition & Aging Research</span></a>
+             <a href="/sleep-longevity.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">😴 <span data-i18n="learnMore.sleep">Sleep Science for Longevity</span></a>
+             <a href="/results-guide.html" style="display: block; padding: 10px 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; text-decoration: none; color: var(--text-primary); font-size: 14px; transition: all 0.2s ease;">📊 <span data-i18n="learnMore.results">Understanding Your Results</span></a>
            </div>
          </div>
         </div>
@@ -2059,6 +2096,10 @@
         metaDescription: 'Educational lifespan estimate from lifestyle answers. Not medical advice.',
         languageLabel: 'Language',
         pageTitle: 'Longevity Insights Calculator',
+        languagePickerLabel: "Language selector",
+        learnMore: {"title": "Learn More About Longevity", "howItWorks": "How This Calculator Works", "exercise": "Exercise & Longevity Science", "nutrition": "Nutrition & Aging Research", "sleep": "Sleep Science for Longevity", "results": "Understanding Your Results"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Can't sleep? Try a soothing story.", "sub": "From Soothing Stories on YouTube — calm listening, not medical advice.", "primary": "Marco Polo sleep", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "How this calculator works", "Results guide": "Results guide", "Exercise & Longevity research summary": "Exercise & Longevity research summary", "Nutrition & Aging research": "Nutrition & Aging research", "Sleep Science for Longevity": "Sleep Science for Longevity"},
         pageSubtitle: 'A first lifespan estimate from five answers. Refine if you want a fuller picture.',
         topNote: 'For educational purposes only — <a href="#disclaimer">review important disclaimers</a>.',
         trustBadges: {
@@ -2285,6 +2326,11 @@
         metaDescription: 'Estimador integral basado en ciencia que destaca factores modificables que influyen en la esperanza de vida.',
         languageLabel: 'Idioma',
         pageTitle: 'Calculadora de Longevidad',
+        languagePickerLabel: "Selector de idioma",
+        learnMore: {"title": "Más información sobre la longevidad", "howItWorks": "Cómo funciona esta calculadora", "exercise": "Ciencia del ejercicio y la longevidad", "nutrition": "Investigación sobre nutrición y envejecimiento", "sleep": "Ciencia del sueño para la longevidad", "results": "Cómo entender tus resultados"},
+        soothingStories: {"aria": "Soothing Stories", "title": "¿No puedes dormir? Prueba una historia relajante.", "sub": "De Soothing Stories en YouTube: escucha tranquila, no consejo médico.", "primary": "Marco Polo para dormir", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Cómo funciona esta calculadora", "Results guide": "Guía de resultados", "Exercise & Longevity research summary": "Resumen de investigación sobre ejercicio y longevidad", "Nutrition & Aging research": "Investigación sobre nutrición y envejecimiento", "Sleep Science for Longevity": "Ciencia del sueño para la longevidad"},
+        cookieConsent: {"title": "Valoramos tu privacidad", "description": "Usamos cookies para mejorar tu experiencia, medir el rendimiento y mostrar anuncios relevantes. Gestiona tus opciones en cualquier momento. Más información en nuestra <a href=\"/privacy.html\" target=\"_blank\">Política de privacidad</a>.", "acceptAll": "Aceptar todas", "rejectAll": "Rechazar todas", "managePreferences": "Gestionar preferencias", "prefsTitle": "Preferencias de cookies", "savePreferences": "Guardar preferencias", "close": "Cerrar", "usageTitle": "Uso de cookies", "usageDescription": "Selecciona qué categorías de cookies quieres permitir. Siempre usamos las cookies estrictamente necesarias para mantener el sitio seguro y operativo.", "necessaryTitle": "Necesarias", "necessaryDescription": "Imprescindibles para las funciones básicas del sitio; no se pueden desactivar.", "analyticsTitle": "Analítica (Google Analytics)", "analyticsDescription": "Nos ayudan a entender el tráfico y el uso del sitio para mejorar la experiencia.", "advertisingTitle": "Publicidad (Google AdSense y Adsterra)", "advertisingDescription": "Se usan para mostrar anuncios y medir su rendimiento. Estos scripts no se cargan a menos que aceptes las cookies de publicidad.", "moreTitle": "Más información", "moreDescription": "Puedes consultar todos los detalles en nuestra <a href=\"/privacy.html\" target=\"_blank\">Política de privacidad</a>."},
         pageSubtitle: 'Estimador integral basado en ciencia que destaca factores modificables que influyen en la esperanza de vida.',
         topNote: 'Solo para fines educativos — <a href="#disclaimer">revise los avisos importantes</a>.',
         trustBadges: {
@@ -2565,6 +2611,11 @@
         metaDescription: 'Kompleksowy, oparty na nauce estymator podkreślający modyfikowalne czynniki wpływające na długość życia.',
         languageLabel: 'Język',
         pageTitle: 'Kalkulator Długowieczności',
+        languagePickerLabel: "Wybór języka",
+        learnMore: {"title": "Dowiedz się więcej o długowieczności", "howItWorks": "Jak działa ten kalkulator", "exercise": "Nauka o ruchu i długowieczności", "nutrition": "Badania nad odżywianiem i starzeniem się", "sleep": "Nauka o śnie a długowieczność", "results": "Jak rozumieć swoje wyniki"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Nie możesz zasnąć? Spróbuj kojącej opowieści.", "sub": "Z kanału Soothing Stories na YouTube — spokojne słuchanie, nie porada medyczna.", "primary": "Marco Polo do snu", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Jak działa ten kalkulator", "Results guide": "Przewodnik po wynikach", "Exercise & Longevity research summary": "Podsumowanie badań o ruchu i długowieczności", "Nutrition & Aging research": "Badania nad odżywianiem i starzeniem się", "Sleep Science for Longevity": "Nauka o śnie a długowieczność"},
+        cookieConsent: {"title": "Szanujemy Twoją prywatność", "description": "Używamy plików cookie, aby ulepszać Twoje doświadczenia, mierzyć wydajność i wyświetlać trafne reklamy. Możesz w każdej chwili zarządzać swoimi wyborami. Więcej informacji znajdziesz w naszej <a href=\"/privacy.html\" target=\"_blank\">Polityce prywatności</a>.", "acceptAll": "Akceptuj wszystkie", "rejectAll": "Odrzuć wszystkie", "managePreferences": "Zarządzaj preferencjami", "prefsTitle": "Preferencje plików cookie", "savePreferences": "Zapisz preferencje", "close": "Zamknij", "usageTitle": "Używanie plików cookie", "usageDescription": "Wybierz, na które kategorie plików cookie chcesz zezwolić. Zawsze używamy niezbędnych plików cookie, aby zapewnić bezpieczeństwo i działanie strony.", "necessaryTitle": "Niezbędne", "necessaryDescription": "Wymagane do podstawowego działania strony i nie można ich wyłączyć.", "analyticsTitle": "Analityka (Google Analytics)", "analyticsDescription": "Pomagają nam zrozumieć ruch na stronie i sposób korzystania z niej, aby ulepszać doświadczenia.", "advertisingTitle": "Reklama (Google AdSense i Adsterra)", "advertisingDescription": "Służą do wyświetlania reklam i mierzenia ich skuteczności. Te skrypty nie są ładowane, dopóki nie zaakceptujesz reklamowych plików cookie.", "moreTitle": "Więcej informacji", "moreDescription": "Pełne szczegóły znajdziesz w naszej <a href=\"/privacy.html\" target=\"_blank\">Polityce prywatności</a>."},
         pageSubtitle: 'Kompleksowy, oparty na nauce estymator podkreślający modyfikowalne czynniki wpływające na długość życia.',
         topNote: 'Tylko do celów edukacyjnych — <a href="#disclaimer">zapoznaj się z ważnymi zastrzeżeniami</a>.',
         sections: {
@@ -2840,6 +2891,11 @@
         metaDescription: 'Umfassender, wissenschaftlich fundierter Schätzer, der modifizierbare Faktoren hervorhebt, die die Lebensspanne beeinflussen.',
         languageLabel: 'Sprache',
         pageTitle: 'Langlebigkeitsrechner',
+        languagePickerLabel: "Sprachauswahl",
+        learnMore: {"title": "Mehr über Langlebigkeit erfahren", "howItWorks": "So funktioniert dieser Rechner", "exercise": "Wissenschaft zu Bewegung und Langlebigkeit", "nutrition": "Forschung zu Ernährung und Altern", "sleep": "Schlafforschung und Langlebigkeit", "results": "Deine Ergebnisse verstehen"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Kannst du nicht schlafen? Probier eine beruhigende Geschichte.", "sub": "Von Soothing Stories auf YouTube – ruhiges Zuhören, keine medizinische Beratung.", "primary": "Marco Polo zum Einschlafen", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "So funktioniert dieser Rechner", "Results guide": "Leitfaden zu den Ergebnissen", "Exercise & Longevity research summary": "Forschungsüberblick zu Bewegung und Langlebigkeit", "Nutrition & Aging research": "Forschung zu Ernährung und Altern", "Sleep Science for Longevity": "Schlafforschung und Langlebigkeit"},
+        cookieConsent: {"title": "Deine Privatsphäre ist uns wichtig", "description": "Wir verwenden Cookies, um dein Erlebnis zu verbessern, die Leistung zu messen und relevante Werbung anzuzeigen. Du kannst deine Auswahl jederzeit ändern. Mehr dazu in unserer <a href=\"/privacy.html\" target=\"_blank\">Datenschutzerklärung</a>.", "acceptAll": "Alle akzeptieren", "rejectAll": "Alle ablehnen", "managePreferences": "Einstellungen verwalten", "prefsTitle": "Cookie-Einstellungen", "savePreferences": "Einstellungen speichern", "close": "Schließen", "usageTitle": "Verwendung von Cookies", "usageDescription": "Wähle aus, welche Cookie-Kategorien du zulassen möchtest. Unbedingt erforderliche Cookies verwenden wir immer, um die Website sicher und funktionsfähig zu halten.", "necessaryTitle": "Erforderlich", "necessaryDescription": "Für die Grundfunktionen der Website erforderlich und können nicht deaktiviert werden.", "analyticsTitle": "Analyse (Google Analytics)", "analyticsDescription": "Helfen uns, Besucherzahlen und Nutzung der Website zu verstehen, um das Erlebnis zu verbessern.", "advertisingTitle": "Werbung (Google AdSense und Adsterra)", "advertisingDescription": "Werden verwendet, um Werbung auszuliefern und ihre Leistung zu messen. Diese Skripte werden nur geladen, wenn du Werbe-Cookies akzeptierst.", "moreTitle": "Mehr erfahren", "moreDescription": "Alle Details findest du in unserer <a href=\"/privacy.html\" target=\"_blank\">Datenschutzerklärung</a>."},
         pageSubtitle: 'Umfassender, wissenschaftlich fundierter Schätzer, der modifizierbare Faktoren hervorhebt, die die Lebensspanne beeinflussen.',
         topNote: 'Nur zu Bildungszwecken — <a href="#disclaimer">wichtige Hinweise ansehen</a>.',
         trustBadges: {
@@ -3115,6 +3171,11 @@
         metaDescription: 'Estimateur complet et scientifique mettant en évidence les facteurs modifiables qui influencent la durée de vie.',
         languageLabel: 'Langue',
         pageTitle: 'Calculateur de Longévité',
+        languagePickerLabel: "Sélecteur de langue",
+        learnMore: {"title": "En savoir plus sur la longévité", "howItWorks": "Comment fonctionne ce calculateur", "exercise": "Science de l’exercice et de la longévité", "nutrition": "Recherche sur la nutrition et le vieillissement", "sleep": "Science du sommeil et longévité", "results": "Comprendre vos résultats"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Vous n’arrivez pas à dormir ? Essayez une histoire apaisante.", "sub": "De Soothing Stories sur YouTube — une écoute calme, pas un avis médical.", "primary": "Marco Polo pour dormir", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Comment fonctionne ce calculateur", "Results guide": "Guide des résultats", "Exercise & Longevity research summary": "Synthèse des recherches sur l’exercice et la longévité", "Nutrition & Aging research": "Recherche sur la nutrition et le vieillissement", "Sleep Science for Longevity": "Science du sommeil et longévité"},
+        cookieConsent: {"title": "Nous respectons votre vie privée", "description": "Nous utilisons des cookies pour améliorer votre expérience, mesurer les performances et diffuser des publicités pertinentes. Gérez vos choix à tout moment. Pour en savoir plus, consultez notre <a href=\"/privacy.html\" target=\"_blank\">Politique de confidentialité</a>.", "acceptAll": "Tout accepter", "rejectAll": "Tout refuser", "managePreferences": "Gérer les préférences", "prefsTitle": "Préférences en matière de cookies", "savePreferences": "Enregistrer les préférences", "close": "Fermer", "usageTitle": "Utilisation des cookies", "usageDescription": "Sélectionnez les catégories de cookies que vous souhaitez autoriser. Nous utilisons toujours les cookies strictement nécessaires pour assurer la sécurité et le fonctionnement du site.", "necessaryTitle": "Nécessaires", "necessaryDescription": "Indispensables aux fonctionnalités essentielles du site ; ils ne peuvent pas être désactivés.", "analyticsTitle": "Mesure d’audience (Google Analytics)", "analyticsDescription": "Nous aident à comprendre la fréquentation et l’utilisation du site afin d’améliorer l’expérience.", "advertisingTitle": "Publicité (Google AdSense et Adsterra)", "advertisingDescription": "Utilisés pour diffuser des publicités et mesurer leurs performances. Ces scripts ne se chargent que si vous acceptez les cookies publicitaires.", "moreTitle": "En savoir plus", "moreDescription": "Vous pouvez consulter tous les détails dans notre <a href=\"/privacy.html\" target=\"_blank\">Politique de confidentialité</a>."},
         pageSubtitle: 'Estimateur complet et scientifique mettant en évidence les facteurs modifiables qui influencent la durée de vie.',
         topNote: 'À des fins éducatives seulement — <a href="#disclaimer">consultez les avertissements importants</a>.',
         trustBadges: {
@@ -3390,6 +3451,11 @@
         metaDescription: '基于科学的综合评估工具，突出影响寿命的可改变因素。',
         languageLabel: '语言',
         pageTitle: '长寿计算器',
+        languagePickerLabel: "语言选择",
+        learnMore: {"title": "了解更多长寿知识", "howItWorks": "本计算器的工作原理", "exercise": "运动与长寿科学", "nutrition": "营养与衰老研究", "sleep": "睡眠科学与长寿", "results": "解读您的结果"},
+        soothingStories: {"aria": "Soothing Stories", "title": "睡不着？试试一个舒缓的故事。", "sub": "来自 YouTube 上的 Soothing Stories——平静聆听，并非医疗建议。", "primary": "马可·波罗助眠故事", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "本计算器的工作原理", "Results guide": "结果指南", "Exercise & Longevity research summary": "运动与长寿研究摘要", "Nutrition & Aging research": "营养与衰老研究", "Sleep Science for Longevity": "睡眠科学与长寿"},
+        cookieConsent: {"title": "我们重视您的隐私", "description": "我们使用 Cookie 来改善您的体验、衡量性能并投放相关广告。您可以随时管理您的选择。详情请参阅我们的<a href=\"/privacy.html\" target=\"_blank\">隐私政策</a>。", "acceptAll": "全部接受", "rejectAll": "全部拒绝", "managePreferences": "管理偏好", "prefsTitle": "Cookie 偏好设置", "savePreferences": "保存偏好", "close": "关闭", "usageTitle": "Cookie 的使用", "usageDescription": "请选择您允许的 Cookie 类别。我们始终使用绝对必要的 Cookie，以确保网站安全并正常运行。", "necessaryTitle": "必要", "necessaryDescription": "网站核心功能所必需，无法停用。", "analyticsTitle": "分析（Google Analytics）", "analyticsDescription": "帮助我们了解网站流量和使用情况，以改善体验。", "advertisingTitle": "广告（Google AdSense 和 Adsterra）", "advertisingDescription": "用于投放广告并衡量其效果。除非您接受广告 Cookie，否则这些脚本不会加载。", "moreTitle": "了解更多", "moreDescription": "您可以在我们的<a href=\"/privacy.html\" target=\"_blank\">隐私政策</a>中查看完整详情。"},
         pageSubtitle: '基于科学的综合评估工具，突出影响寿命的可改变因素。',
         topNote: '仅供教育用途 — <a href="#disclaimer">查看重要免责声明</a>。',
         sections: {
@@ -3665,6 +3731,11 @@
         metaDescription: 'Strumento completo basato sulla scienza che evidenzia i fattori modificabili che influenzano la durata della vita.',
         languageLabel: 'Lingua',
         pageTitle: 'Calcolatore di Longevità',
+        languagePickerLabel: "Selettore della lingua",
+        learnMore: {"title": "Scopri di più sulla longevità", "howItWorks": "Come funziona questo calcolatore", "exercise": "Scienza dell’esercizio e della longevità", "nutrition": "Ricerca su nutrizione e invecchiamento", "sleep": "Scienza del sonno per la longevità", "results": "Capire i tuoi risultati"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Non riesci a dormire? Prova una storia rilassante.", "sub": "Da Soothing Stories su YouTube: ascolto tranquillo, non un consiglio medico.", "primary": "Marco Polo per dormire", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Come funziona questo calcolatore", "Results guide": "Guida ai risultati", "Exercise & Longevity research summary": "Sintesi delle ricerche su esercizio e longevità", "Nutrition & Aging research": "Ricerca su nutrizione e invecchiamento", "Sleep Science for Longevity": "Scienza del sonno per la longevità"},
+        cookieConsent: {"title": "Teniamo alla tua privacy", "description": "Usiamo i cookie per migliorare la tua esperienza, misurare le prestazioni e mostrare annunci pertinenti. Puoi gestire le tue scelte in qualsiasi momento. Maggiori informazioni nella nostra <a href=\"/privacy.html\" target=\"_blank\">Informativa sulla privacy</a>.", "acceptAll": "Accetta tutti", "rejectAll": "Rifiuta tutti", "managePreferences": "Gestisci preferenze", "prefsTitle": "Preferenze sui cookie", "savePreferences": "Salva preferenze", "close": "Chiudi", "usageTitle": "Utilizzo dei cookie", "usageDescription": "Seleziona quali categorie di cookie vuoi consentire. Usiamo sempre i cookie strettamente necessari per mantenere il sito sicuro e funzionante.", "necessaryTitle": "Necessari", "necessaryDescription": "Indispensabili per le funzioni di base del sito; non possono essere disattivati.", "analyticsTitle": "Statistiche (Google Analytics)", "analyticsDescription": "Ci aiutano a capire il traffico e l’utilizzo del sito per migliorare l’esperienza.", "advertisingTitle": "Pubblicità (Google AdSense e Adsterra)", "advertisingDescription": "Usati per mostrare annunci e misurarne le prestazioni. Questi script non vengono caricati se non accetti i cookie pubblicitari.", "moreTitle": "Scopri di più", "moreDescription": "Puoi consultare tutti i dettagli nella nostra <a href=\"/privacy.html\" target=\"_blank\">Informativa sulla privacy</a>."},
         pageSubtitle: 'Strumento completo basato sulla scienza che evidenzia i fattori modificabili che influenzano la durata della vita.',
         topNote: 'Solo a scopo educativo — <a href="#disclaimer">leggi le avvertenze importanti</a>.',
         sections: {
@@ -3940,6 +4011,11 @@
         metaDescription: 'Estimador abrangente e baseado em ciência que destaca fatores modificáveis que influenciam a longevidade.',
         languageLabel: 'Idioma',
         pageTitle: 'Calculadora de Longevidade',
+        languagePickerLabel: "Seletor de idioma",
+        learnMore: {"title": "Saiba mais sobre longevidade", "howItWorks": "Como esta calculadora funciona", "exercise": "Ciência do exercício e da longevidade", "nutrition": "Pesquisa sobre nutrição e envelhecimento", "sleep": "Ciência do sono para a longevidade", "results": "Como entender seus resultados"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Sem sono? Experimente uma história relaxante.", "sub": "Do Soothing Stories no YouTube — escuta tranquila, não é aconselhamento médico.", "primary": "Marco Polo para dormir", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Como esta calculadora funciona", "Results guide": "Guia de resultados", "Exercise & Longevity research summary": "Resumo de pesquisas sobre exercício e longevidade", "Nutrition & Aging research": "Pesquisa sobre nutrição e envelhecimento", "Sleep Science for Longevity": "Ciência do sono para a longevidade"},
+        cookieConsent: {"title": "Valorizamos sua privacidade", "description": "Usamos cookies para melhorar sua experiência, medir o desempenho e exibir anúncios relevantes. Gerencie suas escolhas a qualquer momento. Saiba mais em nossa <a href=\"/privacy.html\" target=\"_blank\">Política de Privacidade</a>.", "acceptAll": "Aceitar todos", "rejectAll": "Rejeitar todos", "managePreferences": "Gerenciar preferências", "prefsTitle": "Preferências de cookies", "savePreferences": "Salvar preferências", "close": "Fechar", "usageTitle": "Uso de cookies", "usageDescription": "Selecione quais categorias de cookies você deseja permitir. Sempre usamos cookies estritamente necessários para manter o site seguro e funcionando.", "necessaryTitle": "Necessários", "necessaryDescription": "Obrigatórios para as funções essenciais do site e não podem ser desativados.", "analyticsTitle": "Análise (Google Analytics)", "analyticsDescription": "Ajudam-nos a entender o tráfego e o uso do site para melhorar a experiência.", "advertisingTitle": "Publicidade (Google AdSense e Adsterra)", "advertisingDescription": "Usados para exibir anúncios e medir seu desempenho. Esses scripts não são carregados a menos que você aceite os cookies de publicidade.", "moreTitle": "Saiba mais", "moreDescription": "Você pode consultar todos os detalhes em nossa <a href=\"/privacy.html\" target=\"_blank\">Política de Privacidade</a>."},
         pageSubtitle: 'Estimador abrangente e baseado em ciência que destaca fatores modificáveis que influenciam a longevidade.',
         topNote: 'Somente para fins educativos — <a href="#disclaimer">consulte os avisos importantes</a>.',
         trustBadges: {
@@ -4215,6 +4291,11 @@
         metaDescription: '寿命に影響する修正可能な要因を示す、科学に基づいた総合的な推計ツール。',
         languageLabel: '言語',
         pageTitle: '長寿インサイト計算機',
+        languagePickerLabel: "言語の選択",
+        learnMore: {"title": "長寿についてもっと知る", "howItWorks": "この計算機の仕組み", "exercise": "運動と長寿の科学", "nutrition": "栄養と老化の研究", "sleep": "長寿のための睡眠科学", "results": "結果の見方"},
+        soothingStories: {"aria": "Soothing Stories", "title": "眠れませんか？心が落ち着く物語を聴いてみましょう。", "sub": "YouTube の Soothing Stories より — 穏やかに聴くためのもので、医学的助言ではありません。", "primary": "マルコ・ポーロ（睡眠用）", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "この計算機の仕組み", "Results guide": "結果ガイド", "Exercise & Longevity research summary": "運動と長寿の研究まとめ", "Nutrition & Aging research": "栄養と老化の研究", "Sleep Science for Longevity": "長寿のための睡眠科学"},
+        cookieConsent: {"title": "お客様のプライバシーを大切にしています", "description": "当サイトでは、利用体験の向上、パフォーマンスの測定、関連性の高い広告の配信のために Cookie を使用しています。選択内容はいつでも管理できます。詳しくは<a href=\"/privacy.html\" target=\"_blank\">プライバシーポリシー</a>をご覧ください。", "acceptAll": "すべて許可", "rejectAll": "すべて拒否", "managePreferences": "設定を管理", "prefsTitle": "Cookie の設定", "savePreferences": "設定を保存", "close": "閉じる", "usageTitle": "Cookie の使用について", "usageDescription": "許可する Cookie のカテゴリを選択してください。サイトの安全性と機能を維持するため、厳密に必要な Cookie は常に使用します。", "necessaryTitle": "必須", "necessaryDescription": "サイトの基本機能に必要なため、無効にすることはできません。", "analyticsTitle": "アクセス解析（Google Analytics）", "analyticsDescription": "サイトのトラフィックや利用状況を把握し、利用体験を向上させるために役立ちます。", "advertisingTitle": "広告（Google AdSense および Adsterra）", "advertisingDescription": "広告の配信とその効果の測定に使用されます。広告 Cookie を許可しない限り、これらのスクリプトは読み込まれません。", "moreTitle": "詳細", "moreDescription": "詳細は<a href=\"/privacy.html\" target=\"_blank\">プライバシーポリシー</a>でご確認いただけます。"},
         pageSubtitle: '寿命に影響する修正可能な要因を示す、科学に基づいた総合的な推計ツール。',
         topNote: '教育目的のみ — <a href="#disclaimer">重要な免責事項を確認してください</a>。',
         sections: {
@@ -4490,6 +4571,11 @@
         metaDescription: '수명에 영향을 주는 수정 가능한 요인을 보여주는 과학 기반 종합 추정 도구입니다.',
         languageLabel: '언어',
         pageTitle: '장수 인사이트 계산기',
+        languagePickerLabel: "언어 선택",
+        learnMore: {"title": "장수에 대해 더 알아보기", "howItWorks": "이 계산기의 작동 방식", "exercise": "운동과 장수의 과학", "nutrition": "영양과 노화 연구", "sleep": "장수를 위한 수면 과학", "results": "결과 이해하기"},
+        soothingStories: {"aria": "Soothing Stories", "title": "잠이 오지 않나요? 마음을 편안하게 하는 이야기를 들어 보세요.", "sub": "YouTube의 Soothing Stories 제공 — 차분히 듣는 콘텐츠이며 의학적 조언이 아닙니다.", "primary": "마르코 폴로 수면 이야기", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "이 계산기의 작동 방식", "Results guide": "결과 가이드", "Exercise & Longevity research summary": "운동과 장수 연구 요약", "Nutrition & Aging research": "영양과 노화 연구", "Sleep Science for Longevity": "장수를 위한 수면 과학"},
+        cookieConsent: {"title": "귀하의 개인정보를 소중히 여깁니다", "description": "당사는 사용자 경험을 개선하고, 성능을 측정하며, 관련성 있는 광고를 제공하기 위해 쿠키를 사용합니다. 언제든지 선택 사항을 관리할 수 있습니다. 자세한 내용은 <a href=\"/privacy.html\" target=\"_blank\">개인정보 처리방침</a>을 참조하세요.", "acceptAll": "모두 허용", "rejectAll": "모두 거부", "managePreferences": "환경설정 관리", "prefsTitle": "쿠키 환경설정", "savePreferences": "환경설정 저장", "close": "닫기", "usageTitle": "쿠키 사용", "usageDescription": "허용할 쿠키 카테고리를 선택하세요. 사이트를 안전하고 정상적으로 운영하기 위해 반드시 필요한 쿠키는 항상 사용합니다.", "necessaryTitle": "필수", "necessaryDescription": "사이트의 핵심 기능에 필요하며 비활성화할 수 없습니다.", "analyticsTitle": "분석(Google Analytics)", "analyticsDescription": "사이트 트래픽과 이용 현황을 파악하여 사용자 경험을 개선하는 데 도움이 됩니다.", "advertisingTitle": "광고(Google AdSense 및 Adsterra)", "advertisingDescription": "광고를 제공하고 그 성과를 측정하는 데 사용됩니다. 광고 쿠키를 허용하지 않으면 이 스크립트는 로드되지 않습니다.", "moreTitle": "자세히 알아보기", "moreDescription": "전체 내용은 <a href=\"/privacy.html\" target=\"_blank\">개인정보 처리방침</a>에서 확인할 수 있습니다."},
         pageSubtitle: '수명에 영향을 주는 수정 가능한 요인을 보여주는 과학 기반 종합 추정 도구입니다.',
         topNote: '교육 목적 전용 — <a href="#disclaimer">중요한 면책 조항을 확인하세요</a>.',
         sections: {
@@ -4765,6 +4851,11 @@
         metaDescription: 'Комплексный калькулятор, основанный на данных, который подчеркивает изменяемые факторы долголетия.',
         languageLabel: 'Язык',
         pageTitle: 'Калькулятор долголетия',
+        languagePickerLabel: "Выбор языка",
+        learnMore: {"title": "Подробнее о долголетии", "howItWorks": "Как работает этот калькулятор", "exercise": "Наука о физической активности и долголетии", "nutrition": "Исследования питания и старения", "sleep": "Наука о сне и долголетие", "results": "Как понимать ваши результаты"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Не можете уснуть? Послушайте успокаивающую историю.", "sub": "С канала Soothing Stories на YouTube — спокойное прослушивание, а не медицинская консультация.", "primary": "Марко Поло для сна", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Как работает этот калькулятор", "Results guide": "Руководство по результатам", "Exercise & Longevity research summary": "Обзор исследований о физической активности и долголетии", "Nutrition & Aging research": "Исследования питания и старения", "Sleep Science for Longevity": "Наука о сне и долголетие"},
+        cookieConsent: {"title": "Мы ценим вашу конфиденциальность", "description": "Мы используем файлы cookie, чтобы улучшать ваш опыт, измерять производительность и показывать релевантную рекламу. Вы можете в любое время изменить свой выбор. Подробнее — в нашей <a href=\"/privacy.html\" target=\"_blank\">Политике конфиденциальности</a>.", "acceptAll": "Принять все", "rejectAll": "Отклонить все", "managePreferences": "Управлять настройками", "prefsTitle": "Настройки файлов cookie", "savePreferences": "Сохранить настройки", "close": "Закрыть", "usageTitle": "Использование файлов cookie", "usageDescription": "Выберите, какие категории файлов cookie вы разрешаете. Строго необходимые файлы cookie мы используем всегда, чтобы сайт оставался безопасным и работоспособным.", "necessaryTitle": "Необходимые", "necessaryDescription": "Нужны для основных функций сайта и не могут быть отключены.", "analyticsTitle": "Аналитика (Google Analytics)", "analyticsDescription": "Помогают нам понимать посещаемость и использование сайта, чтобы улучшать его.", "advertisingTitle": "Реклама (Google AdSense и Adsterra)", "advertisingDescription": "Используются для показа рекламы и измерения её эффективности. Эти скрипты не загружаются, пока вы не примете рекламные файлы cookie.", "moreTitle": "Подробнее", "moreDescription": "Все подробности — в нашей <a href=\"/privacy.html\" target=\"_blank\">Политике конфиденциальности</a>."},
         pageSubtitle: 'Комплексный калькулятор, основанный на данных, который подчеркивает изменяемые факторы долголетия.',
         topNote: 'Только в образовательных целях — <a href="#disclaimer">прочитайте важные предупреждения</a>.',
         sections: {
@@ -5040,6 +5131,11 @@
         metaDescription: 'أداة شاملة مبنية على العلم تسلط الضوء على العوامل القابلة للتعديل التي تؤثر على طول العمر.',
         languageLabel: 'اللغة',
         pageTitle: 'حاسبة رؤى طول العمر',
+        languagePickerLabel: "اختيار اللغة",
+        learnMore: {"title": "اعرف المزيد عن طول العمر", "howItWorks": "كيف تعمل هذه الحاسبة", "exercise": "علم التمارين وطول العمر", "nutrition": "أبحاث التغذية والشيخوخة", "sleep": "علم النوم وطول العمر", "results": "فهم نتائجك"},
+        soothingStories: {"aria": "Soothing Stories", "title": "لا تستطيع النوم؟ جرّب قصة مهدّئة.", "sub": "من قناة Soothing Stories على YouTube — استماع هادئ، وليست نصيحة طبية.", "primary": "ماركو بولو للنوم", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "كيف تعمل هذه الحاسبة", "Results guide": "دليل النتائج", "Exercise & Longevity research summary": "ملخص أبحاث التمارين وطول العمر", "Nutrition & Aging research": "أبحاث التغذية والشيخوخة", "Sleep Science for Longevity": "علم النوم وطول العمر"},
+        cookieConsent: {"title": "نحن نقدّر خصوصيتك", "description": "نستخدم ملفات تعريف الارتباط لتحسين تجربتك وقياس الأداء وعرض إعلانات ملائمة. يمكنك إدارة اختياراتك في أي وقت. اقرأ المزيد في <a href=\"/privacy.html\" target=\"_blank\">سياسة الخصوصية</a> الخاصة بنا.", "acceptAll": "قبول الكل", "rejectAll": "رفض الكل", "managePreferences": "إدارة التفضيلات", "prefsTitle": "تفضيلات ملفات تعريف الارتباط", "savePreferences": "حفظ التفضيلات", "close": "إغلاق", "usageTitle": "استخدام ملفات تعريف الارتباط", "usageDescription": "اختر فئات ملفات تعريف الارتباط التي تريد السماح بها. نستخدم دائمًا ملفات تعريف الارتباط الضرورية للغاية للحفاظ على أمان الموقع وعمله.", "necessaryTitle": "ضرورية", "necessaryDescription": "مطلوبة للوظائف الأساسية للموقع ولا يمكن تعطيلها.", "analyticsTitle": "التحليلات (Google Analytics)", "analyticsDescription": "تساعدنا على فهم حركة الزيارات واستخدام الموقع لتحسين التجربة.", "advertisingTitle": "الإعلانات (Google AdSense وAdsterra)", "advertisingDescription": "تُستخدم لعرض الإعلانات وقياس أدائها. لا يتم تحميل هذه البرامج النصية إلا إذا قبلت ملفات تعريف الارتباط الإعلانية.", "moreTitle": "اعرف المزيد", "moreDescription": "يمكنك مراجعة التفاصيل الكاملة في <a href=\"/privacy.html\" target=\"_blank\">سياسة الخصوصية</a> الخاصة بنا."},
         pageSubtitle: 'أداة شاملة مبنية على العلم تسلط الضوء على العوامل القابلة للتعديل التي تؤثر على طول العمر.',
         topNote: 'لأغراض تعليمية فقط — <a href="#disclaimer">راجع التحذيرات المهمة</a>.',
         sections: {
@@ -5315,6 +5411,11 @@
         metaDescription: 'वैज्ञानिक आधार पर बना समग्र अनुमानक जो आयु को प्रभावित करने वाले बदले जा सकने वाले कारकों को दर्शाता है।',
         languageLabel: 'भाषा',
         pageTitle: 'दीर्घायु इनसाइट्स कैलकुलेटर',
+        languagePickerLabel: "भाषा चयनकर्ता",
+        learnMore: {"title": "दीर्घायु के बारे में और जानें", "howItWorks": "यह कैलकुलेटर कैसे काम करता है", "exercise": "व्यायाम और दीर्घायु का विज्ञान", "nutrition": "पोषण और बुढ़ापे पर शोध", "sleep": "दीर्घायु के लिए नींद का विज्ञान", "results": "अपने परिणाम समझें"},
+        soothingStories: {"aria": "Soothing Stories", "title": "नींद नहीं आ रही? कोई सुकून देने वाली कहानी सुनकर देखें।", "sub": "YouTube पर Soothing Stories से — शांत सुनने के लिए, चिकित्सीय सलाह नहीं।", "primary": "मार्को पोलो — नींद के लिए", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "यह कैलकुलेटर कैसे काम करता है", "Results guide": "परिणाम गाइड", "Exercise & Longevity research summary": "व्यायाम और दीर्घायु शोध सारांश", "Nutrition & Aging research": "पोषण और बुढ़ापे पर शोध", "Sleep Science for Longevity": "दीर्घायु के लिए नींद का विज्ञान"},
+        cookieConsent: {"title": "हम आपकी गोपनीयता को महत्व देते हैं", "description": "हम आपके अनुभव को बेहतर बनाने, प्रदर्शन मापने और प्रासंगिक विज्ञापन दिखाने के लिए कुकीज़ का उपयोग करते हैं। आप कभी भी अपनी पसंद प्रबंधित कर सकते हैं। अधिक जानकारी हमारी <a href=\"/privacy.html\" target=\"_blank\">गोपनीयता नीति</a> में पढ़ें।", "acceptAll": "सभी स्वीकार करें", "rejectAll": "सभी अस्वीकार करें", "managePreferences": "प्राथमिकताएँ प्रबंधित करें", "prefsTitle": "कुकी प्राथमिकताएँ", "savePreferences": "प्राथमिकताएँ सहेजें", "close": "बंद करें", "usageTitle": "कुकी का उपयोग", "usageDescription": "चुनें कि आप कुकीज़ की किन श्रेणियों की अनुमति देना चाहते हैं। साइट को सुरक्षित और कार्यशील रखने के लिए हम हमेशा पूरी तरह आवश्यक कुकीज़ का उपयोग करते हैं।", "necessaryTitle": "आवश्यक", "necessaryDescription": "साइट की मुख्य कार्यक्षमता के लिए ज़रूरी हैं और इन्हें बंद नहीं किया जा सकता।", "analyticsTitle": "एनालिटिक्स (Google Analytics)", "analyticsDescription": "अनुभव को बेहतर बनाने के लिए साइट ट्रैफ़िक और उपयोग को समझने में हमारी मदद करती हैं।", "advertisingTitle": "विज्ञापन (Google AdSense और Adsterra)", "advertisingDescription": "विज्ञापन दिखाने और उनके प्रदर्शन को मापने के लिए उपयोग की जाती हैं। जब तक आप विज्ञापन कुकीज़ स्वीकार नहीं करते, ये स्क्रिप्ट लोड नहीं होतीं।", "moreTitle": "और जानें", "moreDescription": "पूरा विवरण आप हमारी <a href=\"/privacy.html\" target=\"_blank\">गोपनीयता नीति</a> में देख सकते हैं।"},
         pageSubtitle: 'वैज्ञानिक आधार पर बना समग्र अनुमानक जो आयु को प्रभावित करने वाले बदले जा सकने वाले कारकों को दर्शाता है।',
         topNote: 'केवल शैक्षिक उद्देश्य के लिए — <a href="#disclaimer">महत्वपूर्ण अस्वीकरण देखें</a>।',
         sections: {
@@ -5590,6 +5691,11 @@
         metaDescription: 'Yaşam süresini etkileyen değiştirilebilir faktörleri öne çıkaran bilim temelli kapsamlı bir tahminleyici.',
         languageLabel: 'Dil',
         pageTitle: 'Uzun Ömür İçgörü Hesaplayıcısı',
+        languagePickerLabel: "Dil seçici",
+        learnMore: {"title": "Uzun Ömür Hakkında Daha Fazla Bilgi", "howItWorks": "Bu Hesaplayıcı Nasıl Çalışır", "exercise": "Egzersiz ve Uzun Ömür Bilimi", "nutrition": "Beslenme ve Yaşlanma Araştırmaları", "sleep": "Uzun Ömür İçin Uyku Bilimi", "results": "Sonuçlarınızı Anlamak"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Uyuyamıyor musunuz? Rahatlatıcı bir hikâye deneyin.", "sub": "YouTube'daki Soothing Stories'den — sakin bir dinleme, tıbbi tavsiye değildir.", "primary": "Uyku için Marco Polo", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Bu hesaplayıcı nasıl çalışır", "Results guide": "Sonuç rehberi", "Exercise & Longevity research summary": "Egzersiz ve uzun ömür araştırma özeti", "Nutrition & Aging research": "Beslenme ve yaşlanma araştırmaları", "Sleep Science for Longevity": "Uzun ömür için uyku bilimi"},
+        cookieConsent: {"title": "Gizliliğinize önem veriyoruz", "description": "Deneyiminizi iyileştirmek, performansı ölçmek ve ilgili reklamlar sunmak için çerezler kullanıyoruz. Tercihlerinizi istediğiniz zaman yönetebilirsiniz. Ayrıntılar için <a href=\"/privacy.html\" target=\"_blank\">Gizlilik Politikamızı</a> okuyun.", "acceptAll": "Tümünü kabul et", "rejectAll": "Tümünü reddet", "managePreferences": "Tercihleri yönet", "prefsTitle": "Çerez tercihleri", "savePreferences": "Tercihleri kaydet", "close": "Kapat", "usageTitle": "Çerez kullanımı", "usageDescription": "Hangi çerez kategorilerine izin vermek istediğinizi seçin. Sitenin güvenli ve işlevsel kalması için kesinlikle gerekli çerezleri her zaman kullanırız.", "necessaryTitle": "Gerekli", "necessaryDescription": "Sitenin temel işlevleri için gereklidir ve devre dışı bırakılamaz.", "analyticsTitle": "Analiz (Google Analytics)", "analyticsDescription": "Deneyimi iyileştirmek için site trafiğini ve kullanımını anlamamıza yardımcı olur.", "advertisingTitle": "Reklam (Google AdSense ve Adsterra)", "advertisingDescription": "Reklam sunmak ve performanslarını ölçmek için kullanılır. Reklam çerezlerini kabul etmediğiniz sürece bu komut dosyaları yüklenmez.", "moreTitle": "Daha fazla bilgi", "moreDescription": "Tüm ayrıntıları <a href=\"/privacy.html\" target=\"_blank\">Gizlilik Politikamızda</a> inceleyebilirsiniz."},
         pageSubtitle: 'Yaşam süresini etkileyen değiştirilebilir faktörleri öne çıkaran bilim temelli kapsamlı bir tahminleyici.',
         topNote: 'Yalnızca eğitim amaçlıdır — <a href="#disclaimer">önemli uyarıları inceleyin</a>.',
         sections: {
@@ -5865,6 +5971,11 @@
         metaDescription: 'Een compleet, wetenschappelijk onderbouwd hulpmiddel dat aanpasbare factoren voor levensduur uitlicht.',
         languageLabel: 'Taal',
         pageTitle: 'Langleven Inzichten Calculator',
+        languagePickerLabel: "Taalkeuze",
+        learnMore: {"title": "Meer over een lang leven", "howItWorks": "Zo werkt deze calculator", "exercise": "Wetenschap over beweging en levensduur", "nutrition": "Onderzoek naar voeding en veroudering", "sleep": "Slaapwetenschap en levensduur", "results": "Je resultaten begrijpen"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Kun je niet slapen? Probeer een rustgevend verhaal.", "sub": "Van Soothing Stories op YouTube — rustig luisteren, geen medisch advies.", "primary": "Marco Polo om bij te slapen", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Zo werkt deze calculator", "Results guide": "Gids bij de resultaten", "Exercise & Longevity research summary": "Samenvatting van onderzoek naar beweging en levensduur", "Nutrition & Aging research": "Onderzoek naar voeding en veroudering", "Sleep Science for Longevity": "Slaapwetenschap en levensduur"},
+        cookieConsent: {"title": "We hechten waarde aan je privacy", "description": "We gebruiken cookies om je ervaring te verbeteren, prestaties te meten en relevante advertenties te tonen. Beheer je keuzes op elk moment. Lees meer in ons <a href=\"/privacy.html\" target=\"_blank\">Privacybeleid</a>.", "acceptAll": "Alles accepteren", "rejectAll": "Alles weigeren", "managePreferences": "Voorkeuren beheren", "prefsTitle": "Cookievoorkeuren", "savePreferences": "Voorkeuren opslaan", "close": "Sluiten", "usageTitle": "Gebruik van cookies", "usageDescription": "Kies welke categorieën cookies je wilt toestaan. Strikt noodzakelijke cookies gebruiken we altijd om de site veilig en werkend te houden.", "necessaryTitle": "Noodzakelijk", "necessaryDescription": "Vereist voor de basisfuncties van de site en kunnen niet worden uitgeschakeld.", "analyticsTitle": "Analyse (Google Analytics)", "analyticsDescription": "Helpen ons het verkeer op en het gebruik van de site te begrijpen om de ervaring te verbeteren.", "advertisingTitle": "Advertenties (Google AdSense en Adsterra)", "advertisingDescription": "Worden gebruikt om advertenties te tonen en hun prestaties te meten. Deze scripts worden alleen geladen als je advertentiecookies accepteert.", "moreTitle": "Meer informatie", "moreDescription": "Alle details vind je in ons <a href=\"/privacy.html\" target=\"_blank\">Privacybeleid</a>."},
         pageSubtitle: 'Een compleet, wetenschappelijk onderbouwd hulpmiddel dat aanpasbare factoren voor levensduur uitlicht.',
         topNote: 'Alleen voor educatieve doeleinden — <a href="#disclaimer">bekijk de belangrijke disclaimers</a>.',
         sections: {
@@ -6140,6 +6251,11 @@
         metaDescription: 'Ett heltäckande, vetenskapsbaserat verktyg som belyser påverkbara faktorer för livslängd.',
         languageLabel: 'Språk',
         pageTitle: 'Livslängdsinsikter Kalkylator',
+        languagePickerLabel: "Språkväljare",
+        learnMore: {"title": "Läs mer om livslängd", "howItWorks": "Så fungerar kalkylatorn", "exercise": "Forskning om motion och livslängd", "nutrition": "Forskning om kost och åldrande", "sleep": "Sömnforskning och livslängd", "results": "Förstå dina resultat"},
+        soothingStories: {"aria": "Soothing Stories", "title": "Kan du inte sova? Prova en lugnande berättelse.", "sub": "Från Soothing Stories på YouTube – lugnt lyssnande, inte medicinsk rådgivning.", "primary": "Marco Polo att somna till", "secondary": "William"},
+        leverCiteLabels: {"How this calculator works": "Så fungerar kalkylatorn", "Results guide": "Guide till resultaten", "Exercise & Longevity research summary": "Sammanfattning av forskning om motion och livslängd", "Nutrition & Aging research": "Forskning om kost och åldrande", "Sleep Science for Longevity": "Sömnforskning och livslängd"},
+        cookieConsent: {"title": "Vi värnar om din integritet", "description": "Vi använder cookies för att förbättra din upplevelse, mäta prestanda och visa relevanta annonser. Hantera dina val när som helst. Läs mer i vår <a href=\"/privacy.html\" target=\"_blank\">integritetspolicy</a>.", "acceptAll": "Acceptera alla", "rejectAll": "Avvisa alla", "managePreferences": "Hantera inställningar", "prefsTitle": "Cookie-inställningar", "savePreferences": "Spara inställningar", "close": "Stäng", "usageTitle": "Användning av cookies", "usageDescription": "Välj vilka kategorier av cookies du vill tillåta. Strikt nödvändiga cookies använder vi alltid för att hålla webbplatsen säker och fungerande.", "necessaryTitle": "Nödvändiga", "necessaryDescription": "Krävs för webbplatsens grundläggande funktioner och kan inte inaktiveras.", "analyticsTitle": "Analys (Google Analytics)", "analyticsDescription": "Hjälper oss att förstå trafiken på och användningen av webbplatsen för att förbättra upplevelsen.", "advertisingTitle": "Annonser (Google AdSense och Adsterra)", "advertisingDescription": "Används för att visa annonser och mäta hur de presterar. Dessa skript laddas inte om du inte accepterar annonscookies.", "moreTitle": "Läs mer", "moreDescription": "Du hittar alla detaljer i vår <a href=\"/privacy.html\" target=\"_blank\">integritetspolicy</a>."},
         pageSubtitle: 'Ett heltäckande, vetenskapsbaserat verktyg som belyser påverkbara faktorer för livslängd.',
         topNote: 'Endast för utbildningssyfte — <a href="#disclaimer">läs viktiga ansvarsfriskrivningar</a>.',
         sections: {
@@ -6554,6 +6670,29 @@
       sv: { yes: 'Ja', no: 'Nej' }
     };
 
+    // Keep social/OG tags in the page language (English page keeps its original static tags).
+    const socialMetaOriginals = {};
+    function updateSocialMeta(lang) {
+      const t = translations[lang] || translations.en;
+      const localized = lang !== 'en';
+      const title = `${t.pageTitle} | Longevity Modeler`;
+      const values = {
+        'meta[property="og:title"]': title,
+        'meta[property="og:description"]': t.metaDescription,
+        'meta[property="og:site_name"]': t.pageTitle,
+        'meta[property="og:image:alt"]': title,
+        'meta[name="twitter:title"]': title,
+        'meta[name="twitter:description"]': t.metaDescription,
+        'meta[name="twitter:image:alt"]': title
+      };
+      Object.keys(values).forEach((selector) => {
+        const node = document.querySelector(selector);
+        if (!node) return;
+        if (!(selector in socialMetaOriginals)) socialMetaOriginals[selector] = node.getAttribute('content');
+        node.setAttribute('content', localized && values[selector] ? values[selector] : socialMetaOriginals[selector]);
+      });
+    }
+
     function updateStaticText(lang) {
       const t = translations[lang];
       document.getElementById('pageTitle').textContent = t.pageTitle;
@@ -6562,6 +6701,8 @@
       document.getElementById('pageSubtitle').textContent = t.pageSubtitle;
       document.getElementById('topNote').innerHTML = t.topNote;
       document.getElementById('languageLabel').textContent = t.languageLabel;
+      document.getElementById('languagePicker').setAttribute('aria-label', t.languagePickerLabel || translations.en.languagePickerLabel);
+      updateSocialMeta(lang);
       document.documentElement.lang = lang;
 
       setText('sectionFirstScreen', t.sections.firstScreen || translations.en.sections.firstScreen);
@@ -6614,6 +6755,9 @@
       updateStaticText(currentLanguage);
       updateDisclaimers(currentLanguage);
       syncFirstScreenGate();
+      if (window.__cookieConsentStarted && window.CookieConsent && typeof CookieConsent.setLanguage === 'function') {
+        CookieConsent.setLanguage(currentLanguage, true);
+      }
       rebuildImpactGridIfVisible();
     }
 
@@ -6895,14 +7039,15 @@
         if (guide.cite) {
           const cite = document.createElement('p');
           cite.className = 'lever-cite';
+          const citeLabel = (t.leverCiteLabels && t.leverCiteLabels[guide.cite]) || guide.cite;
           cite.appendChild(document.createTextNode(t.leverSource || en.leverSource || 'Source: '));
           if (guide.href) {
             const link = document.createElement('a');
             link.href = guide.href;
-            link.textContent = guide.cite;
+            link.textContent = citeLabel;
             cite.appendChild(link);
           } else {
-            cite.appendChild(document.createTextNode(guide.cite));
+            cite.appendChild(document.createTextNode(citeLabel));
           }
           card.appendChild(cite);
         }
