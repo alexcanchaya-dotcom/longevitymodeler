@@ -1148,6 +1148,12 @@
           <p class="levers-note" id="leversNote">Ranked by how many years each change could add in this model (base: Irish life table for your age and sex). Educational only — not medical advice.</p>
           <div id="recommendationChips" class="lever-list"></div>
 
+          <div class="get-my-plan" id="getMyPlan" style="margin:16px 0;padding:14px;border:1px solid rgba(255,255,255,0.15);border-radius:10px;">
+            <button type="button" class="refine-text-button" id="getMyPlanButton">Get my plan</button>
+            <p id="getMyPlanNote" style="margin:6px 0 0;font-size:13px;">Free. No email, no account. Print it, save it, or email it to yourself.</p>
+            <div id="getMyPlanActions" hidden style="gap:12px;flex-wrap:wrap;margin-top:8px;"></div>
+          </div>
+
           <div class="habit-tools" id="habitTools" hidden>
             <h3 class="habit-tools-heading" id="habitToolsTitle">Habit tools</h3>
             <div class="habit-tools-cards" id="habitToolsCards"></div>
@@ -1543,6 +1549,7 @@
   </div>
     <!-- Load product database for affiliate recommendations -->
     <script src="products.js"></script>
+    <script src="plan.js" defer></script>
 
   <script>
     const supportedLanguages = ['en', 'es', 'pl', 'de', 'fr', 'zh', 'it', 'pt', 'ja', 'ko', 'ru', 'ar', 'hi', 'tr', 'nl', 'sv'];
