@@ -59,6 +59,7 @@ function loadTranslations() {
 
 const { sandbox: base } = runRoad100();
 const LIST = base.ROAD100_VIDEOS;
+const EMPTY = LIST.map((v) => ({ ...v, videoId: '' }));
 
 test("video list = Peter's real uploads (slug, title, page), in going-public order", () => {
   assert(LIST.length === EXPECTED.length, `expected ${EXPECTED.length} videos, got ${LIST.length}`);
@@ -69,8 +70,18 @@ test("video list = Peter's real uploads (slug, title, page), in going-public ord
     assert(!LIST.some((v) => v.slug === s), `pilot slug ${s} still listed`));
 });
 
-test('every videoId is empty (nothing public yet)', () => {
-  LIST.forEach((v) => assert(v.videoId === '', `${v.slug} has videoId ${v.videoId}`));
+test('only sauna-evidence is public (_0RhNKwx5FQ); the other two stay empty', () => {
+  LIST.forEach((v) => assert(v.videoId === (v.slug === 'sauna-evidence' ? '_0RhNKwx5FQ' : ''), `${v.slug} has videoId ${v.videoId}`));
+});
+
+test('shipped list renders exactly the sauna video, thumbnail only (no iframe before click)', () => {
+  const { els, sandbox } = runRoad100();
+  sandbox.Road100.render(STR, 'ltr');
+  assert(els.road100Section.hidden === false, 'section hidden');
+  assert(sandbox.Road100.publishedVideos('index').map((v) => v.slug).join() === 'sauna-evidence', 'published list');
+  assert(els.road100Videos.children.length === 1, `expected 1 video, got ${els.road100Videos.children.length}`);
+  const html = JSON.stringify(els.road100Videos.all ? els.road100Videos.all().map((e) => [e.tagName, e.src || '']) : []);
+  assert(!/IFRAME/.test(html), 'iframe before click');
 });
 
 test('slugs are unique, URL-safe, and every page has a known path', () => {
@@ -89,13 +100,13 @@ test('tracked link format per slug', () => {
 
 test('empty IDs: section stays hidden, no figure, no iframe, no thumbnail (all languages)', () => {
   LANGS.forEach((lang) => {
-    const { els, sandbox } = runRoad100();
+    const { els, sandbox } = runRoad100(EMPTY);
     sandbox.Road100.render(STR, lang === 'ar' ? 'rtl' : 'ltr');
     assert(els.road100Section.hidden === true, `${lang}: section shown`);
     assert(els.road100Videos.children.length === 0, `${lang}: videos rendered`);
     assert(sandbox.Road100.publishedVideos('index').length === 0, 'published list not empty');
   });
-  const { els, sandbox } = runRoad100(null, '?utm_source=youtube&utm_campaign=road100&utm_content=sauna-evidence');
+  const { els, sandbox } = runRoad100(EMPTY, '?utm_source=youtube&utm_campaign=road100&utm_content=sauna-evidence');
   sandbox.Road100.render(STR, 'ltr');
   assert(els.road100Section.hidden === true && els.road100Videos.children.length === 0, 'road100 visit rendered videos');
 });
