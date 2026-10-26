@@ -1029,6 +1029,36 @@
             margin: 0 auto;
         }
     }
+    /* Get my plan action links: light pills with dark text (WCAG AA on the dark-blue panel),
+       visible hover and keyboard focus. */
+    .get-my-plan-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #1a2340;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      border: 2px solid transparent;
+    }
+    .get-my-plan-link:visited { color: #1a2340; }
+    .get-my-plan-link:hover {
+      background: #c9d6ff;
+      color: #0f1730;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .get-my-plan-link:focus { outline: none; }
+    .get-my-plan-link:focus-visible {
+      outline: 3px solid #ffffff;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 5px #1a2340;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
     /* Road to 100 (YouTube) — see road100.js. Hidden unless a video has a real ID. */
     .road100-result-line {
       margin: 8px 0 4px;
