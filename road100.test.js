@@ -71,22 +71,22 @@ test("video list = Peter's real uploads (slug, title, page), in going-public ord
     assert(!LIST.some((v) => v.slug === s), `pilot slug ${s} still listed`));
 });
 
-test('sauna, habits-vs-calculator and can-you-reach-100 are public; life-expectancy stays empty', () => {
+test('all four Road to 100 videos are public with the shipped IDs', () => {
   const ids = {
     'sauna-evidence': '_0RhNKwx5FQ',
-    'life-expectancy-5-answers': '',
+    'life-expectancy-5-answers': '3YvJ7mwPwsk',
     'habits-vs-calculator': 'hj7Vo6Ch94c',
     'can-you-reach-100': 'iYO8zjWfphs'
   };
   LIST.forEach((v) => assert(v.videoId === ids[v.slug], `${v.slug} has videoId ${v.videoId}`));
 });
 
-test('shipped list renders three public videos, thumbnail only (no iframe before click)', () => {
+test('shipped list renders four public videos, thumbnail only (no iframe before click)', () => {
   const { els, sandbox } = runRoad100();
   sandbox.Road100.render(STR, 'ltr');
   assert(els.road100Section.hidden === false, 'section hidden');
-  assert(sandbox.Road100.publishedVideos('index').map((v) => v.slug).join() === 'sauna-evidence,habits-vs-calculator,can-you-reach-100', 'published list');
-  assert(els.road100Videos.children.length === 3, `expected 3 videos, got ${els.road100Videos.children.length}`);
+  assert(sandbox.Road100.publishedVideos('index').map((v) => v.slug).join() === 'sauna-evidence,life-expectancy-5-answers,habits-vs-calculator,can-you-reach-100', 'published list');
+  assert(els.road100Videos.children.length === 4, `expected 4 videos, got ${els.road100Videos.children.length}`);
   const html = JSON.stringify(els.road100Videos.all ? els.road100Videos.all().map((e) => [e.tagName, e.src || '']) : []);
   assert(!/IFRAME/.test(html), 'iframe before click');
 });
