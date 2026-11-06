@@ -9,7 +9,8 @@ const LANGS = ['en', 'es', 'pl', 'de', 'fr', 'zh', 'it', 'pt', 'ja', 'ko', 'ru',
 const EXPECTED = [
   { slug: 'sauna-evidence', title: 'Aiming for 100? What the Sauna Research Really Shows', page: 'index' },
   { slug: 'life-expectancy-5-answers', title: "I Checked My Life Expectancy in 60 Seconds. Here's What Moved It", page: 'index' },
-  { slug: 'habits-vs-calculator', title: 'Aiming for 100? The Habits That Matter vs What the Calculator Asks', page: 'index' }
+  { slug: 'habits-vs-calculator', title: 'Aiming for 100? The Habits That Matter vs What the Calculator Asks', page: 'index' },
+  { slug: 'can-you-reach-100', title: 'Can You Reach 100? What the Real Numbers Say', page: 'index' }
 ];
 const PAGE_PATH = { index: '/' };
 let passed = 0;
@@ -66,20 +67,26 @@ test("video list = Peter's real uploads (slug, title, page), in going-public ord
   EXPECTED.forEach((e, i) => {
     ['slug', 'title', 'page'].forEach((k) => assert(LIST[i][k] === e[k], `video ${i + 1} ${k}: ${LIST[i][k]}`));
   });
-  ['what-moved-my-number', 'can-you-reach-100', 'joke-quizzes-vs-real'].forEach((s) =>
+  ['what-moved-my-number', 'joke-quizzes-vs-real'].forEach((s) =>
     assert(!LIST.some((v) => v.slug === s), `pilot slug ${s} still listed`));
 });
 
-test('only sauna-evidence is public (_0RhNKwx5FQ); the other two stay empty', () => {
-  LIST.forEach((v) => assert(v.videoId === (v.slug === 'sauna-evidence' ? '_0RhNKwx5FQ' : ''), `${v.slug} has videoId ${v.videoId}`));
+test('sauna, habits-vs-calculator and can-you-reach-100 are public; life-expectancy stays empty', () => {
+  const ids = {
+    'sauna-evidence': '_0RhNKwx5FQ',
+    'life-expectancy-5-answers': '',
+    'habits-vs-calculator': 'hj7Vo6Ch94c',
+    'can-you-reach-100': 'iYO8zjWfphs'
+  };
+  LIST.forEach((v) => assert(v.videoId === ids[v.slug], `${v.slug} has videoId ${v.videoId}`));
 });
 
-test('shipped list renders exactly the sauna video, thumbnail only (no iframe before click)', () => {
+test('shipped list renders three public videos, thumbnail only (no iframe before click)', () => {
   const { els, sandbox } = runRoad100();
   sandbox.Road100.render(STR, 'ltr');
   assert(els.road100Section.hidden === false, 'section hidden');
-  assert(sandbox.Road100.publishedVideos('index').map((v) => v.slug).join() === 'sauna-evidence', 'published list');
-  assert(els.road100Videos.children.length === 1, `expected 1 video, got ${els.road100Videos.children.length}`);
+  assert(sandbox.Road100.publishedVideos('index').map((v) => v.slug).join() === 'sauna-evidence,habits-vs-calculator,can-you-reach-100', 'published list');
+  assert(els.road100Videos.children.length === 3, `expected 3 videos, got ${els.road100Videos.children.length}`);
   const html = JSON.stringify(els.road100Videos.all ? els.road100Videos.all().map((e) => [e.tagName, e.src || '']) : []);
   assert(!/IFRAME/.test(html), 'iframe before click');
 });
@@ -112,7 +119,7 @@ test('empty IDs: section stays hidden, no figure, no iframe, no thumbnail (all l
 });
 
 test('invalid IDs (wrong length/characters) still render nothing', () => {
-  const vids = EXPECTED.map((e, i) => ({ ...e, videoId: ['abc', 'has space!!', '_0RhNKwx5FQ_extra'][i] }));
+  const vids = EXPECTED.map((e, i) => ({ ...e, videoId: ['abc', 'has space!!', '_0RhNKwx5FQ_extra', 'short'][i] }));
   const { els } = runRoad100(vids);
   assert(els.road100Section.hidden === true && els.road100Videos.children.length === 0, 'invalid ID rendered');
 });
