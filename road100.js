@@ -15,7 +15,7 @@
  */
 window.ROAD100_VIDEOS = [
   { slug: 'sauna-evidence', title: 'Aiming for 100? What the Sauna Research Really Shows', videoId: '_0RhNKwx5FQ', page: 'index' },
-  { slug: 'life-expectancy-5-answers', title: "I Checked My Life Expectancy in 60 Seconds. Here's What Moved It", videoId: '', page: 'index' },
+  { slug: 'life-expectancy-5-answers', title: "I Checked My Life Expectancy in 60 Seconds. Here's What Moved It", videoId: '3YvJ7mwPwsk', page: 'index' },
   { slug: 'habits-vs-calculator', title: 'Aiming for 100? The Habits That Matter vs What the Calculator Asks', videoId: 'hj7Vo6Ch94c', page: 'index' },
   { slug: 'can-you-reach-100', title: 'Can You Reach 100? What the Real Numbers Say', videoId: 'iYO8zjWfphs', page: 'index' }
 ];
